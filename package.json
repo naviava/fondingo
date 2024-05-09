@@ -10,8 +10,11 @@
   "devDependencies": {
     "@fondingo/eslint-config": "workspace:*",
     "@fondingo/typescript-config": "workspace:*",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.14",
+    "tailwindcss": "^3.4.3",
     "turbo": "latest"
   },
   "packageManager": "pnpm@9.1.0",
