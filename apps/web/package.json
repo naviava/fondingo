@@ -17,7 +17,6 @@
   "devDependencies": {
     "@fondingo/eslint-config": "workspace:*",
     "@fondingo/typescript-config": "workspace:*",
-    "@fondingo/tailwind-config": "workspace:*",
     "@next/eslint-plugin-next": "^14.1.1",
     "@types/eslint": "^8.56.5",
     "@types/node": "^20.11.24",
