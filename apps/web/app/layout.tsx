@@ -2,7 +2,7 @@ import "@fondingo/ui/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
+const font = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Turborepo",
@@ -16,7 +16,7 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={font.className}>{children}</body>
     </html>
   );
 }
