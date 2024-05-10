@@ -18,7 +18,11 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="en">
-      <body className={cn("antialiased", font.className)}>{children}</body>
+      <body
+        className={cn("bg-slate-900 text-white antialiased", font.className)}
+      >
+        {children}
+      </body>
     </html>
   );
 }

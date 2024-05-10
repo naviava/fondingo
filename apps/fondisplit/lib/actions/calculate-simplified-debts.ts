@@ -22,6 +22,11 @@ export async function calculateSimplifiedDebts(
   groupId: string,
 ): Promise<{ message: string } | void> {
   try {
+    // Delete exiisting simplified debts for the group
+    await prisma.simplifiedDebt.deleteMany({
+      where: { groupId },
+    });
+
     // Calculate net balances.
     const payments = await splitdb.expensePayment.findMany({
       where: {
@@ -42,7 +47,7 @@ export async function calculateSimplifiedDebts(
       const amount = payment.amount;
 
       if (!balances[paidBy]) balances[paidBy] = 0;
-      balances[paidBy] -= amount;
+      balances[paidBy] += amount;
     }
 
     for (const split of splits) {
@@ -50,7 +55,7 @@ export async function calculateSimplifiedDebts(
       const amount = split.amount;
 
       if (!balances[owes]) balances[owes] = 0;
-      balances[owes] += amount;
+      balances[owes] -= amount;
     }
 
     // Simplify debts
