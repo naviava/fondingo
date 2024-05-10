@@ -12,3 +12,98 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  phone          String        @unique
+  firstName      String
+  middleName     String?
+  lastName       String
+  hashedPassword String?
+  role           Role          @default(USER)
+  disabled       Boolean       @default(false)
+  groups         GroupMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Group {
+  id              String           @id @default(cuid())
+  name            String
+  groupMembers    GroupMember[]
+  expenses        Expense[]
+  simplifiedDebts SimplifiedDebt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GroupMember {
+  id                 String           @id @default(cuid())
+  name               String?
+  role               GroupRole        @default(MEMBER)
+  userId             String?
+  user               User?            @relation(fields: [userId], references: [id])
+  groupId            String
+  group              Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  expensePayments    ExpensePayment[]
+  expenseSplits      ExpenseSplit[]
+  simplifiedDebtFrom SimplifiedDebt[] @relation("DebtFromUser")
+  simplifiedDebtTo   SimplifiedDebt[] @relation("DebtToUser")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Expense {
+  id              String           @id @default(cuid())
+  amount          Int
+  groupId         String
+  group           Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  expensePayments ExpensePayment[]
+  expenseSplits   ExpenseSplit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExpensePayment {
+  id            String      @id @default(cuid())
+  amount        Int
+  expenseId     String
+  expense       Expense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  groupMemberId String
+  groupMember   GroupMember @relation(fields: [groupMemberId], references: [id], onDelete: Restrict)
+}
+
+model ExpenseSplit {
+  id            String      @id @default(cuid())
+  amount        Int
+  expenseId     String
+  expense       Expense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  groupMemberId String
+  groupMember   GroupMember @relation(fields: [groupMemberId], references: [id], onDelete: Restrict)
+}
+
+model SimplifiedDebt {
+  id      String      @id @default(cuid())
+  amount  Int
+  groupId String
+  group   Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromId  String
+  from    GroupMember @relation("DebtFromUser", fields: [fromId], references: [id], onDelete: Restrict)
+  toId    String
+  to      GroupMember @relation("DebtToUser", fields: [toId], references: [id], onDelete: Restrict)
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum GroupRole {
+  MANAGER
+  MEMBER
+}
