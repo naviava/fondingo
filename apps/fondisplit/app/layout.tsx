@@ -1,10 +1,10 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Montserrat } from "next/font/google";
 
 import { cn } from "@fondingo/ui/utils";
 
-const font = Inter({ subsets: ["latin"] });
+const font = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Fondisplit",
@@ -18,11 +18,7 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="en">
-      <body
-        className={cn("bg-slate-900 text-white antialiased", font.className)}
-      >
-        {children}
-      </body>
+      <body className={cn("antialiased", font.className)}>{children}</body>
     </html>
   );
 }
