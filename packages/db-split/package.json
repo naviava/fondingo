@@ -1,0 +1,21 @@
+{
+  "name": "@fondingo/db-split",
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.13.0"
+  },
+  "devDependencies": {
+    "@fondingo/eslint-config": "workspace:*",
+    "@fondingo/typescript-config": "workspace:*",
+    "prisma": "^5.13.0"
+  }
+}
