@@ -1,7 +1,9 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
+import { Button } from "@fondingo/ui/button";
+import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();
@@ -10,10 +12,13 @@ export default function Page() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-y-4">
       Landing Page
+      <Button asChild variant="outline">
+        <Link href="/groups">Groups page</Link>
+      </Button>
       {!session.data?.user ? (
-        <button onClick={() => router.push("/api/auth/signin")}>Sign In</button>
+        <Button onClick={() => router.push("/api/auth/signin")}>Sign In</Button>
       ) : (
-        <button onClick={() => signOut()}>Sign out</button>
+        <Button onClick={() => signOut()}>Sign out</Button>
       )}
     </div>
   );
