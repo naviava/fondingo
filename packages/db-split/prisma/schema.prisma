@@ -13,16 +13,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id                String  @id @default(cuid())
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  userId            String  @map("user_id")
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  expires      DateTime
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
-  phone          String        @unique
-  firstName      String
+  phone          String?       @unique
+  name           String?
+  firstName      String?
   middleName     String?
-  lastName       String
+  lastName       String?
   hashedPassword String?
+  image          String?
   role           Role          @default(USER)
   disabled       Boolean       @default(false)
+  emailVerified  DateTime?     @map("email_verified")
+  accounts       Account[]
+  sessions       Session[]
   groups         GroupMember[]
 
   createdAt DateTime @default(now())
