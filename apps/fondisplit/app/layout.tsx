@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 
 import { getServerSession } from "next-auth";
-import SessionProvider from "~/components/providers/session-provider";
-
 import { cn } from "@fondingo/ui/utils";
 import { authOptions } from "~/lib/auth";
+
+import { Providers } from "~/components/providers";
+import SessionProvider from "~/components/providers/session-provider";
 
 const font = Montserrat({ subsets: ["latin"] });
 
@@ -26,7 +27,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={cn("antialiased", font.className)}>
         <SessionProvider session={session}>
-          <main className="h-full bg-black/20">{children}</main>
+          <Providers>
+            <main className="h-full bg-black/20">{children}</main>
+          </Providers>
         </SessionProvider>
       </body>
     </html>
