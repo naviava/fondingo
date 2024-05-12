@@ -1,7 +1,38 @@
 "use server";
 
-import prisma from "@fondingo/db-split";
 import splitdb from "@fondingo/db-split";
+
+/**
+ * Creates a new group with the given name and the creator as a member with role "MANAGER".
+ *
+ * @async
+ * @param {string} creatorId - The ID of the creator.
+ * @param {string} name - The name of the group.
+ * @returns {Promise<string>} The ID of the newly created group.
+ * @throws {Error} When the group creation fails.
+ */
+export async function createGroup(
+  creatorId: string,
+  name: string,
+): Promise<string> {
+  try {
+    const group = await splitdb.group.create({
+      data: {
+        name,
+        groupMembers: {
+          create: {
+            name: creatorId,
+            role: "MANAGER",
+          },
+        },
+      },
+    });
+    return group.id;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Failed to create group");
+  }
+}
 
 /**
  * Calculates and stores simplified debts for all users in a specific group.
@@ -23,7 +54,7 @@ export async function calculateSimplifiedDebts(
 ): Promise<{ message: string } | void> {
   try {
     // Delete exiisting simplified debts for the group
-    await prisma.simplifiedDebt.deleteMany({
+    await splitdb.simplifiedDebt.deleteMany({
       where: { groupId },
     });
 
@@ -88,7 +119,7 @@ export async function calculateSimplifiedDebts(
 
     // Store simplified debts in the database
     for (const debt of debts) {
-      await prisma.simplifiedDebt.create({
+      await splitdb.simplifiedDebt.create({
         data: {
           fromId: debt.from,
           toId: debt.to,

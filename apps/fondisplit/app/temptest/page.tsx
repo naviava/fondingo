@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { createGroup } from "~/lib/actions";
+import { createGroup } from "~/server/actions/group";
 
 export default function Page() {
   const router = useRouter();

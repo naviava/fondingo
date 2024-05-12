@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { calculateSimplifiedDebts } from "~/lib/actions";
+import { calculateSimplifiedDebts } from "~/server/actions/group";
 
 export function SimplifyDebtsWidget() {
   const router = useRouter();
