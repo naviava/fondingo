@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { z } from "@fondingo/utils/zod";
 import { Button } from "@fondingo/ui/button";
 
 export default function CreateGroupPage() {

@@ -1,7 +1,8 @@
+import Link from "next/link";
+
 import { Button } from "@fondingo/ui/button";
 import { SearchBar } from "~/components/search-bar";
 import { GroupsPanel } from "~/components/groups-panel";
-import Link from "next/link";
 
 export default function GroupsPage() {
   return (

@@ -13,6 +13,7 @@
     "@fondingo/db-split": "workspace:*",
     "@fondingo/ui": "workspace:*",
     "@fondingo/utils": "workspace:*",
+    "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.35.5",
     "@trpc/client": "11.0.0-rc.366",
     "@trpc/react-query": "11.0.0-rc.366",
@@ -23,6 +24,7 @@
     "nextjs-toploader": "^1.6.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.51.4",
     "react-icons": "^5.2.1",
     "tailwindcss-animate": "^1.0.7"
   },

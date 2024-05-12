@@ -41,6 +41,9 @@ importers:
       '@fondingo/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      '@hookform/resolvers':
+        specifier: ^3.3.4
+        version: 3.3.4(react-hook-form@7.51.4(react@18.2.0))
       '@tanstack/react-query':
         specifier: ^5.35.5
         version: 5.35.5(react@18.2.0)
@@ -71,6 +74,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-hook-form:
+        specifier: ^7.51.4
+        version: 7.51.4(react@18.2.0)
       react-icons:
         specifier: ^5.2.1
         version: 5.2.1(react@18.2.0)
@@ -162,9 +168,6 @@ importers:
 
   packages/ui:
     dependencies:
-      '@hookform/resolvers':
-        specifier: ^3.3.4
-        version: 3.3.4(react-hook-form@7.51.4(react@18.2.0))
       '@radix-ui/react-label':
         specifier: ^2.0.2
         version: 2.0.2(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -180,9 +183,6 @@ importers:
       lucide-react:
         specifier: ^0.378.0
         version: 0.378.0(react@18.2.0)
-      react-hook-form:
-        specifier: ^7.51.4
-        version: 7.51.4(react@18.2.0)
       tailwind-merge:
         specifier: ^2.3.0
         version: 2.3.0
