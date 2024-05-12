@@ -2,8 +2,21 @@
 
 import splitdb, { GroupType } from "@fondingo/db-split";
 import { privateProcedure } from "~/server/trpc";
+import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 
+/**
+ * Creates a new group with the provided details.
+ *
+ * @function
+ * @param {Object} ctx - The context object containing the user information.
+ * @param {Object} input - The input object containing the group details.
+ * @param {string} input.groupName - The name of the group.
+ * @param {string} input.color - The color associated with the group.
+ * @param {GroupType} input.type - The type of the group.
+ * @returns {Promise<Object>} A promise that resolves to an object containing the new group's ID, a toast title, and a toast description.
+ * @throws {TRPCError} Will throw an error if the group creation fails.
+ */
 export const createGroup = privateProcedure
   .input(
     z.object({
@@ -33,11 +46,74 @@ export const createGroup = privateProcedure
       },
     });
 
+    if (!group)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to create group. Try again later.",
+      });
+
     return {
       groupId: group.id,
       toastTitle: `${group.name} created.`,
       toastDescription: "You can now invite members to the group.",
     };
+  });
+
+/**
+ * Retrieves all groups that the current user is a member of.
+ *
+ * @function
+ * @param {Object} ctx - The context object containing the user information.
+ * @returns {Promise<Array>} A promise that resolves to an array of group objects.
+ * @throws Will throw an error if the database query fails.
+ */
+export const getGroups = privateProcedure.query(async ({ ctx }) => {
+  const { user } = ctx;
+  const groups = await splitdb.group.findMany({
+    where: {
+      members: {
+        some: { userId: user.id },
+      },
+    },
+  });
+  return groups || [];
+});
+
+/**
+ * Retrieves a group by its ID. The group must include the current user as a member.
+ *
+ * @function
+ * @param {Object} ctx - The context object containing the user information.
+ * @param {string} groupId - The ID of the group to retrieve. This ID must be a non-empty string.
+ * @returns {Promise<Object>} A promise that resolves to the group object. The group object includes its simplified debts and the associated users (both the 'from' and 'to' users).
+ * @throws {TRPCError} Will throw a TRPCError with code "NOT_FOUND" and message "Group not found" if no group with the provided ID exists or if the current user is not a member of the group.
+ */
+export const getGroupById = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .query(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+      include: {
+        simplifiedDebts: {
+          include: {
+            from: true,
+            to: true,
+          },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+    return group;
   });
 
 /**

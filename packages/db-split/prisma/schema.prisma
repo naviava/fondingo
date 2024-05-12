@@ -103,12 +103,12 @@ model GroupMember {
 }
 
 model Expense {
-  id              String           @id @default(cuid())
-  amount          Int
-  groupId         String
-  group           Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  expensePayments ExpensePayment[]
-  expenseSplits   ExpenseSplit[]
+  id       String           @id @default(cuid())
+  amount   Int
+  groupId  String
+  group    Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  payments ExpensePayment[]
+  splits   ExpenseSplit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
