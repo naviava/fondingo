@@ -2,9 +2,14 @@
   "name": "@fondingo/utils",
   "version": "0.0.0",
   "exports": {
-    "./hooks": "./src/hooks.ts"
+    "./hooks": "./src/hooks.ts",
+    "./uuid": "./src/uuid.ts"
   },
   "dependencies": {
-    "usehooks-ts": "^3.1.0"
+    "usehooks-ts": "^3.1.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.8"
   }
 }
