@@ -1,24 +1,27 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { z } from "@fondingo/utils/zod";
-import { useForm } from "react-hook-form";
-import { uuid } from "@fondingo/utils/uuid";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { uuid } from "@fondingo/utils/uuid";
+import { useForm } from "react-hook-form";
+import { z } from "@fondingo/utils/zod";
 
-import { FaRegListAlt } from "react-icons/fa";
-import { IoHomeOutline } from "react-icons/io5";
-import { IoMdHeartEmpty } from "react-icons/io";
 import { IoAirplaneOutline } from "react-icons/io5";
+import { IoMdHeartEmpty } from "react-icons/io";
+import { IoHomeOutline } from "react-icons/io5";
+import { FaRegListAlt } from "react-icons/fa";
+import { Loader } from "@fondingo/ui/lucide";
 
-import { TGroupType } from "~/types";
 import { GroupType } from "@fondingo/db-split";
+import { TGroupType } from "~/types";
 
 import { GroupTypeOptions } from "~/components/create-group/group-type-options";
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { ColorPicker } from "~/components/color-picker";
+import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 import {
@@ -27,19 +30,25 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@fondingo/ui/form";
 
+import { trpc } from "~/lib/trpc/client";
+
 const formSchema = z.object({
-  name: z
+  groupName: z
     .string()
     .min(1, { message: "Group name cannot be empty" })
     .max(50, { message: "Group name cannot be longer than 50 characters" }),
+  color: z.string().min(1, { message: "Color cannot be empty" }),
   type: z.nativeEnum(GroupType),
 });
 
 export default function CreateGroupPage() {
+  const router = useRouter();
+  const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [color, setColor] = useState("#00968a");
   const [selectedGroupType, setSelectedGroupType] = useState<TGroupType>(
     GroupType.TRIP,
   );
@@ -47,7 +56,8 @@ export default function CreateGroupPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      groupName: "",
+      color,
       type: GroupType.TRIP,
     },
   });
@@ -83,6 +93,14 @@ export default function CreateGroupPage() {
     [],
   );
 
+  const handleColorChange = useCallback(
+    (value: string) => {
+      setColor(value);
+      form.setValue("color", value);
+    },
+    [form],
+  );
+
   const handleGroupTypeClick = useCallback(
     (value: TGroupType) => {
       setSelectedGroupType(value);
@@ -91,35 +109,54 @@ export default function CreateGroupPage() {
     [form],
   );
 
+  const { mutate: handleCreateGroup, isPending } =
+    trpc.group.createGroup.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong.",
+          description: message,
+        }),
+      onSuccess: ({ groupId, toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        form.reset();
+        router.push(`/groups/${groupId}`);
+      },
+    });
+
   const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    handleCreateGroup(values);
   }, []);
 
   return (
     <>
-      <div className="flex items-center justify-between pt-4">
-        <Button asChild variant="splitGhost">
+      <div className="flex items-center justify-between px-2 pt-4">
+        <Button asChild variant="splitGhost" disabled={isPending}>
           <Link href="/groups">Cancel</Link>
         </Button>
         <h1 className="text-lg font-semibold">Create a group</h1>
         <Button
           variant="splitGhost"
+          disabled={isPending}
+          className="w-20"
           onClick={() => {
             if (submitButtonRef.current) {
               submitButtonRef.current.click();
             }
           }}
         >
-          Done
+          {isPending ? <Loader className="h-6 w-6 animate-spin" /> : "Done"}
         </Button>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="my-10 flex items-center gap-x-4 px-4">
-            <ColorPicker />
+            <ColorPicker color={color} handleColorChange={handleColorChange} />
             <FormField
               control={form.control}
-              name="name"
+              name="groupName"
               // @ts-ignore
               render={({ field }) => (
                 <FormItem className="w-full px-2">
@@ -128,11 +165,11 @@ export default function CreateGroupPage() {
                     <Input
                       autoComplete="off"
                       placeholder="NYC Trip"
+                      disabled={isPending}
                       {...field}
                       className="focus-visible:border-b-cta h-6 rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70"
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />

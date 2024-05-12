@@ -1,4 +1,8 @@
+"use client";
+
+import { memo } from "react";
 import { cn } from "@fondingo/ui/utils";
+
 import { IconType } from "react-icons";
 import { TGroupType } from "~/types";
 
@@ -8,10 +12,12 @@ interface IProps {
   customClasses?: string;
   isSelected: boolean;
   icon: IconType;
+  /* eslint-disable no-unused-vars */
   onClick: (value: TGroupType) => void;
 }
 
-export function GroupTypeOptions({
+export const GroupTypeOptions = memo(_GroupTypeOptions);
+function _GroupTypeOptions({
   label,
   value,
   customClasses,

@@ -1,38 +1,44 @@
 "use server";
 
-import splitdb from "@fondingo/db-split";
+import splitdb, { GroupType } from "@fondingo/db-split";
+import { privateProcedure } from "~/server/trpc";
+import { z } from "@fondingo/utils/zod";
 
-/**
- * Creates a new group with the given name and the creator as a member with role "MANAGER".
- *
- * @async
- * @param {string} creatorId - The ID of the creator.
- * @param {string} name - The name of the group.
- * @returns {Promise<string>} The ID of the newly created group.
- * @throws {Error} When the group creation fails.
- */
-export async function createGroup(
-  creatorId: string,
-  name: string,
-): Promise<string> {
-  try {
+export const createGroup = privateProcedure
+  .input(
+    z.object({
+      groupName: z
+        .string()
+        .min(1, { message: "Group name cannot be empty" })
+        .max(50, { message: "Group name cannot be longer than 50 characters" }),
+      color: z.string().min(1, { message: "Color cannot be empty" }),
+      type: z.nativeEnum(GroupType),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupName, color, type } = input;
+
     const group = await splitdb.group.create({
       data: {
-        name,
-        groupMembers: {
+        name: groupName,
+        color,
+        type,
+        members: {
           create: {
-            name: creatorId,
+            userId: user.id,
             role: "MANAGER",
           },
         },
       },
     });
-    return group.id;
-  } catch (err) {
-    console.error(err);
-    throw new Error("Failed to create group");
-  }
-}
+
+    return {
+      groupId: group.id,
+      toastTitle: `${group.name} created.`,
+      toastDescription: "You can now invite members to the group.",
+    };
+  });
 
 /**
  * Calculates and stores simplified debts for all users in a specific group.

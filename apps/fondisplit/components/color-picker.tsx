@@ -1,14 +1,18 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { CirclePicker } from "react-color";
 
-interface IProps {}
+interface IProps {
+  color: string;
+  /* eslint-disable no-unused-vars */
+  handleColorChange: (value: string) => void;
+}
 
-export function ColorPicker({}: IProps) {
+export const ColorPicker = memo(_ColorPicker);
+function _ColorPicker({ color, handleColorChange }: IProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [color, setColor] = useState("#00968a");
 
   return (
     <div
@@ -31,7 +35,7 @@ export function ColorPicker({}: IProps) {
         >
           <CirclePicker
             color={color}
-            onChangeComplete={(color) => setColor(color.hex)}
+            onChangeComplete={(color) => handleColorChange(color.hex)}
           />
         </div>
       )}

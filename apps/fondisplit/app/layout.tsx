@@ -10,6 +10,7 @@ import { authOptions } from "~/lib/auth";
 
 import { Providers } from "~/components/providers";
 import SessionProvider from "~/components/providers/session-provider";
+import { Toaster } from "@fondingo/ui/toaster";
 
 const font = Montserrat({ subsets: ["latin"] });
 
@@ -32,6 +33,7 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <Providers>
             <main className="h-full bg-black/20">{children}</main>
+            <Toaster />
           </Providers>
         </SessionProvider>
       </body>
