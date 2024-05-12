@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Plus } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 import { v4 as uuid } from "@fondingo/utils/uuid";
 

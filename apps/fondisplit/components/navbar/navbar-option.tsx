@@ -2,6 +2,7 @@
 
 import { memo } from "react";
 import { IconType } from "react-icons";
+import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   label: string;
@@ -26,7 +27,14 @@ function _NavbarOption({
         ) : (
           <InactiveIcon className="h-6 w-6" />
         )}
-        <span className="text-sm md:text-base">{label}</span>
+        <span
+          className={cn(
+            "text-sm font-medium md:text-base",
+            isActive && "text-cta font-semibold",
+          )}
+        >
+          {label}
+        </span>
       </div>
     );
   }
@@ -34,11 +42,18 @@ function _NavbarOption({
   return (
     <div className="flex flex-col items-center gap-y-1">
       {isActive ? (
-        <ActiveIcon className="h-6 w-6" />
+        <ActiveIcon className="text-cta h-6 w-6" />
       ) : (
         <InactiveIcon className="h-6 w-6" />
       )}
-      <span className="text-sm md:text-base">{label}</span>
+      <span
+        className={cn(
+          "text-sm font-medium md:text-base",
+          isActive && "text-cta font-semibold",
+        )}
+      >
+        {label}
+      </span>
     </div>
   );
 }

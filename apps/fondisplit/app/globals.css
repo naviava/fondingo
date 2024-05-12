@@ -86,4 +86,7 @@ body,
       "rlig" 1,
       "calt" 1;
   }
+  cta-gradient {
+    @apply from-cta bg-gradient-to-tr to-[#186E60];
+  }
 }
