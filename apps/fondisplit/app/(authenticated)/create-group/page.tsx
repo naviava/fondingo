@@ -1,5 +1,5 @@
-import { Button } from "@fondingo/ui/button";
 import Link from "next/link";
+import { Button } from "@fondingo/ui/button";
 
 export default function CreateGroupPage() {
   return (
