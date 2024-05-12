@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { Button } from "@fondingo/ui/button";
-import { v4 as uuid } from "@fondingo/utils/uuid";
+import { uuid } from "@fondingo/utils/uuid";
 
 import {
   RiUser3Line,

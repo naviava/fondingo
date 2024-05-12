@@ -7,7 +7,10 @@
     "./lucide": "./src/lib/lucide.ts",
     "./react-icons": "./src/lib/react-icons.ts",
     "./button": "./src/shadcn/button.tsx",
-    "./input": "./src/shadcn/input.tsx"
+    "./input": "./src/shadcn/input.tsx",
+    "./label": "./src/shadcn/label.tsx",
+    "./form": "./src/shadcn/form.tsx",
+    "./scroll-area": "./src/shadcn/scroll-area.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -27,6 +30,7 @@
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

@@ -27,7 +27,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn("antialiased", font.className)}>
+      <body className={cn("text-neutral-700 antialiased", font.className)}>
         <NextTopLoader />
         <SessionProvider session={session}>
           <Providers>
