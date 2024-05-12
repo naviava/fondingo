@@ -25,11 +25,11 @@ function _NavbarOption({
         {isActive ? (
           <ActiveIcon className="h-6 w-6" />
         ) : (
-          <InactiveIcon className="h-6 w-6" />
+          <InactiveIcon className="h-6 w-6 text-neutral-600" />
         )}
         <span
           className={cn(
-            "text-sm font-medium md:text-base",
+            "text-sm font-medium text-neutral-600 md:text-base",
             isActive && "text-cta font-semibold",
           )}
         >
@@ -44,11 +44,11 @@ function _NavbarOption({
       {isActive ? (
         <ActiveIcon className="text-cta h-6 w-6" />
       ) : (
-        <InactiveIcon className="h-6 w-6" />
+        <InactiveIcon className="h-6 w-6 text-neutral-600" />
       )}
       <span
         className={cn(
-          "text-sm font-medium md:text-base",
+          "text-sm font-medium text-neutral-600 md:text-base",
           isActive && "text-cta font-semibold",
         )}
       >

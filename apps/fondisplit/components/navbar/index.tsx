@@ -77,7 +77,7 @@ export function Navbar() {
         </Link>
       ))}
       <Button variant="splitCta" className="aspect-square h-full px-3">
-        <span className="text-[48px] font-medium">+</span>
+        <span className="text-[60px] font-light">+</span>
       </Button>
       {optionsRight.map((option) => (
         <Link key={option.id} href={option.href}>
