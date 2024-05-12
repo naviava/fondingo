@@ -75,6 +75,7 @@ model User {
 model Group {
   id              String           @id @default(cuid())
   name            String
+  type            GroupType
   groupMembers    GroupMember[]
   expenses        Expense[]
   simplifiedDebts SimplifiedDebt[]
@@ -149,4 +150,11 @@ enum Role {
 enum GroupRole {
   MANAGER
   MEMBER
+}
+
+enum GroupType {
+  TRIP
+  HOME
+  COUPLE
+  OTHER
 }
