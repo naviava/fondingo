@@ -13,11 +13,12 @@ import { IoHomeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoAirplaneOutline } from "react-icons/io5";
 
-import { GroupTypeT } from "~/types";
+import { TGroupType } from "~/types";
 import { GroupType } from "@fondingo/db-split";
 
-import { GroupTypeOptions } from "~/components/group-type-options";
+import { GroupTypeOptions } from "~/components/create-group/group-type-options";
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
+import { ColorPicker } from "~/components/color-picker";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 import {
@@ -39,7 +40,7 @@ const formSchema = z.object({
 
 export default function CreateGroupPage() {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const [selectedGroupType, setSelectedGroupType] = useState<GroupTypeT>(
+  const [selectedGroupType, setSelectedGroupType] = useState<TGroupType>(
     GroupType.TRIP,
   );
 
@@ -83,7 +84,7 @@ export default function CreateGroupPage() {
   );
 
   const handleGroupTypeClick = useCallback(
-    (value: GroupTypeT) => {
+    (value: TGroupType) => {
       setSelectedGroupType(value);
       form.setValue("type", value);
     },
@@ -114,13 +115,14 @@ export default function CreateGroupPage() {
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="my-10 px-4">
+          <div className="my-10 flex items-center gap-x-4 px-4">
+            <ColorPicker />
             <FormField
               control={form.control}
               name="name"
               // @ts-ignore
               render={({ field }) => (
-                <FormItem className="px-2">
+                <FormItem className="w-full px-2">
                   <FormLabel className="font-bold">Group name</FormLabel>
                   <FormControl>
                     <Input

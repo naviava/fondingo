@@ -1,14 +1,14 @@
 import { cn } from "@fondingo/ui/utils";
 import { IconType } from "react-icons";
-import { GroupTypeT } from "~/types";
+import { TGroupType } from "~/types";
 
 interface IProps {
   label: string;
-  value: "TRIP" | "HOME" | "COUPLE" | "OTHER";
+  value: TGroupType;
   customClasses?: string;
   isSelected: boolean;
   icon: IconType;
-  onClick: (value: GroupTypeT) => void;
+  onClick: (value: TGroupType) => void;
 }
 
 export function GroupTypeOptions({

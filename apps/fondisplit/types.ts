@@ -1,1 +1,1 @@
-export type GroupTypeT = "TRIP" | "HOME" | "COUPLE" | "OTHER";
+export type TGroupType = "TRIP" | "HOME" | "COUPLE" | "OTHER";
