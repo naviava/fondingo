@@ -4,6 +4,7 @@ import { Search } from "@fondingo/ui/lucide";
 
 export function SearchBar() {
   return (
+    // TODO: Add click handler
     <div
       role="button"
       className="flex w-[250px] cursor-pointer items-center gap-x-2 rounded-full border border-neutral-300 px-3 py-1 text-neutral-400"
