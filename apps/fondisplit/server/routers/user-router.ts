@@ -1,7 +1,13 @@
 import { router } from "~/server/trpc";
 
-import { getAuthProfile } from "../actions/user";
+import {
+  declineFriendRequest,
+  sendFriendRequest,
+  getAuthProfile,
+} from "../actions/user";
 
 export const userRouter = router({
   getAuthProfile,
+  sendFriendRequest,
+  declineFriendRequest,
 });

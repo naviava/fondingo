@@ -52,22 +52,24 @@ model VerificationToken {
 }
 
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  phone          String?       @unique
-  name           String?
-  firstName      String?
-  middleName     String?
-  lastName       String?
-  hashedPassword String?
-  image          String?
-  role           Role          @default(USER)
-  disabled       Boolean       @default(false)
-  emailVerified  DateTime?     @map("email_verified")
-  accounts       Account[]
-  sessions       Session[]
-  groups         GroupMember[]
-  friends        Friend[]
+  id                     String          @id @default(cuid())
+  email                  String          @unique
+  phone                  String?         @unique
+  name                   String?
+  firstName              String?
+  middleName             String?
+  lastName               String?
+  hashedPassword         String?
+  image                  String?
+  role                   Role            @default(USER)
+  disabled               Boolean         @default(false)
+  emailVerified          DateTime?       @map("email_verified")
+  accounts               Account[]
+  sessions               Session[]
+  groups                 GroupMember[]
+  friends                Friend[]
+  friendRequestsSent     FriendRequest[] @relation("FriendRequestFrom")
+  friendRequestsReceived FriendRequest[] @relation("FriendRequestTo")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,6 +87,19 @@ model Friend {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, email])
+}
+
+model FriendRequest {
+  id     String @id @default(cuid())
+  fromId String
+  from   User   @relation("FriendRequestFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId   String
+  to     User   @relation("FriendRequestTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([fromId, toId])
 }
 
 model Group {

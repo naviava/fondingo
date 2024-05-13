@@ -224,7 +224,7 @@ export const addMember = privateProcedure
     // If the user does not exist, add them to the group, and add them as a friend.
     // TODO: Send an invitation email to the user.
     return splitdb.$transaction(async (db) => {
-      const newGroupMember = await splitdb.groupMember.create({
+      const newGroupMember = await db.groupMember.create({
         data: {
           groupId,
           name: memberName,
