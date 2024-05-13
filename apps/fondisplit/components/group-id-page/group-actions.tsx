@@ -8,7 +8,12 @@ interface IProps {}
 
 export function GroupActions({}: IProps) {
   const options = useMemo(
-    () => [{ label: "Settle up" }, { label: "Balances" }, { label: "Totals" }],
+    () => [
+      { label: "Add members" },
+      { label: "Settle up" },
+      { label: "Balances" },
+      { label: "Totals" },
+    ],
     [],
   );
 
