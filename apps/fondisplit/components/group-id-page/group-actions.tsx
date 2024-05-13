@@ -7,13 +7,15 @@ import { useCallback, useMemo } from "react";
 
 interface IProps {
   groupId: string;
-  currentUserRole: string | undefined;
+  isGroupManager: boolean;
 }
 
-export function GroupActions({ groupId, currentUserRole }: IProps) {
+export function GroupActions({ groupId, isGroupManager = false }: IProps) {
   const { onOpen } = useAddMemberModal();
 
-  const handleAddMember = useCallback(() => {}, []);
+  const handleAddMember = useCallback(() => {
+    onOpen(groupId, isGroupManager);
+  }, []);
 
   const options = useMemo(
     () => [
@@ -34,7 +36,7 @@ export function GroupActions({ groupId, currentUserRole }: IProps) {
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => option.onClick}
+            onClick={option.onClick}
             className="min-w-[7rem] font-bold shadow-sm shadow-neutral-600"
           >
             {option.label}

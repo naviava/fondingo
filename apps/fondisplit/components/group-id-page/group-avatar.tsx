@@ -1,6 +1,7 @@
 import { IoAirplaneOutline, IoHomeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { FaRegListAlt } from "react-icons/fa";
+import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/lib/utils";
 import { TGroupType } from "~/types";
 
@@ -26,7 +27,10 @@ export function GroupAvatar({ groupType, groupColor }: IProps) {
         backgroundImage: `linear-gradient(to bottom left, ${groupColor}, ${hexToRgb(groupColor, "0.5")})`,
       }}
     >
-      <Icon size={48} className="text-white" />
+      <Icon
+        size={48}
+        className={cn("text-white", groupType === "TRIP" && "-rotate-[45deg]")}
+      />
     </div>
   );
 }

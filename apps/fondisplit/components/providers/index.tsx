@@ -1,5 +1,6 @@
 "use client";
 
+import { ModalProvider } from "./modal-provider";
 import { TRPCProvider } from "./trpc-provider";
 
 interface IProps {
@@ -7,5 +8,10 @@ interface IProps {
 }
 
 export function Providers({ children }: IProps) {
-  return <TRPCProvider>{children}</TRPCProvider>;
+  return (
+    <TRPCProvider>
+      <ModalProvider />
+      {children}
+    </TRPCProvider>
+  );
 }

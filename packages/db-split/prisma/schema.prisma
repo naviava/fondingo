@@ -100,7 +100,8 @@ model Group {
 
 model GroupMember {
   id                 String           @id @default(cuid())
-  name               String?
+  name               String
+  email              String
   role               GroupRole        @default(MEMBER)
   userId             String?
   user               User?            @relation(fields: [userId], references: [id])

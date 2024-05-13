@@ -41,6 +41,8 @@ export const createGroup = privateProcedure
         members: {
           create: {
             userId: user.id,
+            name: user.name || user.email,
+            email: user.email,
             role: "MANAGER",
           },
         },
