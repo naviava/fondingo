@@ -123,19 +123,24 @@ export const getGroupById = privateProcedure
   });
 
 /**
- * This function adds a new member to a group.
+ * This function adds a new member to a group. It takes an object as input which includes groupId, memberName, and email.
+ * It performs several checks before adding the member:
+ * - It checks if the user is trying to add themselves to the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message "You cannot add yourself to the group."
+ * - It checks if the user is already in the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message "User is already in this group."
+ * - It checks if the user exists in the database and is a friend. If the user exists but is not a friend, it throws a TRPCError with a "BAD_REQUEST" code and a message "You can add an existing account only if they are your friend."
+ *
+ * If the user exists and is a friend, they are added to the group.
+ * If the user does not exist, they are added to the group and also added as a friend.
  *
  * @function addMember
- * @param {Object} ctx - The context object containing the current user.
- * @param {Object} input - The input object containing the group ID, member name, and email.
+ * @memberof module:group
+ * @param {Object} ctx - The context object, which includes the current user.
+ * @param {Object} input - The input object, which includes groupId, memberName, and email.
  * @param {string} input.groupId - The ID of the group to which the member is to be added.
  * @param {string} input.memberName - The name of the member to be added.
  * @param {string} input.email - The email of the member to be added.
- * @returns {Promise<Object>} A promise that resolves to an object containing a message indicating the member was added to the group.
- * @throws {TRPCError} Will throw an error if the user tries to add themselves to the group.
- * @throws {TRPCError} Will throw an error if the user is already in the group.
- * @throws {TRPCError} Will throw an error if the user exists in the database but is not a friend.
- * @todo Implement sending an invitation email to the user if they do not exist in the database.
+ * @returns {Promise<Object>} A promise that resolves to an object containing a toastTitle and toastDescription, which are messages indicating the result of the operation.
+ * @throws {TRPCError} Will throw an error if the user tries to add themselves to the group, if the user is already in the group, or if the user exists but is not a friend.
  */
 export const addMember = privateProcedure
   .input(
@@ -153,7 +158,7 @@ export const addMember = privateProcedure
     if (user.email === email)
       throw new TRPCError({
         code: "BAD_REQUEST",
-        message: "You cannot add yourself to the group",
+        message: "You cannot add yourself to the group.",
       });
 
     // Check if the user is already in the group.
@@ -168,7 +173,7 @@ export const addMember = privateProcedure
     if (!!existingUserInGroup)
       throw new TRPCError({
         code: "BAD_REQUEST",
-        message: "User is already in this group",
+        message: "User is already in this group.",
       });
 
     // Check if the user exists in the database and is a friend.
@@ -178,11 +183,11 @@ export const addMember = privateProcedure
 
     let isFriend = false;
     if (!!existingUser) {
-      const existingUserInFriendsList = await splitdb.user.findUnique({
+      const existingUserInFriendsList = await splitdb.friend.findUnique({
         where: {
-          email: user.email,
-          friends: {
-            some: { email },
+          userId_email: {
+            userId: user.id,
+            email,
           },
         },
       });
@@ -192,7 +197,7 @@ export const addMember = privateProcedure
         throw new TRPCError({
           code: "BAD_REQUEST",
           message:
-            "You can add an existing account only if they are your friend",
+            "You can add an existing account only if they are your friend.",
         });
       else {
         isFriend = true;
@@ -206,24 +211,39 @@ export const addMember = privateProcedure
           groupId,
           userId: existingUser.id,
           name: memberName,
+          email: existingUser.email,
+          role: "MEMBER",
+        },
+      });
+      return {
+        toastTitle: `${newGroupMember.name} added to the group.`,
+        toastDescription: "You can now split expenses with them.",
+      };
+    }
+
+    // If the user does not exist, add them to the group, and add them as a friend.
+    // TODO: Send an invitation email to the user.
+    return splitdb.$transaction(async (db) => {
+      const newGroupMember = await splitdb.groupMember.create({
+        data: {
+          groupId,
+          name: memberName,
           email,
           role: "MEMBER",
         },
       });
-      return { message: `${newGroupMember.name} added to the group` };
-    }
-
-    // If the user does not exist, add them to the group.
-    // TODO: Send an invitation email to the user.
-    const newGroupMember = await splitdb.groupMember.create({
-      data: {
-        groupId,
-        name: memberName,
-        email,
-        role: "MEMBER",
-      },
+      const newFriend = await db.friend.create({
+        data: {
+          name: memberName,
+          email,
+          userId: user.id,
+        },
+      });
+      return {
+        toastTitle: `${newGroupMember.name} added to the group.`,
+        toastDescription: `You can now split expenses with them. ${newFriend.email} has been added to your friends list.`,
+      };
     });
-    return { message: `${newGroupMember.name} added to the group` };
   });
 
 /**
