@@ -13,7 +13,8 @@
     "./scroll-area": "./src/shadcn/scroll-area.tsx",
     "./toast": "./src/shadcn/toast.tsx",
     "./toaster": "./src/shadcn/toaster.tsx",
-    "./use-toast": "./src/shadcn/use-toast.tsx"
+    "./use-toast": "./src/shadcn/use-toast.tsx",
+    "./dialog": "./src/shadcn/dialog.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -32,6 +33,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",

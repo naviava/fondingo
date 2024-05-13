@@ -14,7 +14,11 @@ interface IProps {
 }
 
 export default async function GroupIdPage({ params }: IProps) {
+  const currentUser = await serverClient.user.getAuthProfile();
   const group = await serverClient.group.getGroupById(params.groupId);
+  const currentUserRole = group.members.find(
+    (member) => member.userId === currentUser?.id,
+  )?.role;
 
   return (
     <article className="flex h-full flex-col">
@@ -33,7 +37,7 @@ export default async function GroupIdPage({ params }: IProps) {
           hasExpenses={!!group.expenses.length}
           debts={group.simplifiedDebts}
         />
-        <GroupActions />
+        <GroupActions groupId={group.id} currentUserRole={currentUserRole} />
         <GroupExpensesPanel
           hasMembers={group.members.length > 1}
           hasExpenses={!!group.expenses.length}

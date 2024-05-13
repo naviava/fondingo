@@ -1,0 +1,10 @@
+{
+  "name": "@fondingo/store",
+  "version": "0.0.0",
+  "exports": {
+    "./fondisplit": "./src/fondisplit.ts"
+  },
+  "dependencies": {
+    "zustand": "^4.5.2"
+  }
+}

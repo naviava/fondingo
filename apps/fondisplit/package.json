@@ -13,6 +13,7 @@
     "@fondingo/db-split": "workspace:*",
     "@fondingo/ui": "workspace:*",
     "@fondingo/utils": "workspace:*",
+    "@fondingo/store": "workspace:*",
     "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.35.5",
     "@trpc/client": "11.0.0-rc.366",
