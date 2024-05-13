@@ -138,6 +138,7 @@ export default function CreateGroupPage() {
         </Button>
         <h1 className="text-lg font-semibold">Create a group</h1>
         <Button
+          type="button"
           variant="splitGhost"
           disabled={isPending}
           className="w-20"

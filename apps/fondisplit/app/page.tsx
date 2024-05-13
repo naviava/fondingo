@@ -16,9 +16,13 @@ export default function Page() {
         <Link href="/groups">Groups page</Link>
       </Button>
       {!session.data?.user ? (
-        <Button onClick={() => router.push("/api/auth/signin")}>Sign In</Button>
+        <Button type="button" onClick={() => router.push("/api/auth/signin")}>
+          Sign In
+        </Button>
       ) : (
-        <Button onClick={() => signOut()}>Sign out</Button>
+        <Button type="button" onClick={() => signOut()}>
+          Sign out
+        </Button>
       )}
     </div>
   );

@@ -2,6 +2,7 @@
 
 import splitdb, { GroupType } from "@fondingo/db-split";
 import { privateProcedure } from "~/server/trpc";
+import { revalidatePath } from "next/cache";
 import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 
@@ -52,6 +53,7 @@ export const createGroup = privateProcedure
         message: "Failed to create group. Try again later.",
       });
 
+    revalidatePath("/groups");
     return {
       groupId: group.id,
       toastTitle: `${group.name} created.`,
@@ -100,6 +102,8 @@ export const getGroupById = privateProcedure
         },
       },
       include: {
+        members: true,
+        expenses: true,
         simplifiedDebts: {
           include: {
             from: true,

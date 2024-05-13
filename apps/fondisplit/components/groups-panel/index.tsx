@@ -1,9 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
+import { serverClient } from "~/lib/trpc/server-client";
 
-export function GroupsPanel() {
-  // TODO: Add the API call to fetch user groups.
-  const groups = [];
+interface IProps {
+  groups: Awaited<ReturnType<typeof serverClient.group.getGroups>>;
+}
 
+export function GroupsPanel({ groups = [] }: IProps) {
+  // Empty state
   if (!groups.length) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-y-8 px-4 pb-24">
@@ -32,5 +36,13 @@ export function GroupsPanel() {
     );
   }
 
-  return <div className="flex-1 px-4 pb-24">GroupsPanel</div>;
+  return (
+    <section className="flex-1 px-4 pb-24">
+      {groups.map((group) => (
+        <Link key={group.id} href={`/groups/${group.id}`}>
+          <div>{group.name}</div>
+        </Link>
+      ))}
+    </section>
+  );
 }

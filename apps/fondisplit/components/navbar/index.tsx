@@ -28,7 +28,7 @@ export function Navbar() {
         activeIcon: RiUser3Fill,
         label: "Friends",
         href: "/friends",
-        isActive: pathname === "/friends",
+        isActive: pathname.startsWith("/friends"),
       },
       {
         id: uuid(),
@@ -36,7 +36,7 @@ export function Navbar() {
         activeIcon: RiGroupFill,
         label: "Groups",
         href: "/groups",
-        isActive: pathname === "/groups",
+        isActive: pathname.startsWith("/groups"),
       },
     ],
     [pathname],
@@ -50,7 +50,7 @@ export function Navbar() {
         activeIcon: MdLocalActivity,
         label: "Activity",
         href: "/activity",
-        isActive: pathname === "/activity",
+        isActive: pathname.startsWith("/activity"),
       },
       {
         id: uuid(),
@@ -58,7 +58,7 @@ export function Navbar() {
         activeIcon: RiUser3Fill,
         label: "Account",
         href: "/account",
-        isActive: pathname === "/account",
+        isActive: pathname.startsWith("/account"),
       },
     ],
     [pathname],
@@ -76,7 +76,11 @@ export function Navbar() {
           />
         </Link>
       ))}
-      <Button variant="splitCta" className="aspect-square h-full px-3">
+      <Button
+        type="button"
+        variant="splitCta"
+        className="aspect-square h-full px-3"
+      >
         <span className="text-[60px] font-light">+</span>
       </Button>
       {optionsRight.map((option) => (
