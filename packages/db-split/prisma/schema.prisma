@@ -114,6 +114,8 @@ model GroupMember {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([groupId, email])
 }
 
 model Expense {
