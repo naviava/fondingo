@@ -123,24 +123,27 @@ export const getGroupById = privateProcedure
   });
 
 /**
- * This function adds a new member to a group. It takes an object as input which includes groupId, memberName, and email.
- * It performs several checks before adding the member:
- * - It checks if the user is trying to add themselves to the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message "You cannot add yourself to the group."
- * - It checks if the user is already in the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message "User is already in this group."
- * - It checks if the user exists in the database and is a friend. If the user exists but is not a friend, it throws a TRPCError with a "BAD_REQUEST" code and a message "You can add an existing account only if they are your friend."
+ * This function is used to add a member to a group. It takes an input object with the following properties:
+ * - groupId: A string representing the ID of the group to which the member is to be added. It cannot be empty.
+ * - memberName: A string representing the name of the member to be added. It cannot be empty.
+ * - email: A string representing the email of the member to be added. It must be a valid email format.
  *
- * If the user exists and is a friend, they are added to the group.
- * If the user does not exist, they are added to the group and also added as a friend.
+ * The function performs the following checks:
+ * - It checks if the user is trying to add themselves to the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message stating "You cannot add yourself to the group."
+ * - It checks if the user is already in the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message stating "User is already in this group."
+ * - It checks if the user exists in the database and is a friend. If the user exists but is not a friend, it throws a TRPCError with a "BAD_REQUEST" code and a message stating "You can add an existing account only if they are your friend."
+ *
+ * If the user exists and is a friend, the function adds them to the group and returns an object with a toastTitle and toastDescription.
+ *
+ * If the user does not exist, the function adds them to the group, adds them as a temp friend, and returns an object with a toastTitle and toastDescription. It also has a TODO to send an invitation email to the user.
  *
  * @function addMember
- * @memberof module:group
- * @param {Object} ctx - The context object, which includes the current user.
- * @param {Object} input - The input object, which includes groupId, memberName, and email.
+ * @param {Object} input - The input object containing the groupId, memberName, and email.
  * @param {string} input.groupId - The ID of the group to which the member is to be added.
  * @param {string} input.memberName - The name of the member to be added.
  * @param {string} input.email - The email of the member to be added.
- * @returns {Promise<Object>} A promise that resolves to an object containing a toastTitle and toastDescription, which are messages indicating the result of the operation.
- * @throws {TRPCError} Will throw an error if the user tries to add themselves to the group, if the user is already in the group, or if the user exists but is not a friend.
+ * @returns {Promise<Object>} Returns a promise that resolves to an object with a toastTitle and toastDescription.
+ * @throws {TRPCError} Throws a TRPCError if the user is trying to add themselves to the group, if the user is already in the group, or if the user exists but is not a friend.
  */
 export const addMember = privateProcedure
   .input(
@@ -238,15 +241,31 @@ export const addMember = privateProcedure
           role: "MEMBER",
         },
       });
-      const newFriend = await db.tempFriend.create({
+
+      const existingTempFriend = await db.tempFriend.findUnique({
+        where: {
+          userId_email: {
+            userId: user.id,
+            email,
+          },
+        },
+      });
+      if (!!existingTempFriend)
+        return {
+          toastTitle: `${newGroupMember.name} added to the group.`,
+          toastDescription: `You can now split expenses with them.`,
+        };
+
+      const newTempFriend = await db.tempFriend.create({
         data: {
           name: memberName,
           email,
+          userId: user.id,
         },
       });
       return {
         toastTitle: `${newGroupMember.name} added to the group.`,
-        toastDescription: `You can now split expenses with them. ${newFriend.email} has been added to your friends list.`,
+        toastDescription: `You can now split expenses with them. ${newTempFriend.email} has been added to your friends list.`,
       };
     });
   });

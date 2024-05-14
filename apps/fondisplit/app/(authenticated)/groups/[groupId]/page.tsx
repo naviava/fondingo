@@ -43,6 +43,7 @@ export default async function GroupIdPage({ params }: IProps) {
         />
         <GroupExpensesPanel
           groupId={group.id}
+          groupColor={group.color}
           isGroupManager={currentUserRole === "MANAGER"}
           hasMembers={group.members.length > 1}
           hasExpenses={!!group.expenses.length}

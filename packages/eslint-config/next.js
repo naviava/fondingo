@@ -18,7 +18,7 @@ module.exports = {
     node: true,
     browser: true,
   },
-  plugins: ["only-warn"],
+  plugins: ["only-warn", "react-hooks"],
   settings: {
     "import/resolver": {
       typescript: {
@@ -34,5 +34,7 @@ module.exports = {
   overrides: [{ files: ["*.js?(x)", "*.ts?(x)"] }],
   rules: {
     "no-extra-boolean-cast": "off",
+    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+    "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
   },
 };

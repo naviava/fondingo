@@ -71,9 +71,12 @@ export function AddMemberModal() {
       },
     });
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    handleAddMember({ ...values, groupId });
-  }, []);
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      handleAddMember({ ...values, groupId });
+    },
+    [groupId, handleAddMember],
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
