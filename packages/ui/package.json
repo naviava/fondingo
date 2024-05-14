@@ -15,7 +15,8 @@
     "./toaster": "./src/shadcn/toaster.tsx",
     "./use-toast": "./src/shadcn/use-toast.tsx",
     "./dialog": "./src/shadcn/dialog.tsx",
-    "./separator": "./src/shadcn/separator.tsx"
+    "./separator": "./src/shadcn/separator.tsx",
+    "./avatar": "./src/avatar.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -34,6 +35,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-scroll-area": "^1.0.5",
