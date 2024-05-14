@@ -183,12 +183,18 @@ export const addMember = privateProcedure
 
     let isFriend = false;
     if (!!existingUser) {
-      const existingUserInFriendsList = await splitdb.friend.findUnique({
+      const existingUserInFriendsList = await splitdb.friend.findFirst({
         where: {
-          userId_email: {
-            userId: user.id,
-            email,
-          },
+          OR: [
+            {
+              user1Id: user.id,
+              user2Id: existingUser.id,
+            },
+            {
+              user1Id: existingUser.id,
+              user2Id: user.id,
+            },
+          ],
         },
       });
 
@@ -209,9 +215,9 @@ export const addMember = privateProcedure
       const newGroupMember = await splitdb.groupMember.create({
         data: {
           groupId,
-          userId: existingUser.id,
           name: memberName,
           email: existingUser.email,
+          userId: existingUser.id,
           role: "MEMBER",
         },
       });
@@ -221,7 +227,7 @@ export const addMember = privateProcedure
       };
     }
 
-    // If the user does not exist, add them to the group, and add them as a friend.
+    // If the user does not exist, add them to the group, and add them as a temp friend.
     // TODO: Send an invitation email to the user.
     return splitdb.$transaction(async (db) => {
       const newGroupMember = await db.groupMember.create({
@@ -232,11 +238,10 @@ export const addMember = privateProcedure
           role: "MEMBER",
         },
       });
-      const newFriend = await db.friend.create({
+      const newFriend = await db.tempFriend.create({
         data: {
           name: memberName,
           email,
-          userId: user.id,
         },
       });
       return {

@@ -171,6 +171,19 @@ export const declineFriendRequest = privateProcedure
     };
   });
 
+/**
+ * This function accepts a friend request by creating a new friendship and deleting the friend request.
+ * It is a private procedure that requires the user to be authenticated.
+ *
+ * @function acceptFriendRequest
+ * @param {string} friendReqId - The ID of the friend request to be accepted. It must be a non-empty string.
+ * @returns {Promise<Object>} A promise that resolves to an object containing a success message and the names of the new friends.
+ *
+ * @throws {TRPCError} Will throw an error if the friend request ID is not found.
+ * @throws {TRPCError} Will throw an error if the user is not authorized to accept the friend request.
+ * @throws {TRPCError} Will throw an error if the creation of the friend fails.
+ * @throws {TRPCError} Will throw an error if the deletion of the friend request fails.
+ */
 export const acceptFriendRequest = privateProcedure
   .input(z.string().min(1, { message: "Friend request ID cannot be empty" }))
   .mutation(async ({ ctx, input: friendReqId }) => {
