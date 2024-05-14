@@ -67,12 +67,18 @@ export const sendFriendRequest = privateProcedure
         message: "User with that email does not exist.",
       });
 
-    const existingFriend = await splitdb.friend.findUnique({
+    const existingFriend = await splitdb.friend.findFirst({
       where: {
-        userId_email: {
-          userId: user.id,
-          email: existingUser.email,
-        },
+        OR: [
+          {
+            user1Id: user.id,
+            user2: { email: email },
+          },
+          {
+            user1: { email: email },
+            user2Id: user.id,
+          },
+        ],
       },
     });
     if (!!existingFriend)
@@ -171,7 +177,6 @@ export const acceptFriendRequest = privateProcedure
     const { user } = ctx;
     const friendRequest = await splitdb.friendRequest.findUnique({
       where: { id: friendReqId },
-      include: { from: true },
     });
     if (!friendRequest)
       throw new TRPCError({
@@ -181,8 +186,42 @@ export const acceptFriendRequest = privateProcedure
     if (friendRequest.toId !== user.id && friendRequest.fromId !== user.id)
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: "You are not authorized to decline this friend request.",
+        message: "You are not authorized to accept this friend request.",
       });
 
-    return splitdb.$transaction(async (db) => {});
+    return splitdb.$transaction(async (db) => {
+      const friend = await db.friend.create({
+        data: {
+          user1Id: friendRequest.fromId,
+          user2Id: friendRequest.toId,
+        },
+        include: {
+          user1: {
+            select: { name: true },
+          },
+          user2: {
+            select: { name: true },
+          },
+        },
+      });
+      if (!friend)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create friend.",
+        });
+
+      const deletedFriendRequest = await db.friendRequest.delete({
+        where: { id: friendReqId },
+      });
+      if (!deletedFriendRequest)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete friend request.",
+        });
+
+      return {
+        toastTitle: "Friend request has been accepted.",
+        toastDescription: `${friend.user1.name} and ${friend.user2.name} are now friends`,
+      };
+    });
   });
