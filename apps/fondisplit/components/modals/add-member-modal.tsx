@@ -1,13 +1,14 @@
 "use client";
 
+import { useCallback, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
-import { useCallback, useRef, useState } from "react";
 
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { Search, UserPlus } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
+import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 import {
@@ -26,12 +27,18 @@ import {
   FormMessage,
 } from "@fondingo/ui/form";
 
+import { trpc } from "~/lib/trpc/client";
+import { useRouter } from "next/navigation";
+
 const formSchema = z.object({
   memberName: z.string().min(1, { message: "Name cannot be empty" }),
   email: z.string().email({ message: "Invalid email" }),
 });
 
 export function AddMemberModal() {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [isAddingContact, setIsAddingContact] = useState(false);
   const { groupId, isGroupManager, isOpen, onClose } = useAddMemberModal();
@@ -44,8 +51,28 @@ export function AddMemberModal() {
     },
   });
 
+  const { mutate: handleAddMember, isPending } =
+    trpc.group.addMember.useMutation({
+      onError: ({ message }) =>
+        toast({
+          variant: "destructive",
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        setIsAddingContact(false);
+        form.reset();
+        onClose();
+        router.refresh();
+      },
+    });
+
   const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    console.log({ ...values, groupId });
+    handleAddMember({ ...values, groupId });
   }, []);
 
   return (
@@ -57,22 +84,24 @@ export function AddMemberModal() {
               <Button
                 variant="splitGhost"
                 size="sm"
+                disabled={isPending}
                 onClick={() => {
                   form.reset();
                   setIsAddingContact(false);
                 }}
                 className="min-w-[5rem]"
               >
-                {isAddingContact ? "Back" : "Cancel"}
+                Back
               </Button>
             ) : (
               <Button
                 variant="splitGhost"
                 size="sm"
+                disabled={isPending}
                 onClick={onClose}
                 className="min-w-[5rem]"
               >
-                {isAddingContact ? "Back" : "Cancel"}
+                Cancel
               </Button>
             )}
             <DialogTitle>Add group members</DialogTitle>
@@ -80,7 +109,7 @@ export function AddMemberModal() {
               <Button
                 variant="splitGhost"
                 size="sm"
-                disabled={!isGroupManager}
+                disabled={!isGroupManager || isPending}
                 onClick={() => submitButtonRef.current?.click()}
                 className="min-w-[5rem]"
               >
@@ -90,7 +119,7 @@ export function AddMemberModal() {
               <Button
                 variant="splitGhost"
                 size="sm"
-                disabled={!isGroupManager}
+                disabled={!isGroupManager || isPending}
                 onClick={onClose}
                 className="min-w-[5rem]"
               >
@@ -108,7 +137,10 @@ export function AddMemberModal() {
               {!isAddingContact && (
                 <div className="relative px-4">
                   {/* TODO: Add search friends functionality */}
-                  <Input className="bg-neutral-200/90 pl-10 text-base font-medium" />
+                  <Input
+                    disabled={isPending}
+                    className="bg-neutral-200/90 pl-10 text-base font-medium"
+                  />
                   <Search
                     size={20}
                     className="text-muted-foreground absolute left-6 top-1/2 -translate-y-1/2"
@@ -146,6 +178,7 @@ export function AddMemberModal() {
                           <FormControl>
                             <Input
                               autoComplete="off"
+                              disabled={isPending}
                               {...field}
                               className="focus-visible:border-b-cta h-6 rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70"
                             />
@@ -166,6 +199,7 @@ export function AddMemberModal() {
                           <FormControl>
                             <Input
                               autoComplete="off"
+                              disabled={isPending}
                               {...field}
                               className="focus-visible:border-b-cta h-6 rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70"
                             />
@@ -177,6 +211,7 @@ export function AddMemberModal() {
                     <button
                       ref={submitButtonRef}
                       type="submit"
+                      disabled={isPending}
                       className="hidden"
                     />
                   </form>

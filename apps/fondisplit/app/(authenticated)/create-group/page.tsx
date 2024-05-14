@@ -113,6 +113,7 @@ export default function CreateGroupPage() {
     trpc.group.createGroup.useMutation({
       onError: ({ message }) =>
         toast({
+          variant: "destructive",
           title: "Something went wrong.",
           description: message,
         }),
