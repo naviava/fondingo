@@ -135,14 +135,16 @@ model GroupMember {
   name               String
   email              String
   role               GroupRole        @default(MEMBER)
-  userId             String?
-  user               User?            @relation(fields: [userId], references: [id], onDelete: Restrict)
   groupId            String
   group              Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId             String?
+  user               User?            @relation(fields: [userId], references: [id], onDelete: Restrict)
   expensePayments    ExpensePayment[]
   expenseSplits      ExpenseSplit[]
   simplifiedDebtFrom SimplifiedDebt[] @relation("DebtFromUser")
   simplifiedDebtTo   SimplifiedDebt[] @relation("DebtToUser")
+  settlementsFrom    Settlement[]     @relation("SettlementFromUser")
+  settlementsTo      Settlement[]     @relation("SettlementToUser")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,12 +153,13 @@ model GroupMember {
 }
 
 model Expense {
-  id       String           @id @default(cuid())
-  amount   Int
-  groupId  String
-  group    Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  payments ExpensePayment[]
-  splits   ExpenseSplit[]
+  id          String           @id @default(cuid())
+  amount      Int
+  groupId     String
+  group       Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  payments    ExpensePayment[]
+  splits      ExpenseSplit[]
+  settlements Settlement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -178,6 +181,20 @@ model ExpenseSplit {
   expense       Expense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
   groupMemberId String
   groupMember   GroupMember @relation(fields: [groupMemberId], references: [id], onDelete: Restrict)
+}
+
+model Settlement {
+  id        String      @id @default(cuid())
+  amount    Int
+  expenseId String
+  expense   Expense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  fromId    String
+  from      GroupMember @relation("SettlementFromUser", fields: [fromId], references: [id], onDelete: Restrict)
+  toId      String
+  to        GroupMember @relation("SettlementToUser", fields: [toId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model SimplifiedDebt {

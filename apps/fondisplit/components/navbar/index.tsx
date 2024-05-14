@@ -20,6 +20,7 @@ export function Navbar() {
   const params = useParams();
   const pathname = usePathname();
 
+  // TODO: Add global state for navbar links.
   const optionsLeft = useMemo(
     () => [
       {
