@@ -127,9 +127,12 @@ export default function CreateGroupPage() {
       },
     });
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    handleCreateGroup(values);
-  }, []);
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      handleCreateGroup(values);
+    },
+    [handleCreateGroup],
+  );
 
   return (
     <>
@@ -169,7 +172,7 @@ export default function CreateGroupPage() {
                       placeholder="NYC Trip"
                       disabled={isPending}
                       {...field}
-                      className="focus-visible:border-b-cta h-6 rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70"
+                      className="form-input"
                     />
                   </FormControl>
                 </FormItem>

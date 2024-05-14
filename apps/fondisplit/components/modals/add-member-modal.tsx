@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
 
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
-import { Search, UserPlus } from "@fondingo/ui/lucide";
+import { Loader, Search, UserPlus } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
 import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
@@ -116,7 +116,11 @@ export function AddMemberModal() {
                 onClick={() => submitButtonRef.current?.click()}
                 className="min-w-[5rem]"
               >
-                Add
+                {isPending ? (
+                  <Loader className="h-6 w-6 animate-spin" />
+                ) : (
+                  "Add"
+                )}
               </Button>
             ) : (
               <Button
@@ -183,7 +187,7 @@ export function AddMemberModal() {
                               autoComplete="off"
                               disabled={isPending}
                               {...field}
-                              className="focus-visible:border-b-cta h-6 rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70"
+                              className="form-input"
                             />
                           </FormControl>
                           <FormMessage />
@@ -204,7 +208,7 @@ export function AddMemberModal() {
                               autoComplete="off"
                               disabled={isPending}
                               {...field}
-                              className="focus-visible:border-b-cta h-6 rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70"
+                              className="form-input"
                             />
                           </FormControl>
                           <FormMessage />

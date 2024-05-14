@@ -1,23 +1,23 @@
 "use client";
 
-import { useMemo } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-import { Button } from "@fondingo/ui/button";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useCallback, useMemo } from "react";
 import { uuid } from "@fondingo/utils/uuid";
+import Link from "next/link";
 
+import { MdOutlineLocalActivity, MdLocalActivity } from "react-icons/md";
+import { NavbarOption } from "./navbar-option";
+import { Button } from "@fondingo/ui/button";
 import {
   RiUser3Line,
   RiUser3Fill,
   RiGroupFill,
   RiGroupLine,
 } from "react-icons/ri";
-import { MdOutlineLocalActivity, MdLocalActivity } from "react-icons/md";
-
-import { NavbarOption } from "./navbar-option";
 
 export function Navbar() {
+  const router = useRouter();
+  const params = useParams();
   const pathname = usePathname();
 
   const optionsLeft = useMemo(
@@ -64,6 +64,13 @@ export function Navbar() {
     [pathname],
   );
 
+  const handleClick = useCallback(() => {
+    if (!!params.groupId) {
+      return router.push(`/groups/${params.groupId}/add-expense`);
+    }
+    return null;
+  }, [params.groupId, router]);
+
   return (
     <nav className="absolute bottom-6 flex h-14 w-full items-center justify-between border-t px-4 pt-2 md:px-6">
       {optionsLeft.map((option) => (
@@ -79,6 +86,7 @@ export function Navbar() {
       <Button
         type="button"
         variant="splitCta"
+        onClick={handleClick}
         className="aspect-square h-full px-3"
       >
         <span className="text-[60px] font-light">+</span>
