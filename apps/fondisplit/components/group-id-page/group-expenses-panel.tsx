@@ -4,7 +4,8 @@ import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { UserPlus } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
-import { hexToRgb } from "~/lib/utils";
+
+import { linearGradientWithAlpha } from "~/lib/utils";
 
 interface IProps {
   groupId: string;
@@ -52,7 +53,7 @@ export function GroupExpensesPanel({
         <div
           className="mt-10 h-16 w-4"
           style={{
-            backgroundImage: `linear-gradient(to bottom left, ${groupColor}, ${hexToRgb(groupColor, "0.5")})`,
+            backgroundImage: linearGradientWithAlpha(groupColor, 0.5),
           }}
         />
         <div

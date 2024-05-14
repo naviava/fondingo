@@ -1,11 +1,11 @@
+import { GroupExpensesPanel } from "~/components/group-id-page/group-expenses-panel";
 import { UtilityButtons } from "~/components/group-id-page/utility-buttons";
 import { GroupActions } from "~/components/group-id-page/group-actions";
 import { GroupAvatar } from "~/components/group-id-page/group-avatar";
 import { GroupHeader } from "~/components/group-id-page/group-header";
 
 import { serverClient } from "~/lib/trpc/server-client";
-import { hexToRgb } from "~/lib/utils";
-import { GroupExpensesPanel } from "~/components/group-id-page/group-expenses-panel";
+import { linearGradientWithAlpha } from "~/lib/utils";
 
 interface IProps {
   params: {
@@ -25,7 +25,7 @@ export default async function GroupIdPage({ params }: IProps) {
       <div
         className="relative h-[7.5rem]"
         style={{
-          backgroundImage: `linear-gradient(to bottom left, ${group.color}, ${hexToRgb(group.color, "0.5")})`,
+          backgroundImage: linearGradientWithAlpha(group.color, 0.5),
         }}
       >
         <UtilityButtons />

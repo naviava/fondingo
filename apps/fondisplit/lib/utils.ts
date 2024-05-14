@@ -10,3 +10,7 @@ export function hexToRgb(hex: string, alpha: string) {
   const b = parseInt(result[3] || "0", 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+export function linearGradientWithAlpha(hex: string, alpha: number) {
+  return `linear-gradient(to bottom left, ${hex}, ${hexToRgb(hex, alpha.toString())})`;
+}

@@ -1,9 +1,10 @@
 import { IoAirplaneOutline, IoHomeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { FaRegListAlt } from "react-icons/fa";
-import { cn } from "@fondingo/ui/utils";
-import { hexToRgb } from "~/lib/utils";
 import { TGroupType } from "~/types";
+
+import { linearGradientWithAlpha } from "~/lib/utils";
+import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   groupType: TGroupType;
@@ -24,7 +25,7 @@ export function GroupAvatar({ groupType, groupColor }: IProps) {
     <div
       className="absolute -bottom-8 left-20 flex aspect-square h-20 items-center justify-center rounded-2xl border-[6px] border-[#F4F4F4]"
       style={{
-        backgroundImage: `linear-gradient(to bottom left, ${groupColor}, ${hexToRgb(groupColor, "0.5")})`,
+        backgroundImage: linearGradientWithAlpha(groupColor, 0.5),
       }}
     >
       <Icon
