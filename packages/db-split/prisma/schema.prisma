@@ -125,6 +125,7 @@ model Group {
   members         GroupMember[]
   expenses        Expense[]
   simplifiedDebts SimplifiedDebt[]
+  settlements     Settlement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -186,6 +187,8 @@ model ExpenseSplit {
 model Settlement {
   id        String      @id @default(cuid())
   amount    Int
+  groupId   String
+  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
   expenseId String
   expense   Expense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
   fromId    String

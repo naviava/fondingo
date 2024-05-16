@@ -270,6 +270,110 @@ export const addMember = privateProcedure
     });
   });
 
+export async function calculateDebts(
+  groupId: string,
+): Promise<{ message: string } | void> {
+  try {
+    return splitdb.$transaction(async (db) => {
+      // Delete existing simplified debts for the group
+      await db.simplifiedDebt.deleteMany({
+        where: { groupId },
+      });
+
+      // Calculate net balances.
+      const payments = await db.expensePayment.findMany({
+        where: {
+          expense: { groupId },
+        },
+        include: { expense: true },
+      });
+      const splits = await db.expenseSplit.findMany({
+        where: {
+          expense: { groupId },
+        },
+        include: { expense: true },
+      });
+
+      // Fetch settlement entries
+      const settlements = await db.settlement.findMany({
+        where: {
+          groupId,
+        },
+      });
+
+      const balances: { [key: string]: number } = {};
+      for (const payment of payments) {
+        const paidBy = payment.groupMemberId;
+        const amount = payment.amount;
+
+        if (!balances[paidBy]) balances[paidBy] = 0;
+        balances[paidBy] += amount;
+      }
+
+      for (const split of splits) {
+        const owes = split.groupMemberId;
+        const amount = split.amount;
+
+        if (!balances[owes]) balances[owes] = 0;
+        balances[owes] -= amount;
+      }
+
+      // Subtract settled amounts from balances
+      for (const settlement of settlements) {
+        const paidBy = settlement.toId;
+        const amount = settlement.amount;
+
+        if (!balances[paidBy]) balances[paidBy] = 0;
+        balances[paidBy] -= amount;
+      }
+
+      // Simplify debts
+      const debts: {
+        from: string;
+        to: string;
+        amount: number;
+      }[] = [];
+
+      while (Object.keys(balances).length > 0) {
+        const maxOwed = Object.keys(balances).reduce((a, b) =>
+          balances[a]! > balances[b]! ? a : b,
+        );
+        const maxOwing = Object.keys(balances).reduce((a, b) =>
+          balances[a]! < balances[b]! ? a : b,
+        );
+        const amount = Math.min(balances[maxOwed]!, -balances[maxOwing]!);
+
+        debts.push({
+          from: maxOwing,
+          to: maxOwed,
+          amount,
+        });
+        balances[maxOwed]! -= amount;
+        balances[maxOwing]! += amount;
+
+        if (balances[maxOwed] === 0) delete balances[maxOwed];
+        if (balances[maxOwing] === 0) delete balances[maxOwing];
+      }
+
+      // Store simplified debts in the database
+      for (const debt of debts) {
+        await db.simplifiedDebt.create({
+          data: {
+            fromId: debt.from,
+            toId: debt.to,
+            amount: debt.amount,
+            groupId,
+          },
+        });
+      }
+      return { message: "Simplified debts calculated and stored" };
+    });
+  } catch (err) {
+    console.error("\n\nError calculating simplified debts:\n\n", err);
+    return { message: "Error calculating simplified debts" };
+  }
+}
+
 /**
  * Calculates and stores simplified debts for all users in a specific group.
  *
@@ -285,88 +389,88 @@ export const addMember = privateProcedure
  * @returns {Promise<{message: string} | void>} A Promise that resolves with a success message when all simplified debts have been stored in the database, or an object with an error message if an error occurred.
  * @throws {Error} Throws an error if there is a problem communicating with the database.
  */
-export async function calculateSimplifiedDebts(
-  groupId: string,
-): Promise<{ message: string } | void> {
-  try {
-    // Delete exiisting simplified debts for the group
-    await splitdb.simplifiedDebt.deleteMany({
-      where: { groupId },
-    });
+// export async function calculateSimplifiedDebts(
+//   groupId: string,
+// ): Promise<{ message: string } | void> {
+//   try {
+//     // Delete exiisting simplified debts for the group
+//     await splitdb.simplifiedDebt.deleteMany({
+//       where: { groupId },
+//     });
 
-    // Calculate net balances.
-    const payments = await splitdb.expensePayment.findMany({
-      where: {
-        expense: { groupId },
-      },
-      include: { expense: true },
-    });
-    const splits = await splitdb.expenseSplit.findMany({
-      where: {
-        expense: { groupId },
-      },
-      include: { expense: true },
-    });
+//     // Calculate net balances.
+//     const payments = await splitdb.expensePayment.findMany({
+//       where: {
+//         expense: { groupId },
+//       },
+//       include: { expense: true },
+//     });
+//     const splits = await splitdb.expenseSplit.findMany({
+//       where: {
+//         expense: { groupId },
+//       },
+//       include: { expense: true },
+//     });
 
-    const balances: { [key: string]: number } = {};
-    for (const payment of payments) {
-      const paidBy = payment.groupMemberId;
-      const amount = payment.amount;
+//     const balances: { [key: string]: number } = {};
+//     for (const payment of payments) {
+//       const paidBy = payment.groupMemberId;
+//       const amount = payment.amount;
 
-      if (!balances[paidBy]) balances[paidBy] = 0;
-      balances[paidBy] += amount;
-    }
+//       if (!balances[paidBy]) balances[paidBy] = 0;
+//       balances[paidBy] += amount;
+//     }
 
-    for (const split of splits) {
-      const owes = split.groupMemberId;
-      const amount = split.amount;
+//     for (const split of splits) {
+//       const owes = split.groupMemberId;
+//       const amount = split.amount;
 
-      if (!balances[owes]) balances[owes] = 0;
-      balances[owes] -= amount;
-    }
+//       if (!balances[owes]) balances[owes] = 0;
+//       balances[owes] -= amount;
+//     }
 
-    // Simplify debts
-    const debts: {
-      from: string;
-      to: string;
-      amount: number;
-    }[] = [];
+//     // Simplify debts
+//     const debts: {
+//       from: string;
+//       to: string;
+//       amount: number;
+//     }[] = [];
 
-    while (Object.keys(balances).length > 0) {
-      const maxOwed = Object.keys(balances).reduce((a, b) =>
-        balances[a]! > balances[b]! ? a : b,
-      );
-      const maxOwing = Object.keys(balances).reduce((a, b) =>
-        balances[a]! < balances[b]! ? a : b,
-      );
-      const amount = Math.min(balances[maxOwed]!, -balances[maxOwing]!);
+//     while (Object.keys(balances).length > 0) {
+//       const maxOwed = Object.keys(balances).reduce((a, b) =>
+//         balances[a]! > balances[b]! ? a : b,
+//       );
+//       const maxOwing = Object.keys(balances).reduce((a, b) =>
+//         balances[a]! < balances[b]! ? a : b,
+//       );
+//       const amount = Math.min(balances[maxOwed]!, -balances[maxOwing]!);
 
-      debts.push({
-        from: maxOwing,
-        to: maxOwed,
-        amount,
-      });
-      balances[maxOwed]! -= amount;
-      balances[maxOwing]! += amount;
+//       debts.push({
+//         from: maxOwing,
+//         to: maxOwed,
+//         amount,
+//       });
+//       balances[maxOwed]! -= amount;
+//       balances[maxOwing]! += amount;
 
-      if (balances[maxOwed] === 0) delete balances[maxOwed];
-      if (balances[maxOwing] === 0) delete balances[maxOwing];
-    }
+//       if (balances[maxOwed] === 0) delete balances[maxOwed];
+//       if (balances[maxOwing] === 0) delete balances[maxOwing];
+//     }
 
-    // Store simplified debts in the database
-    for (const debt of debts) {
-      await splitdb.simplifiedDebt.create({
-        data: {
-          fromId: debt.from,
-          toId: debt.to,
-          amount: debt.amount,
-          groupId,
-        },
-      });
-    }
-    return { message: "Simplified debts calculated and stored" };
-  } catch (err) {
-    console.error("\n\nError calculating simplified debts:\n\n", err);
-    return { message: "Error calculating simplified debts" };
-  }
-}
+//     // Store simplified debts in the database
+//     for (const debt of debts) {
+//       await splitdb.simplifiedDebt.create({
+//         data: {
+//           fromId: debt.from,
+//           toId: debt.to,
+//           amount: debt.amount,
+//           groupId,
+//         },
+//       });
+//     }
+//     return { message: "Simplified debts calculated and stored" };
+//   } catch (err) {
+//     console.error("\n\nError calculating simplified debts:\n\n", err);
+//     return { message: "Error calculating simplified debts" };
+//   }
+// }
