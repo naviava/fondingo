@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
-import { Check, ChevronRight } from "@fondingo/ui/lucide";
+import { CheckCircle, ChevronLeft, ChevronRight } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
-import { Avatar } from "@fondingo/ui/avatar";
 import { Button } from "@fondingo/ui/button";
 import {
   Drawer,
@@ -15,37 +14,63 @@ import {
 } from "@fondingo/ui/drawer";
 
 import { trpc } from "~/lib/trpc/client";
+import { ExpensePaymentsMember } from "./expense-payments-member";
 import { cn } from "@fondingo/ui/utils";
 
 export function ExpensePaymentsDrawer() {
-  const [isMultiple, setIsMultiple] = useState(false);
-
   const {
     isPaymentsDrawerOpen,
     onPaymentsDrawerClose,
     groupId,
+    expenseAmount,
     payments,
     setPayments,
-    expenseAmount,
+    clearPayments,
   } = useExpenseDetails();
 
   const { data: members } = trpc.group.getMembers.useQuery(groupId);
+  const [isMultiple, setIsMultiple] = useState(payments.length > 1);
 
-  const handleSinglePayer = useCallback(
-    ({ userId, userName }: { userId: string; userName: string }) => {
-      setPayments([
-        {
-          userId,
-          userName,
-          amount: expenseAmount,
-        },
-      ]);
-    },
-    [setPayments, expenseAmount],
-  );
+  const [sum, setSum] = useState(0);
+  const [paymentsState, setPaymentsState] = useState<
+    {
+      userId: string;
+      userName: string;
+      amount: number;
+    }[]
+  >([]);
+
+  const handleMultiplePayers = useCallback(() => {
+    if (sum !== expenseAmount) {
+      return;
+    } else {
+      setPayments(paymentsState.filter((payment) => payment.amount > 0));
+      onPaymentsDrawerClose();
+    }
+  }, [expenseAmount, sum, paymentsState, setPayments, onPaymentsDrawerClose]);
+
+  useEffect(() => {
+    setSum(
+      paymentsState.reduce((total, payment) => {
+        total += payment.amount;
+        return total;
+      }, 0),
+    );
+  }, [setSum, paymentsState]);
 
   return (
-    <Drawer open={isPaymentsDrawerOpen} onOpenChange={onPaymentsDrawerClose}>
+    <Drawer
+      open={isPaymentsDrawerOpen}
+      onOpenChange={() => {
+        setPaymentsState([]);
+        onPaymentsDrawerClose();
+        if (paymentsState.length > 1) {
+          return;
+        } else {
+          setIsMultiple(false);
+        }
+      }}
+    >
       <DrawerContent className="mx-auto max-w-xl">
         <DrawerHeader className="px-0 py-1">
           <DrawerTitle className="flex items-center justify-between px-4">
@@ -60,7 +85,11 @@ export function ExpensePaymentsDrawer() {
             <Button
               size="sm"
               variant="splitGhost"
-              onClick={isMultiple ? () => {} : onPaymentsDrawerClose}
+              disabled={sum !== expenseAmount}
+              onClick={
+                isMultiple ? handleMultiplePayers : onPaymentsDrawerClose
+              }
+              className="disabled:text-muted-foreground disabled:cursor-not-allowed"
             >
               {isMultiple ? "Save" : "Done"}
             </Button>
@@ -68,42 +97,57 @@ export function ExpensePaymentsDrawer() {
           <Separator />
         </DrawerHeader>
         <ul className="space-y-4 px-8 py-4">
-          {members?.map((member) => (
-            <li
-              key={member.id}
-              onClick={() =>
-                handleSinglePayer({ userId: member.id, userName: member.name })
-              }
-              className="flex cursor-pointer items-center justify-between border-b pb-2"
-            >
+          {isMultiple && (
+            <div className="flex flex-col items-center justify-center text-sm">
               <div className="flex items-center">
-                <Avatar
-                  userImageUrl={member.user?.image}
-                  userName={member.name}
-                />
+                {sum === expenseAmount && (
+                  <CheckCircle className="text-cta mr-2 h-4 w-4" />
+                )}
                 <p
                   className={cn(
-                    "ml-4",
-                    payments.length === 1 &&
-                      payments[0]?.userName === member.name &&
-                      "font-semibold",
+                    "font-bold",
+                    sum === expenseAmount && "text-cta",
                   )}
-                >
-                  {member.name}
-                </p>
+                >{`${sum.toFixed(2)} of ${expenseAmount.toFixed(2)} assigned`}</p>
               </div>
-              {payments.length === 1 &&
-                payments[0]?.userName === member.name && (
-                  <Check className="text-cta" />
-                )}
-            </li>
+              {expenseAmount - sum !== 0 && (
+                <p className="font-medium text-rose-500">{`${(expenseAmount - sum).toFixed(2)} left`}</p>
+              )}
+            </div>
+          )}
+          {members?.map((member) => (
+            <ExpensePaymentsMember
+              key={member.id}
+              userId={member.id}
+              userName={member.name}
+              userImageUrl={member.user?.image}
+              isMultiple={isMultiple}
+              setPaymentsState={setPaymentsState}
+            />
           ))}
-          {!isMultiple && (
+          {isMultiple ? (
             <li
-              onClick={() => setIsMultiple(true)}
+              onClick={() => {
+                clearPayments();
+                setIsMultiple(false);
+              }}
               className="flex cursor-pointer items-center justify-between border-b pb-2"
             >
-              Multiple people
+              <span className="text-muted-foreground text-sm font-medium">
+                Single payer
+              </span>
+              <ChevronLeft className="text-muted-foreground" />
+            </li>
+          ) : (
+            <li
+              onClick={() => {
+                setIsMultiple(true);
+              }}
+              className="flex cursor-pointer items-center justify-between border-b pb-2"
+            >
+              <span className="text-muted-foreground text-sm font-medium">
+                Multiple people
+              </span>
               <ChevronRight className="text-muted-foreground" />
             </li>
           )}

@@ -20,6 +20,7 @@ type ExpenseDetails = {
       amount: number;
     }[],
   ) => void;
+  clearPayments: () => void;
 
   splitType: "equally" | "custom";
   splits: {
@@ -27,11 +28,24 @@ type ExpenseDetails = {
     userName: string;
     amount: number;
   }[];
+  setSplits: (
+    splits: {
+      userId: string;
+      userName: string;
+      amount: number;
+    }[],
+  ) => void;
+  clearSplits: () => void;
 
   breakPoint: number;
+
   isPaymentsDrawerOpen: boolean;
   onPaymentsDrawerOpen: () => void;
   onPaymentsDrawerClose: () => void;
+
+  isSplitsDrawerOpen: boolean;
+  onSplitsDrawerOpen: () => void;
+  onSplitsDrawerClose: () => void;
 };
 
 export const useExpenseDetails = create<ExpenseDetails>((set) => ({
@@ -45,11 +59,15 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
 
   payments: [],
   setPayments: (payments) => set({ payments }),
+  clearPayments: () => set({ payments: [] }),
 
-  splitType: "equally",
+  splitType: "equally" as const,
   splits: [],
+  setSplits: (splits) => set({ splits }),
+  clearSplits: () => set({ splits: [] }),
 
   breakPoint: 0,
+
   isPaymentsDrawerOpen: false,
   onPaymentsDrawerOpen: () =>
     set({ isPaymentsDrawerOpen: true, breakPoint: Date.now() }),
@@ -59,6 +77,18 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
         return { isPaymentsDrawerOpen: true };
       }
       return { isPaymentsDrawerOpen: false };
+    });
+  },
+
+  isSplitsDrawerOpen: false,
+  onSplitsDrawerOpen: () =>
+    set({ isSplitsDrawerOpen: true, breakPoint: Date.now() }),
+  onSplitsDrawerClose: () => {
+    set((state) => {
+      if (Date.now() - state.breakPoint < 100) {
+        return { isSplitsDrawerOpen: true };
+      }
+      return { isSplitsDrawerOpen: false };
     });
   },
 }));

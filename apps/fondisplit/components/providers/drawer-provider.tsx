@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ExpensePaymentsDrawer } from "../drawers/expense-payments-drawer";
+import { ExpenseSplitsDrawer } from "../drawers/expense-splits-drawer";
 
 export function DrawerProvider() {
   const [isMounted, setIsMounted] = useState(false);
@@ -11,6 +12,7 @@ export function DrawerProvider() {
   return (
     <>
       <ExpensePaymentsDrawer />
+      <ExpenseSplitsDrawer />
     </>
   );
 }

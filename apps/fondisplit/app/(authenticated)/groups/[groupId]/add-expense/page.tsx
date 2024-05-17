@@ -6,14 +6,16 @@ import Link from "next/link";
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { trpc } from "~/lib/trpc/client";
 import { z } from "@fondingo/utils/zod";
 
 import { Form, FormControl, FormField, FormItem } from "@fondingo/ui/form";
 import { IndianRupee, LayoutList, X } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
+import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
+
+import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/lib/utils";
 
@@ -42,21 +44,26 @@ interface IProps {
 }
 
 export default function AddExpensePage({ params }: IProps) {
+  const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { data: group } = trpc.group.getGroupById.useQuery(params.groupId);
 
   const {
     groupId,
-    expenseName,
-    expenseAmount,
     setGroupId,
+    expenseName,
     setExpenseName,
+    expenseAmount,
     setExpenseAmount,
     payments,
+    clearPayments,
+    isPaymentsDrawerOpen,
+    onPaymentsDrawerOpen,
     splits,
     splitType,
-    onPaymentsDrawerOpen,
-    isPaymentsDrawerOpen,
+    clearSplits,
+    isSplitsDrawerOpen,
+    onSplitsDrawerOpen,
   } = useExpenseDetails();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -182,6 +189,7 @@ export default function AddExpensePage({ params }: IProps) {
                       value={expenseAmount === 0 ? "" : expenseAmount}
                       onChange={(e) => {
                         form.setValue("expenseAmount", e.target.value);
+                        clearPayments();
                         setExpenseAmount(Number(e.target.value));
                       }}
                       className={cn(
@@ -199,7 +207,17 @@ export default function AddExpensePage({ params }: IProps) {
               type="button"
               variant="splitGhost"
               size="sm"
-              onClick={onPaymentsDrawerOpen}
+              onClick={() => {
+                if (Number(form.getValues("expenseAmount")) > 0) {
+                  clearPayments();
+                  onPaymentsDrawerOpen();
+                } else
+                  toast({
+                    title: "Enter an amount",
+                    description:
+                      "Amount must be greater than 0 before selecting a payer",
+                  });
+              }}
             >
               {payments.length === 0
                 ? "choose"
@@ -208,7 +226,22 @@ export default function AddExpensePage({ params }: IProps) {
                   : `${payments.length} members`}
             </Button>
             <p>and split</p>
-            <Button type="button" variant="splitGhost" size="sm">
+            <Button
+              type="button"
+              variant="splitGhost"
+              size="sm"
+              onClick={() => {
+                if (Number(form.getValues("expenseAmount")) > 0) {
+                  clearSplits();
+                  onSplitsDrawerOpen();
+                } else
+                  toast({
+                    title: "Enter an amount",
+                    description:
+                      "Amount must be greater than 0 before selecting a payer",
+                  });
+              }}
+            >
               {splitType}
             </Button>
           </div>
