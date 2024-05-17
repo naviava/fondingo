@@ -55,6 +55,8 @@ export default function AddExpensePage({ params }: IProps) {
     payments,
     splits,
     splitType,
+    onPaymentsDrawerOpen,
+    isPaymentsDrawerOpen,
   } = useExpenseDetails();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,6 +91,7 @@ export default function AddExpensePage({ params }: IProps) {
     groupId,
     setExpenseName,
     setExpenseAmount,
+    isPaymentsDrawerOpen,
   ]);
 
   return (
@@ -192,8 +195,17 @@ export default function AddExpensePage({ params }: IProps) {
           </div>
           <div className="mx-auto flex w-fit items-center justify-center rounded-lg border border-neutral-300 pl-2 text-sm shadow-sm shadow-neutral-500">
             <p>Paid by</p>
-            <Button type="button" variant="splitGhost" size="sm">
-              you
+            <Button
+              type="button"
+              variant="splitGhost"
+              size="sm"
+              onClick={onPaymentsDrawerOpen}
+            >
+              {payments.length === 0
+                ? "choose"
+                : payments.length === 1
+                  ? `${payments[0]?.userName}`
+                  : `${payments.length} members`}
             </Button>
             <p>and split</p>
             <Button type="button" variant="splitGhost" size="sm">

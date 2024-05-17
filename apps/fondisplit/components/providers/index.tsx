@@ -1,5 +1,6 @@
 "use client";
 
+import { DrawerProvider } from "./drawer-provider";
 import { ModalProvider } from "./modal-provider";
 import { TRPCProvider } from "./trpc-provider";
 
@@ -11,6 +12,7 @@ export function Providers({ children }: IProps) {
   return (
     <TRPCProvider>
       <ModalProvider />
+      <DrawerProvider />
       {children}
     </TRPCProvider>
   );

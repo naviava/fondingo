@@ -5,6 +5,7 @@ import {
   createGroup,
   getGroupById,
   getGroups,
+  getMembers,
 } from "../actions/group";
 
 export const groupRouter = router({
@@ -12,4 +13,5 @@ export const groupRouter = router({
   getGroups,
   getGroupById,
   addMember,
+  getMembers,
 });

@@ -7,17 +7,31 @@ type ExpenseDetails = {
   setGroupId: (groupId: string) => void;
   setExpenseName: (expenseName: string) => void;
   setExpenseAmount: (expenseAmount: number) => void;
+
   payments: {
     userId: string;
     userName: string;
     amount: number;
   }[];
+  setPayments: (
+    payments: {
+      userId: string;
+      userName: string;
+      amount: number;
+    }[],
+  ) => void;
+
+  splitType: "equally" | "custom";
   splits: {
     userId: string;
     userName: string;
     amount: number;
   }[];
-  splitType: "equally" | "custom";
+
+  breakPoint: number;
+  isPaymentsDrawerOpen: boolean;
+  onPaymentsDrawerOpen: () => void;
+  onPaymentsDrawerClose: () => void;
 };
 
 export const useExpenseDetails = create<ExpenseDetails>((set) => ({
@@ -30,6 +44,21 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
   setGroupId: (groupId) => set({ groupId }),
 
   payments: [],
-  splits: [],
+  setPayments: (payments) => set({ payments }),
+
   splitType: "equally",
+  splits: [],
+
+  breakPoint: 0,
+  isPaymentsDrawerOpen: false,
+  onPaymentsDrawerOpen: () =>
+    set({ isPaymentsDrawerOpen: true, breakPoint: Date.now() }),
+  onPaymentsDrawerClose: () => {
+    set((state) => {
+      if (Date.now() - state.breakPoint < 100) {
+        return { isPaymentsDrawerOpen: true };
+      }
+      return { isPaymentsDrawerOpen: false };
+    });
+  },
 }));

@@ -271,6 +271,47 @@ export const addMember = privateProcedure
   });
 
 /**
+ * This function is a private procedure that retrieves the members of a group.
+ * It takes a group ID as input and returns the members of the group.
+ *
+ * @function getMembers
+ * @memberof module:group
+ * @public
+ * @param {string} groupId - The ID of the group. It must be a non-empty string.
+ * @throws {TRPCError} Will throw an error if the group ID is not found or the user is not a member of the group.
+ * @returns {Promise<Array<GroupMember>>} Returns a promise that resolves to an array of group members. Each group member is an object that includes the user details.
+ *
+ * @description
+ * The function first checks if the user is a member of the group with the provided ID. If the user is not a member or the group does not exist, it throws a TRPCError with a "NOT_FOUND" code.
+ * If the user is a member of the group, the function retrieves the members of the group from the database and returns them.
+ * The function uses the `splitdb.group.findUnique` method to check if the user is a member of the group and the `splitdb.groupMember.findMany` method to retrieve the group members.
+ */
+export const getMembers = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .query(({ ctx, input: groupId }) => {
+    const { user } = ctx;
+    const isInGroup = splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!isInGroup)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const groupMembers = splitdb.groupMember.findMany({
+      where: { groupId },
+      include: { user: true },
+    });
+    return groupMembers;
+  });
+
+/**
  * This function calculates and stores the simplified debts for a given group.
  *
  * It first deletes any existing simplified debts for the group. Then it calculates the net balances
