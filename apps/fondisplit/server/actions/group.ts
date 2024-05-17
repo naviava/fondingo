@@ -270,6 +270,33 @@ export const addMember = privateProcedure
     });
   });
 
+/**
+ * This function calculates and stores the simplified debts for a given group.
+ *
+ * It first deletes any existing simplified debts for the group. Then it calculates the net balances
+ * by fetching all payments and splits related to the group. It also fetches any settlement entries
+ * for the group.
+ *
+ * The function then calculates the balances for each group member by adding the amounts they have paid
+ * and subtracting the amounts they owe. It also subtracts any settled amounts from the balances.
+ *
+ * After calculating the balances, the function simplifies the debts. It finds the group member who owes
+ * the most and the group member who is owed the most, and creates a debt from the former to the latter.
+ * The amount of the debt is the lesser of the amount owed by the former and the amount owed to the latter.
+ * This process is repeated until all debts are simplified.
+ *
+ * Finally, the simplified debts are stored in the database and a success message is returned. If any error
+ * occurs during the process, an error message is returned.
+ *
+ * @param {string} groupId - The ID of the group for which to calculate and store simplified debts.
+ * @returns {Promise<{ message: string } | void>} - A promise that resolves to an object containing a success
+ * or error message, or resolves to undefined if no group with the given ID exists.
+ *
+ * @throws {Error} - Throws an error if there is a problem with the database transaction or if any other
+ * unexpected error occurs.
+ *
+ * @async
+ */
 export async function calculateDebts(
   groupId: string,
 ): Promise<{ message: string } | void> {

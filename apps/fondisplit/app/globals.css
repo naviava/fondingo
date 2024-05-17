@@ -92,5 +92,5 @@ body,
 }
 
 .form-input {
-  @apply focus-visible:border-b-cta h-6 rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70;
+  @apply focus-visible:border-b-cta rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70;
 }
