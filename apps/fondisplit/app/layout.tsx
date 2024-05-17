@@ -8,8 +8,8 @@ import { getServerSession } from "next-auth";
 import { cn } from "@fondingo/ui/utils";
 import { authOptions } from "~/lib/auth";
 
-import { Providers } from "~/components/providers";
 import SessionProvider from "~/components/providers/session-provider";
+import { Providers } from "~/components/providers";
 import { Toaster } from "@fondingo/ui/toaster";
 
 const font = Montserrat({ subsets: ["latin"] });

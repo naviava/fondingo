@@ -1,16 +1,19 @@
-import { compare } from "bcrypt";
-import { AuthOptions } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
+import { AuthOptions } from "next-auth";
+
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import { Adapter } from "next-auth/adapters";
+
+import { sign } from "@fondingo/utils/jwt";
 import splitdb from "@fondingo/db-split";
+import { compare } from "bcrypt";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(splitdb) as Adapter,
   session: { strategy: "jwt" },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
@@ -43,4 +46,26 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user, account }) {
+      if (!!account) {
+        const tokenObject = {
+          id: user.id,
+          email: user.email,
+        };
+        token.accessToken = sign(tokenObject, process.env.NEXTAUTH_SECRET!);
+      }
+      if (!!user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.image = user.image;
+      }
+      return { ...token };
+    },
+    async session({ session, token }) {
+      session.user = token;
+      return session;
+    },
+  },
 };
