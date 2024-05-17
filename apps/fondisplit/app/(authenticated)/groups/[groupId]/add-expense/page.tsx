@@ -64,7 +64,7 @@ export default function AddExpensePage({ params }: IProps) {
     clearSplits,
     isSplitsDrawerOpen,
     onSplitsDrawerOpen,
-  } = useExpenseDetails();
+  } = useExpenseDetails((state) => state);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

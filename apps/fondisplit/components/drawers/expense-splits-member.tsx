@@ -10,7 +10,7 @@ interface IProps {
   userId: string;
   userName: string;
   userImageUrl: string | null | undefined;
-  setPaymentsState: Dispatch<
+  setSplitsState: Dispatch<
     SetStateAction<
       {
         userId: string;
@@ -25,9 +25,9 @@ export function ExpenseSplitsMember({
   userId,
   userName,
   userImageUrl,
-  setPaymentsState,
+  setSplitsState,
 }: IProps) {
-  const { onPaymentsDrawerClose, splitType, splits, expenseAmount, setSplits } =
+  const { onSplitsDrawerClose, splitType, splits, expenseAmount, setSplits } =
     useExpenseDetails();
 
   const handleSinglePayer = useCallback(
@@ -65,9 +65,9 @@ export function ExpenseSplitsMember({
                 : ""
             }
             onChange={(e) => {
-              setPaymentsState((prev) =>
+              setSplitsState((prev) =>
                 prev
-                  .filter((payment) => payment.userId !== userId)
+                  .filter((split) => split.userId !== userId)
                   .concat([
                     {
                       userId,

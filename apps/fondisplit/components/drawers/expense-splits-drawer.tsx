@@ -37,14 +37,14 @@ export function ExpenseSplitsDrawer() {
     }[]
   >([]);
 
-  const handleMultiplePayers = useCallback(() => {
+  const handleCustomSplit = useCallback(() => {
     if (sum !== expenseAmount) {
       return;
     } else {
       setSplits(splitsState.filter((payment) => payment.amount > 0));
       onSplitsDrawerClose();
     }
-  }, [expenseAmount, sum, splitsState, setSplits, onSplitsDrawerClose]);
+  }, [expenseAmount, onSplitsDrawerClose, setSplits, splitsState, sum]);
 
   useEffect(() => {
     setSum(
@@ -96,7 +96,7 @@ export function ExpenseSplitsDrawer() {
               userId={member.id}
               userName={member.name}
               userImageUrl={member.user?.image}
-              setPaymentsState={setSplitsState}
+              setSplitsState={setSplitsState}
             />
           ))}
         </ul>
