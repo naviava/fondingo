@@ -62,7 +62,6 @@ export default function AddExpensePage({ params }: IProps) {
     splits,
     splitType,
     clearSplits,
-    isSplitsDrawerOpen,
     onSplitsDrawerOpen,
   } = useExpenseDetails((state) => state);
 

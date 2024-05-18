@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
 import { ExpenseSplitsMember } from "./expense-splits-member";
@@ -34,9 +34,7 @@ export function ExpenseSplitsDrawer() {
     onSplitsDrawerClose,
     groupId,
     expenseAmount,
-    splits,
     setSplits,
-    clearSplits,
     splitType,
     setSplitType,
   } = useExpenseDetails();
