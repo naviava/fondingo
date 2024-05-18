@@ -1,10 +1,14 @@
 "use client";
 
+import { Dispatch, SetStateAction, useCallback } from "react";
+
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
-import { IndianRupee } from "@fondingo/ui/lucide";
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { cn } from "@fondingo/ui/utils";
+
+import { adjustMinorAmount } from "~/lib/utils";
 
 interface IProps {
   userId: string;
@@ -30,23 +34,48 @@ export function ExpenseSplitsMember({
   const { onSplitsDrawerClose, splitType, splits, expenseAmount, setSplits } =
     useExpenseDetails();
 
-  const handleSinglePayer = useCallback(
+  const handleClick = useCallback(
     ({ userId, userName }: { userId: string; userName: string }) => {
-      setSplits([
-        {
-          userId,
-          userName,
-          amount: expenseAmount,
-        },
-      ]);
+      if (splitType === "custom") return;
+      const currentSplits = [...splits];
+      const exisitingEntry = currentSplits.find(
+        (split) => split.userId === userId,
+      );
+
+      let newSplits: {
+        userId: string;
+        userName: string;
+        amount: number;
+      }[] = [];
+      if (!!exisitingEntry) {
+        const tempSplits = currentSplits.filter(
+          (split) => split.userId !== userId,
+        );
+        newSplits = tempSplits.map((split) => ({
+          ...split,
+          amount: expenseAmount / tempSplits.length,
+        }));
+      } else {
+        const tempSplits = [...currentSplits, { userId, userName, amount: 0 }];
+        newSplits = tempSplits.map((split) => ({
+          ...split,
+          amount: expenseAmount / tempSplits.length,
+        }));
+      }
+
+      const adjustedSplits = adjustMinorAmount(newSplits, expenseAmount);
+      return setSplits(adjustedSplits);
     },
-    [setSplits, expenseAmount],
+    [splitType, splits, expenseAmount, setSplits],
   );
 
   return (
     <li
-      onClick={() => {}}
-      className="flex cursor-pointer items-center justify-between border-b pb-2"
+      onClick={() => handleClick({ userId, userName })}
+      className={cn(
+        "flex items-center justify-between border-b pb-2",
+        splitType === "equally" && "cursor-pointer",
+      )}
     >
       <div className="flex items-center">
         <Avatar userImageUrl={userImageUrl} userName={userName} />

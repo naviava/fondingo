@@ -22,7 +22,6 @@ type ExpenseDetails = {
   ) => void;
   clearPayments: () => void;
 
-  splitType: "equally" | "custom";
   splits: {
     userId: string;
     userName: string;
@@ -36,6 +35,8 @@ type ExpenseDetails = {
     }[],
   ) => void;
   clearSplits: () => void;
+  splitType: "equally" | "custom";
+  setSplitType: (splitType: "equally" | "custom") => void;
 
   breakPoint: number;
 
@@ -61,10 +62,11 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
   setPayments: (payments) => set({ payments }),
   clearPayments: () => set({ payments: [] }),
 
-  splitType: "equally" as const,
   splits: [],
   setSplits: (splits) => set({ splits }),
   clearSplits: () => set({ splits: [] }),
+  splitType: "equally" as const,
+  setSplitType: (splitType) => set({ splitType }),
 
   breakPoint: 0,
 

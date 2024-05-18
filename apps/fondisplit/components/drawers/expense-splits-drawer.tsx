@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { ExpenseSplitsMember } from "./expense-splits-member";
 import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";
 import {
@@ -13,7 +14,19 @@ import {
 } from "@fondingo/ui/drawer";
 
 import { trpc } from "~/lib/trpc/client";
-import { ExpenseSplitsMember } from "./expense-splits-member";
+import { cn } from "@fondingo/ui/utils";
+import { CheckCircle, TriangleAlert } from "@fondingo/ui/lucide";
+
+const textMap = {
+  equally: {
+    title: "Split equally",
+    tagline: "Select which people owe an equal share.",
+  },
+  custom: {
+    title: "Split by exact amounts",
+    tagline: "Specify exactly how much each person owes.",
+  },
+};
 
 export function ExpenseSplitsDrawer() {
   const {
@@ -24,11 +37,12 @@ export function ExpenseSplitsDrawer() {
     splits,
     setSplits,
     clearSplits,
+    splitType,
+    setSplitType,
   } = useExpenseDetails();
 
   const { data: members } = trpc.group.getMembers.useQuery(groupId);
 
-  const [sum, setSum] = useState(0);
   const [splitsState, setSplitsState] = useState<
     {
       userId: string;
@@ -37,23 +51,41 @@ export function ExpenseSplitsDrawer() {
     }[]
   >([]);
 
-  const handleCustomSplit = useCallback(() => {
-    if (sum !== expenseAmount) {
-      return;
-    } else {
-      setSplits(splitsState.filter((payment) => payment.amount > 0));
-      onSplitsDrawerClose();
-    }
-  }, [expenseAmount, onSplitsDrawerClose, setSplits, splitsState, sum]);
-
-  useEffect(() => {
-    setSum(
+  const sum = useMemo(
+    () =>
       splitsState.reduce((total, payment) => {
         total += payment.amount;
         return total;
       }, 0),
-    );
-  }, [setSum, splitsState]);
+    [splitsState],
+  );
+
+  const hasNegativeAmount = useMemo(
+    () => !!splitsState.find((split) => split.amount < 0),
+    [splitsState],
+  );
+
+  const handleCustomSplit = useCallback(() => {
+    if (splitType === "equally") {
+      return onSplitsDrawerClose();
+    }
+    if (sum !== expenseAmount) {
+      return;
+    }
+    setSplits(splitsState.filter((payment) => payment.amount > 0));
+    onSplitsDrawerClose();
+  }, [
+    expenseAmount,
+    onSplitsDrawerClose,
+    setSplits,
+    splitsState,
+    sum,
+    splitType,
+  ]);
+
+  useEffect(() => {
+    console.log(splits);
+  }, [splits]);
 
   return (
     <Drawer
@@ -80,15 +112,47 @@ export function ExpenseSplitsDrawer() {
             <Button
               size="sm"
               variant="splitGhost"
-              disabled={sum !== expenseAmount}
-              onClick={() => {}}
+              disabled={splitType === "custom" && sum !== expenseAmount}
+              onClick={handleCustomSplit}
               className="disabled:text-muted-foreground disabled:cursor-not-allowed"
             >
-              {"Done"}
+              Done
             </Button>
           </DrawerTitle>
           <Separator />
         </DrawerHeader>
+        <div className="mt-2 text-center text-sm">
+          <h4 className="font-bold">{textMap[splitType].title}</h4>
+          <p className="font-medium">{textMap[splitType].tagline}</p>
+        </div>
+        <div className="mt-4 flex items-center justify-center gap-x-8">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setSplitType("equally")}
+            className={cn(
+              "w-20 rounded-none text-6xl font-bold shadow-sm shadow-neutral-500",
+              splitType === "equally" &&
+                "bg-cta hover:bg-cta text-white hover:text-white",
+            )}
+          >
+            =
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setSplitType("custom")}
+            className={cn(
+              "w-20 rounded-none text-4xl font-bold shadow-sm shadow-neutral-500",
+              splitType === "custom" &&
+                "bg-cta hover:bg-cta text-white hover:text-white",
+            )}
+          >
+            1.23
+          </Button>
+        </div>
         <ul className="space-y-4 px-8 py-4">
           {members?.map((member) => (
             <ExpenseSplitsMember
@@ -100,6 +164,33 @@ export function ExpenseSplitsDrawer() {
             />
           ))}
         </ul>
+        {splitType === "custom" && (
+          <div className="mb-4 flex flex-col items-center justify-center text-sm">
+            {hasNegativeAmount ? (
+              <div className="flex items-center text-rose-500">
+                <TriangleAlert className="mr-2 h-4 w-4" />
+                <p>No amounts can be negative</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center">
+                  {sum === expenseAmount && (
+                    <CheckCircle className="text-cta mr-2 h-4 w-4" />
+                  )}
+                  <p
+                    className={cn(
+                      "font-bold",
+                      sum === expenseAmount && "text-cta",
+                    )}
+                  >{`${sum.toFixed(2)} of ${expenseAmount.toFixed(2)} assigned`}</p>
+                </div>
+                {expenseAmount - sum !== 0 && (
+                  <p className="font-medium text-rose-500">{`${(expenseAmount - sum).toFixed(2)} left`}</p>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </DrawerContent>
     </Drawer>
   );

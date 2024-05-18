@@ -209,7 +209,6 @@ export default function AddExpensePage({ params }: IProps) {
               size="sm"
               onClick={() => {
                 if (Number(form.getValues("expenseAmount")) > 0) {
-                  clearPayments();
                   onPaymentsDrawerOpen();
                 } else
                   toast({

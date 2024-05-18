@@ -55,7 +55,10 @@ export function ExpensePaymentsMember({
         }
         return;
       }}
-      className="flex cursor-pointer items-center justify-between border-b pb-2"
+      className={cn(
+        "flex items-center justify-between border-b pb-2",
+        !isMultiple && "cursor-pointer",
+      )}
     >
       <div className="flex items-center">
         <Avatar userImageUrl={userImageUrl} userName={userName} />

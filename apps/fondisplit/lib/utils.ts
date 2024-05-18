@@ -14,3 +14,29 @@ export function hexToRgb(hex: string, alpha: number) {
 export function linearGradientWithAlpha(hex: string, alpha: number) {
   return `linear-gradient(to bottom left, ${hex}, ${hexToRgb(hex, alpha)})`;
 }
+
+export function adjustMinorAmount(
+  originalSplits: { userId: string; userName: string; amount: number }[],
+  expenseAmount: number,
+) {
+  const splits = originalSplits.map((split) => ({
+    ...split,
+    amount: Math.floor(split.amount * 100),
+  }));
+
+  const totalAmount = splits.reduce((acc, split) => acc + split.amount, 0);
+  const diff = Math.floor(expenseAmount * 100) - totalAmount;
+  if (diff === 0) return originalSplits;
+
+  const adjustedSplits = [...splits];
+  const randomIndex = Math.floor(Math.random() * adjustedSplits.length);
+  if (adjustedSplits[randomIndex]) {
+    adjustedSplits[randomIndex].amount += diff;
+  }
+
+  const newSplits = adjustedSplits.map((split) => ({
+    ...split,
+    amount: split.amount / 100,
+  }));
+  return newSplits;
+}
