@@ -67,6 +67,7 @@ model User {
   accounts               Account[]
   sessions               Session[]
   groups                 GroupMember[]
+  createdExpenses        Expense[]
   tempfriends            TempFriend[]
   friends1               Friend[]        @relation("Friend1")
   friends2               Friend[]        @relation("Friend2")
@@ -140,7 +141,6 @@ model GroupMember {
   group              Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   userId             String?
   user               User?            @relation(fields: [userId], references: [id], onDelete: Restrict)
-  expenses           Expense[]
   expensePayments    ExpensePayment[]
   expenseSplits      ExpenseSplit[]
   simplifiedDebtFrom SimplifiedDebt[] @relation("DebtFromUser")
@@ -159,7 +159,7 @@ model Expense {
   name        String
   amount      Int
   createdById String
-  createdBy   GroupMember      @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdBy   User             @relation(fields: [createdById], references: [id], onDelete: Restrict)
   groupId     String
   group       Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   payments    ExpensePayment[]

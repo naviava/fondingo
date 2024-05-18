@@ -18,6 +18,7 @@ import { Input } from "@fondingo/ui/input";
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/lib/utils";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   groupId: z.string().min(1, { message: "Group ID is required" }),
@@ -44,6 +45,7 @@ interface IProps {
 }
 
 export default function AddExpensePage({ params }: IProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { data: group } = trpc.group.getGroupById.useQuery(params.groupId);
@@ -63,6 +65,7 @@ export default function AddExpensePage({ params }: IProps) {
     splitType,
     clearSplits,
     onSplitsDrawerOpen,
+    clearExpenseDetails,
   } = useExpenseDetails((state) => state);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -75,10 +78,6 @@ export default function AddExpensePage({ params }: IProps) {
       splits: [],
     },
   });
-
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    console.log(values);
-  }, []);
 
   useEffect(() => {
     setExpenseName(form.getValues("expenseName"));
@@ -100,10 +99,32 @@ export default function AddExpensePage({ params }: IProps) {
     isPaymentsDrawerOpen,
   ]);
 
+  const { mutate: handleAddExpense, isPending } =
+    trpc.group.addExpense.useMutation({
+      onError: ({ message }) =>
+        toast({ title: "Something went wrong", description: message }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({ title: toastTitle, description: toastDescription });
+        form.reset();
+        clearExpenseDetails();
+        router.push(`/groups/${params.groupId}`);
+      },
+    });
+
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      handleAddExpense({
+        ...values,
+        expenseAmount: Number(values.expenseAmount),
+      });
+    },
+    [handleAddExpense],
+  );
+
   return (
     <>
       <div className="flex items-center justify-between px-2 pt-4">
-        <Button asChild variant="splitGhost">
+        <Button asChild variant="splitGhost" disabled={isPending}>
           <Link href={`/groups/${params.groupId}`}>
             <X className="text-muted-foreground h-8 w-8" />
           </Link>
@@ -112,10 +133,11 @@ export default function AddExpensePage({ params }: IProps) {
         <Button
           type="button"
           variant="splitGhost"
-          className="w-20"
+          disabled={isPending}
           onClick={() => {
             submitButtonRef.current?.click();
           }}
+          className="w-20"
         >
           Save
         </Button>
@@ -154,6 +176,8 @@ export default function AddExpensePage({ params }: IProps) {
                   <FormControl>
                     <Input
                       placeholder="Enter a description"
+                      autoComplete="off"
+                      disabled={isPending}
                       {...field}
                       value={expenseName}
                       onChange={(e) => {
@@ -182,8 +206,10 @@ export default function AddExpensePage({ params }: IProps) {
                   <FormControl>
                     <Input
                       placeholder="0.00"
+                      autoComplete="off"
                       type="number"
                       step={0.1}
+                      disabled={isPending}
                       {...field}
                       value={expenseAmount === 0 ? "" : expenseAmount}
                       onChange={(e) => {
@@ -206,6 +232,7 @@ export default function AddExpensePage({ params }: IProps) {
               type="button"
               variant="splitGhost"
               size="sm"
+              disabled={isPending}
               onClick={() => {
                 if (Number(form.getValues("expenseAmount")) > 0) {
                   onPaymentsDrawerOpen();
@@ -228,6 +255,7 @@ export default function AddExpensePage({ params }: IProps) {
               type="button"
               variant="splitGhost"
               size="sm"
+              disabled={isPending}
               onClick={() => {
                 if (Number(form.getValues("expenseAmount")) > 0) {
                   clearSplits();

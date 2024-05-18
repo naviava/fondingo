@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
 import {
@@ -69,6 +69,12 @@ export function ExpensePaymentsDrawer() {
     setPayments,
     onPaymentsDrawerClose,
   ]);
+
+  useEffect(() => {
+    members?.forEach((member) => {
+      console.log(member.id);
+    });
+  }, [members]);
 
   return (
     <Drawer

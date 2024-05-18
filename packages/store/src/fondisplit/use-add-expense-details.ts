@@ -47,6 +47,8 @@ type ExpenseDetails = {
   isSplitsDrawerOpen: boolean;
   onSplitsDrawerOpen: () => void;
   onSplitsDrawerClose: () => void;
+
+  clearExpenseDetails: () => void;
 };
 
 export const useExpenseDetails = create<ExpenseDetails>((set) => ({
@@ -93,4 +95,16 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
       return { isSplitsDrawerOpen: false };
     });
   },
+
+  clearExpenseDetails: () =>
+    set({
+      groupId: "",
+      expenseName: "",
+      expenseAmount: 0,
+      payments: [],
+      splits: [],
+      splitType: "equally",
+      isPaymentsDrawerOpen: false,
+      isSplitsDrawerOpen: false,
+    }),
 }));
