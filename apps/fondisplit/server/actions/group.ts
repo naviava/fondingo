@@ -5,6 +5,7 @@ import { privateProcedure } from "~/server/trpc";
 import { revalidatePath } from "next/cache";
 import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
+import { hasDuplicates } from "~/lib/utils";
 
 /**
  * Creates a new group with the provided details.
@@ -311,6 +312,181 @@ export const getMembers = privateProcedure
     return groupMembers;
   });
 
+export const addExpense = privateProcedure
+  .input(
+    z.object({
+      groupId: z.string().min(1, { message: "Group ID is required" }),
+      expenseName: z.string().min(1, { message: "Expense name is required" }),
+      expenseAmount: z.number(),
+      payments: z.array(
+        z.object({
+          userId: z.string().min(1),
+          amount: z.number(),
+        }),
+      ),
+      splits: z.array(
+        z.object({
+          userId: z.string().min(1),
+          amount: z.number(),
+        }),
+      ),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupId, expenseName, expenseAmount, payments, splits } = input;
+
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const totalPaymentsAmount = payments.reduce(
+      (acc, payment) => acc + payment.amount,
+      0,
+    );
+    const totalSplitsAmount = splits.reduce(
+      (acc, split) => acc + split.amount,
+      0,
+    );
+    if (
+      totalPaymentsAmount !== expenseAmount ||
+      totalSplitsAmount !== expenseAmount
+    ) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Total payments and splits should match the expense amount",
+      });
+    }
+
+    if (expenseAmount <= 1)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message:
+          "Don't be cheap. Expense amount should be greater than or equal to 1",
+      });
+
+    const groupMembers = await splitdb.groupMember.findMany({
+      where: { groupId },
+    });
+    const groupMemberIds = groupMembers.map((member) => member.userId);
+
+    const paymentUserIds = payments.map((payment) => payment.userId);
+    if (hasDuplicates(paymentUserIds)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Duplicate users in payments",
+      });
+    }
+    payments.forEach((payment) => {
+      if (payment.amount <= 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Payment amount should be greater than 0",
+        });
+      if (!groupMemberIds.includes(payment.userId))
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Payment user not in group",
+        });
+    });
+
+    const splitUserIds = splits.map((split) => split.userId);
+    if (hasDuplicates(splitUserIds)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Duplicate users in splits",
+      });
+    }
+    splits.forEach((split) => {
+      if (split.amount <= 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Split amount should be greater than 0",
+        });
+      if (!groupMemberIds.includes(split.userId))
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Split user not in group",
+        });
+    });
+
+    try {
+      return splitdb.$transaction(async (db) => {
+        const expense = await db.expense.create({
+          data: {
+            name: expenseName,
+            amount: Math.floor(expenseAmount * 100),
+            createdById: user.id,
+            groupId,
+          },
+        });
+        if (!expense)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create expense",
+          });
+
+        for (const payment of payments) {
+          const expensePayment = await db.expensePayment.create({
+            data: {
+              amount: Math.floor(payment.amount * 100),
+              groupMemberId: payment.userId,
+              expenseId: expense.id,
+            },
+          });
+          if (!expensePayment)
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to create payment",
+            });
+        }
+
+        for (const split of splits) {
+          const expenseSplit = await db.expenseSplit.create({
+            data: {
+              amount: Math.floor(split.amount * 100),
+              groupMemberId: split.userId,
+              expenseId: expense.id,
+            },
+          });
+          if (!expenseSplit)
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to create split",
+            });
+        }
+
+        const res = await calculateDebts(groupId);
+        if (!("success" in res) || !res.success) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to calculate debts",
+          });
+        }
+        return {
+          toastTitle: `${expense.name} added"`,
+          toastDescription: `Expense of ${expense.amount} added to the group`,
+        };
+      });
+    } catch (err) {
+      console.error("\n\nError adding expense:\n\n", err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to add expense",
+      });
+    }
+  });
+
 /**
  * This function calculates and stores the simplified debts for a given group.
  *
@@ -340,7 +516,7 @@ export const getMembers = privateProcedure
  */
 export async function calculateDebts(
   groupId: string,
-): Promise<{ message: string } | void> {
+): Promise<{ success: string } | { error: string }> {
   try {
     return splitdb.$transaction(async (db) => {
       // Delete existing simplified debts for the group
@@ -434,11 +610,11 @@ export async function calculateDebts(
           },
         });
       }
-      return { message: "Simplified debts calculated and stored" };
+      return { success: "Simplified debts calculated and stored" };
     });
   } catch (err) {
     console.error("\n\nError calculating simplified debts:\n\n", err);
-    return { message: "Error calculating simplified debts" };
+    return { error: "Error calculating simplified debts" };
   }
 }
 

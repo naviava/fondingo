@@ -15,6 +15,10 @@ export function linearGradientWithAlpha(hex: string, alpha: number) {
   return `linear-gradient(to bottom left, ${hex}, ${hexToRgb(hex, alpha)})`;
 }
 
+export function hasDuplicates(array: any[]) {
+  return new Set(array).size !== array.length;
+}
+
 export function adjustMinorAmount(
   originalSplits: { userId: string; userName: string; amount: number }[],
   expenseAmount: number,

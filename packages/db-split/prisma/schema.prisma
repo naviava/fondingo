@@ -140,6 +140,7 @@ model GroupMember {
   group              Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   userId             String?
   user               User?            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  expenses           Expense[]
   expensePayments    ExpensePayment[]
   expenseSplits      ExpenseSplit[]
   simplifiedDebtFrom SimplifiedDebt[] @relation("DebtFromUser")
@@ -155,7 +156,10 @@ model GroupMember {
 
 model Expense {
   id          String           @id @default(cuid())
+  name        String
   amount      Int
+  createdById String
+  createdBy   GroupMember      @relation(fields: [createdById], references: [id], onDelete: Restrict)
   groupId     String
   group       Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   payments    ExpensePayment[]
