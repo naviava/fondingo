@@ -130,7 +130,11 @@ export function ExpenseSplitsDrawer() {
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => setSplitType("equally")}
+            onClick={() => {
+              setSplits([]);
+              setSplitsState([]);
+              setSplitType("equally");
+            }}
             className={cn(
               "w-20 rounded-none text-6xl font-bold shadow-sm shadow-neutral-500",
               splitType === "equally" &&
@@ -143,7 +147,11 @@ export function ExpenseSplitsDrawer() {
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => setSplitType("custom")}
+            onClick={() => {
+              setSplits([]);
+              setSplitsState([]);
+              setSplitType("custom");
+            }}
             className={cn(
               "w-20 rounded-none text-4xl font-bold shadow-sm shadow-neutral-500",
               splitType === "custom" &&

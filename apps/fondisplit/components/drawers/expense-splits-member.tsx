@@ -1,9 +1,9 @@
 "use client";
 
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
-import { IndianRupee } from "@fondingo/ui/lucide";
+import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
 import { cn } from "@fondingo/ui/utils";
@@ -31,8 +31,12 @@ export function ExpenseSplitsMember({
   userImageUrl,
   setSplitsState,
 }: IProps) {
-  const { onSplitsDrawerClose, splitType, splits, expenseAmount, setSplits } =
-    useExpenseDetails();
+  const { splitType, splits, expenseAmount, setSplits } = useExpenseDetails();
+
+  const isInSplits = useMemo(
+    () => splits.find((split) => split.userId === userId),
+    [splits, userId],
+  );
 
   const handleClick = useCallback(
     ({ userId, userName }: { userId: string; userName: string }) => {
@@ -81,6 +85,16 @@ export function ExpenseSplitsMember({
         <Avatar userImageUrl={userImageUrl} userName={userName} />
         <p className="ml-4">{userName}</p>
       </div>
+      {splitType === "equally" && (
+        <div
+          className={cn(
+            "flex h-6 w-6 items-center justify-center rounded-full border-2",
+            isInSplits && "border-cta bg-cta",
+          )}
+        >
+          {isInSplits && <Check className="h-4 w-4 text-white" />}
+        </div>
+      )}
       {splitType === "custom" && (
         <div className="flex items-center">
           <IndianRupee className="text-muted-foreground mr-2 h-4 w-4" />
