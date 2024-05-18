@@ -6,9 +6,9 @@ import { useExpenseDetails } from "@fondingo/store/fondisplit";
 import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
-import { cn } from "@fondingo/ui/utils";
 
 import { adjustMinorAmount } from "~/lib/utils";
+import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   userId: string;
@@ -41,31 +41,17 @@ export function ExpenseSplitsMember({
   const handleClick = useCallback(
     ({ userId, userName }: { userId: string; userName: string }) => {
       if (splitType === "custom") return;
-      const currentSplits = [...splits];
-      const exisitingEntry = currentSplits.find(
-        (split) => split.userId === userId,
-      );
 
-      let newSplits: {
-        userId: string;
-        userName: string;
-        amount: number;
-      }[] = [];
-      if (!!exisitingEntry) {
-        const tempSplits = currentSplits.filter(
-          (split) => split.userId !== userId,
-        );
-        newSplits = tempSplits.map((split) => ({
-          ...split,
-          amount: expenseAmount / tempSplits.length,
-        }));
-      } else {
-        const tempSplits = [...currentSplits, { userId, userName, amount: 0 }];
-        newSplits = tempSplits.map((split) => ({
-          ...split,
-          amount: expenseAmount / tempSplits.length,
-        }));
-      }
+      const existingEntry = splits.find((split) => split.userId === userId);
+
+      const tempSplits = !!existingEntry
+        ? splits.filter((split) => split.userId !== userId)
+        : [...splits, { userId, userName, amount: 0 }];
+
+      const newSplits = tempSplits.map((split) => ({
+        ...split,
+        amount: expenseAmount / tempSplits.length,
+      }));
 
       const adjustedSplits = adjustMinorAmount(newSplits, expenseAmount);
       return setSplits(adjustedSplits);

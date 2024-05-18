@@ -73,7 +73,7 @@ export function ExpenseSplitsDrawer() {
       return;
     }
     setSplits(splitsState.filter((payment) => payment.amount > 0));
-    onSplitsDrawerClose();
+    return onSplitsDrawerClose();
   }, [
     expenseAmount,
     onSplitsDrawerClose,
@@ -82,10 +82,6 @@ export function ExpenseSplitsDrawer() {
     sum,
     splitType,
   ]);
-
-  useEffect(() => {
-    console.log(splits);
-  }, [splits]);
 
   return (
     <Drawer
