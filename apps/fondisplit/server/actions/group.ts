@@ -518,6 +518,34 @@ export const addExpense = privateProcedure
     }
   });
 
+export const getDebts = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .mutation(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const debts = await splitdb.simplifiedDebt.findMany({
+      where: { groupId },
+      include: {
+        from: true,
+        to: true,
+      },
+    });
+    return debts || [];
+  });
+
 /**
  * This function calculates and stores the simplified debts for a given group.
  *
