@@ -6,6 +6,7 @@ import { UserPlus } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 
 import { linearGradientWithAlpha } from "~/lib/utils";
+import { trpc } from "~/lib/trpc/client";
 
 interface IProps {
   groupId: string;
@@ -23,6 +24,7 @@ export function GroupExpensesPanel({
   isGroupManager = false,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
+  const { data: debts } = trpc.group.getDebts.useQuery(groupId);
 
   if (!hasMembers) {
     return (
@@ -70,6 +72,10 @@ export function GroupExpensesPanel({
   }
 
   return (
-    <ScrollArea className="h-[55vh] flex-1 md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"></ScrollArea>
+    <ScrollArea className="h-[55vh] flex-1 md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
+      {debts?.map((debt) => (
+        <p>{`${debt.from.name} has to pay ${debt.amount / 100} to ${debt.to.name}`}</p>
+      ))}
+    </ScrollArea>
   );
 }
