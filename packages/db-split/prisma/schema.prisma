@@ -125,8 +125,8 @@ model Group {
   type            GroupType
   members         GroupMember[]
   expenses        Expense[]
-  simplifiedDebts SimplifiedDebt[]
   settlements     Settlement[]
+  simplifiedDebts SimplifiedDebt[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -164,7 +164,6 @@ model Expense {
   group       Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   payments    ExpensePayment[]
   splits      ExpenseSplit[]
-  settlements Settlement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -189,16 +188,14 @@ model ExpenseSplit {
 }
 
 model Settlement {
-  id        String      @id @default(cuid())
-  amount    Int
-  groupId   String
-  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  expenseId String
-  expense   Expense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  fromId    String
-  from      GroupMember @relation("SettlementFromUser", fields: [fromId], references: [id], onDelete: Restrict)
-  toId      String
-  to        GroupMember @relation("SettlementToUser", fields: [toId], references: [id], onDelete: Restrict)
+  id      String      @id @default(cuid())
+  amount  Int
+  groupId String
+  group   Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromId  String
+  from    GroupMember @relation("SettlementFromUser", fields: [fromId], references: [id], onDelete: Restrict)
+  toId    String
+  to      GroupMember @relation("SettlementToUser", fields: [toId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 
-import { SettleUpClient } from "~/components/settle-up-client";
 import { serverClient } from "~/lib/trpc/server-client";
+import { GroupMemberClient } from "~/types";
+
+import { SettleUpClient } from "~/components/settle-up-client";
 
 interface IProps {
   params: {
@@ -13,5 +15,41 @@ export default async function SettleUpPage({ params }: IProps) {
   const group = await serverClient.group.getGroupById(params.groupId);
   if (!group) return redirect("/groups");
 
-  return <SettleUpClient group={group} />;
+  const debtors = group.simplifiedDebts.reduce<GroupMemberClient[]>(
+    (acc, debtor) => {
+      const index = acc.findIndex((item) => item.id === debtor.from.id);
+      if (index === -1) {
+        acc.push({
+          id: debtor.from.id,
+          name: debtor.from.name,
+          image: debtor.from.user?.image || "",
+        });
+      }
+      return acc;
+    },
+    [],
+  );
+
+  const creditors = group.simplifiedDebts.reduce<GroupMemberClient[]>(
+    (acc, creditor) => {
+      const index = acc.findIndex((item) => item.id === creditor.to.id);
+      if (index === -1) {
+        acc.push({
+          id: creditor.to.id,
+          name: creditor.to.name,
+          image: creditor.to.user?.image || "",
+        });
+      }
+      return acc;
+    },
+    [],
+  );
+
+  return (
+    <SettleUpClient
+      groupId={params.groupId}
+      debtors={debtors}
+      creditors={creditors}
+    />
+  );
 }

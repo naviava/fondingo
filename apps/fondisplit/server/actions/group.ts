@@ -109,8 +109,12 @@ export const getGroupById = privateProcedure
         expenses: true,
         simplifiedDebts: {
           include: {
-            from: true,
-            to: true,
+            from: {
+              include: { user: true },
+            },
+            to: {
+              include: { user: true },
+            },
           },
         },
       },
@@ -668,8 +672,6 @@ export async function calculateDebts(
         if (balances[maxOwed] === 0) delete balances[maxOwed];
         if (balances[maxOwing] === 0) delete balances[maxOwing];
       }
-
-      console.log(debts);
 
       // Store simplified debts in the database
       for (const debt of debts) {

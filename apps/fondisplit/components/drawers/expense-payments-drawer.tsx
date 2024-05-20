@@ -70,12 +70,6 @@ export function ExpensePaymentsDrawer() {
     onPaymentsDrawerClose,
   ]);
 
-  useEffect(() => {
-    members?.forEach((member) => {
-      console.log(member.id);
-    });
-  }, [members]);
-
   return (
     <Drawer
       open={isPaymentsDrawerOpen}

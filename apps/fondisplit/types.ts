@@ -6,3 +6,9 @@ export type DebtWithDetails = SimplifiedDebt & {
   to: GroupMember;
   from: GroupMember;
 };
+
+export type GroupMemberClient = {
+  id: string;
+  name: string;
+  image: string;
+};

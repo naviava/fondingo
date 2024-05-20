@@ -17,7 +17,8 @@
     "./dialog": "./src/shadcn/dialog.tsx",
     "./separator": "./src/shadcn/separator.tsx",
     "./avatar": "./src/avatar.tsx",
-    "./drawer": "./src/shadcn/drawer.tsx"
+    "./drawer": "./src/shadcn/drawer.tsx",
+    "./select": "./src/shadcn/select.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
