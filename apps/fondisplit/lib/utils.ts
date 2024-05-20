@@ -4,7 +4,7 @@ export function formatPrice(price: number): string {
 
 export function hexToRgb(hex: string, alpha: number) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return null;
+  if (!result) return `rgba(0, 0, 0, ${alpha})`;
   const r = parseInt(result[1] || "0", 16);
   const g = parseInt(result[2] || "0", 16);
   const b = parseInt(result[3] || "0", 16);

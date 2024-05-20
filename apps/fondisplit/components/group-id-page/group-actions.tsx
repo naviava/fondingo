@@ -7,9 +7,11 @@ import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { Button } from "@fondingo/ui/button";
 import { toast } from "@fondingo/ui/use-toast";
+import { hexToRgb } from "~/lib/utils";
 
 interface IProps {
   groupId: string;
+  groupColor: string;
   hasDebts: boolean;
   hasExpenses: boolean;
   isGroupManager: boolean;
@@ -18,6 +20,7 @@ interface IProps {
 export const GroupActions = memo(_GroupActions);
 function _GroupActions({
   groupId,
+  groupColor,
   hasDebts,
   hasExpenses,
   isGroupManager = false,
@@ -57,6 +60,10 @@ function _GroupActions({
             variant="outline"
             onClick={option.onClick}
             className="min-w-[7rem] font-bold shadow-sm shadow-neutral-600"
+            style={{
+              backgroundColor:
+                option.label === "Settle up" ? hexToRgb(groupColor, 0.3) : "",
+            }}
           >
             {option.label}
           </Button>
