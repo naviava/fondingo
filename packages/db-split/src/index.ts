@@ -1,5 +1,6 @@
 import {
   PrismaClient,
+  User as UserPrisma,
   Role as RolePrisma,
   GroupRole as GroupRolePrisma,
   GroupType as GroupTypePrisma,
@@ -23,6 +24,7 @@ export const GroupType = GroupTypePrisma;
 
 export type SimplifiedDebt = SimplifiedDebtPrisma;
 export type GroupMember = GroupMemberPrisma;
+export type User = UserPrisma;
 export default prisma;
 
 if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;

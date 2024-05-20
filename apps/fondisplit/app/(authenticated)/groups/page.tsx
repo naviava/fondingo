@@ -4,10 +4,15 @@ import { Button } from "@fondingo/ui/button";
 import { SearchBar } from "~/components/search-bar";
 import { GroupsPanel } from "~/components/groups-panel";
 import { serverClient } from "~/lib/trpc/server-client";
+import { redirect } from "next/navigation";
 
 export default async function GroupsPage() {
   const user = await serverClient.user.getAuthProfile();
   const groups = await serverClient.group.getGroups();
+
+  if (!user) {
+    return redirect("/api/auth/signin");
+  }
 
   return (
     <>
@@ -24,7 +29,7 @@ export default async function GroupsPage() {
       <div className="my-10 px-4 font-semibold">
         Overall you are owed <span className="text-cta">$12916.39</span>
       </div>
-      <GroupsPanel groups={groups} />
+      <GroupsPanel user={user} groups={groups} />
     </>
   );
 }

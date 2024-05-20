@@ -1,8 +1,8 @@
 import { GroupExpensesPanel } from "~/components/group-id-page/group-expenses-panel";
 import { UtilityButtons } from "~/components/group-id-page/utility-buttons";
 import { GroupActions } from "~/components/group-id-page/group-actions";
-import { GroupAvatar } from "~/components/group-id-page/group-avatar";
 import { GroupHeader } from "~/components/group-id-page/group-header";
+import { GroupAvatar } from "~/components/group-avatar";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { linearGradientWithAlpha } from "~/lib/utils";

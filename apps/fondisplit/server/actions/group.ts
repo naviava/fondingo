@@ -576,8 +576,12 @@ export const getDebts = privateProcedure
     const debts = await splitdb.simplifiedDebt.findMany({
       where: { groupId },
       include: {
-        from: true,
-        to: true,
+        from: {
+          include: { user: true },
+        },
+        to: {
+          include: { user: true },
+        },
       },
     });
     return debts || [];
