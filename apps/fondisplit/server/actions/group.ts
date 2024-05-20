@@ -702,6 +702,8 @@ export const addSettlement = privateProcedure
 export async function calculateDebts(
   groupId: string,
 ): Promise<{ success: string } | { error: string }> {
+  "use server";
+
   try {
     return splitdb.$transaction(async (db) => {
       // Delete existing simplified debts for the group
@@ -749,11 +751,14 @@ export async function calculateDebts(
 
       // Subtract settled amounts from balances
       for (const settlement of settlements) {
-        const paidBy = settlement.toId;
+        const paidBy = settlement.fromId;
+        const receivedBy = settlement.toId;
         const amount = settlement.amount;
 
         if (!balances[paidBy]) balances[paidBy] = 0;
-        balances[paidBy] -= amount;
+        if (!balances[receivedBy]) balances[receivedBy] = 0;
+        balances[paidBy] += amount;
+        balances[receivedBy] -= amount;
       }
 
       // Simplify debts
@@ -786,14 +791,16 @@ export async function calculateDebts(
 
       // Store simplified debts in the database
       for (const debt of debts) {
-        await db.simplifiedDebt.create({
-          data: {
-            fromId: debt.from,
-            toId: debt.to,
-            amount: debt.amount,
-            groupId,
-          },
-        });
+        if (!!debt.amount) {
+          await db.simplifiedDebt.create({
+            data: {
+              fromId: debt.from,
+              toId: debt.to,
+              amount: debt.amount,
+              groupId,
+            },
+          });
+        }
       }
       return { success: "Simplified debts calculated and stored" };
     });

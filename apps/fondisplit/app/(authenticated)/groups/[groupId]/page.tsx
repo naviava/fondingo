@@ -6,6 +6,7 @@ import { GroupHeader } from "~/components/group-id-page/group-header";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { linearGradientWithAlpha } from "~/lib/utils";
+import { calculateDebts } from "~/server/actions/group";
 
 interface IProps {
   params: {
@@ -14,6 +15,8 @@ interface IProps {
 }
 
 export default async function GroupIdPage({ params }: IProps) {
+  // TODO: Handle this better
+  await calculateDebts(params.groupId);
   const currentUser = await serverClient.user.getAuthProfile();
   const group = await serverClient.group.getGroupById(params.groupId);
   const currentUserRole = group.members.find(
@@ -39,6 +42,7 @@ export default async function GroupIdPage({ params }: IProps) {
         />
         <GroupActions
           groupId={group.id}
+          hasDebts={!!group.simplifiedDebts.length}
           hasExpenses={!!group.expenses.length}
           isGroupManager={currentUserRole === "MANAGER"}
         />

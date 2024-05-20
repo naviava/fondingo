@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { Button } from "@fondingo/ui/button";
+import { toast } from "@fondingo/ui/use-toast";
 
 interface IProps {
   groupId: string;
+  hasDebts: boolean;
   hasExpenses: boolean;
   isGroupManager: boolean;
 }
@@ -16,6 +18,7 @@ interface IProps {
 export const GroupActions = memo(_GroupActions);
 function _GroupActions({
   groupId,
+  hasDebts,
   hasExpenses,
   isGroupManager = false,
 }: IProps) {
@@ -33,13 +36,14 @@ function _GroupActions({
         label: "Settle up",
         onClick: () => {
           if (!hasExpenses) return;
+          if (!hasDebts) return toast({ title: "No debts to settle" });
           router.push(`/groups/${groupId}/settle-up`);
         },
       },
       { label: "Balances", onClick: () => {} },
       { label: "Totals", onClick: () => {} },
     ],
-    [handleAddMember, groupId, router, hasExpenses],
+    [handleAddMember, groupId, router, hasExpenses, hasDebts],
   );
 
   return (

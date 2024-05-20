@@ -8,7 +8,7 @@ import {
 } from "@fondingo/ui/drawer";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Check } from "@fondingo/ui/lucide";
-import { useCallback } from "react";
+import { Fragment, useCallback } from "react";
 import { GroupMemberClient } from "~/types";
 
 export function SettlementDrawer() {
@@ -45,9 +45,8 @@ export function SettlementDrawer() {
         <Separator />
         <div className="px-4">
           {members.map((member) => (
-            <>
+            <Fragment key={member.id}>
               <div
-                key={member.id}
                 role="button"
                 onClick={() => handleSelection(member)}
                 className="flex items-center justify-between py-4"
@@ -73,7 +72,7 @@ export function SettlementDrawer() {
                   )}
               </div>
               <Separator />
-            </>
+            </Fragment>
           ))}
         </div>
       </DrawerContent>

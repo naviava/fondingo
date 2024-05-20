@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { serverClient } from "~/lib/trpc/server-client";
 import { GroupMemberClient } from "~/types";
 
-import { SettleUpClient } from "~/components/settle-up-client";
+import { SettlementClient } from "~/components/settlement-client";
 
 interface IProps {
   params: {
@@ -46,7 +46,7 @@ export default async function SettleUpPage({ params }: IProps) {
   );
 
   return (
-    <SettleUpClient
+    <SettlementClient
       groupId={params.groupId}
       debtors={debtors}
       creditors={creditors}

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useSettlementDrawer } from "@fondingo/store/fondisplit";
@@ -11,9 +12,12 @@ import { z } from "@fondingo/utils/zod";
 
 import { Form, FormControl, FormField, FormItem } from "@fondingo/ui/form";
 import { ChevronLeft, IndianRupee } from "@fondingo/ui/lucide";
+import { SettlementMember } from "./settlement-member";
+import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
-import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
+
+import { trpc } from "~/lib/trpc/client";
 
 const formSchema = z.object({
   amount: z.string().min(1, { message: "Amount must be greater than 0" }),
@@ -25,16 +29,17 @@ interface IProps {
   creditors: GroupMemberClient[];
 }
 
-export const SettleUpClient = memo(_SettleUpClient);
-function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
+export const SettlementClient = memo(_SettlementClient);
+function _SettlementClient({ groupId, debtors, creditors }: IProps) {
+  const router = useRouter();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
-    onDrawerOpen,
     selectedDebtor,
     selectedCreditor,
     setSelectedDebtor,
     setSelectedCreditor,
+    resetDrawer,
   } = useSettlementDrawer();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,16 +49,29 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
     },
   });
 
+  const utils = trpc.useUtils();
+  const { mutate: handleAddSettlement, isPending } =
+    trpc.group.addSettlement.useMutation({
+      onError: ({ message }) =>
+        toast({ title: "Something went wrong", description: message }),
+      onSuccess: () => {
+        form.reset();
+        resetDrawer();
+        utils.group.invalidate();
+        router.push(`/groups/${groupId}`);
+      },
+    });
+
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
-      console.log({
+      handleAddSettlement({
         groupId,
-        fromId: selectedDebtor?.id,
-        toId: selectedCreditor?.id,
+        fromId: selectedDebtor?.id || "",
+        toId: selectedCreditor?.id || "",
         amount: Number(values.amount),
       });
     },
-    [groupId, selectedDebtor, selectedCreditor],
+    [groupId, selectedDebtor, selectedCreditor, handleAddSettlement],
   );
 
   useEffect(() => {
@@ -75,7 +93,7 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
   return (
     <>
       <div className="flex items-center justify-between px-2 pt-4">
-        <Button asChild variant="ghost" size="sm">
+        <Button asChild variant="ghost" size="sm" disabled={isPending}>
           <Link href={`/groups/${groupId}`}>
             <ChevronLeft />
           </Link>
@@ -84,6 +102,7 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
         <Button
           variant="splitGhost"
           size="sm"
+          disabled={isPending}
           onClick={() => {
             submitButtonRef.current?.click();
           }}
@@ -97,24 +116,13 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
           className="flex h-full flex-col items-center justify-center pb-24"
         >
           <div className="flex items-center gap-x-4">
-            <div
-              role="button"
-              onClick={() => {
-                onDrawerOpen({
-                  groupId,
-                  members: debtors,
-                  drawerType: "debtor",
-                });
-              }}
-              className="select-none"
-            >
-              <Avatar
-                key={selectedDebtor?.id}
-                variant="lg"
-                userName={selectedDebtor?.name || ""}
-                userImageUrl={selectedDebtor?.image}
-              />
-            </div>
+            <SettlementMember
+              groupId={groupId}
+              drawerType="debtor"
+              members={debtors}
+              selectedMember={selectedDebtor}
+              isPending={isPending}
+            />
             <div className="flex items-center">
               <div className="h-1.5 w-7 bg-neutral-700" />
               <div
@@ -127,23 +135,13 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
                 }}
               />
             </div>
-            <div
-              role="button"
-              onClick={() => {
-                onDrawerOpen({
-                  groupId,
-                  members: creditors,
-                  drawerType: "creditor",
-                });
-              }}
-              className="select-none"
-            >
-              <Avatar
-                variant="lg"
-                userName={selectedCreditor?.name}
-                userImageUrl={selectedCreditor?.image}
-              />
-            </div>
+            <SettlementMember
+              groupId={groupId}
+              drawerType="creditor"
+              members={creditors}
+              selectedMember={selectedCreditor}
+              isPending={isPending}
+            />
           </div>
           {!!selectedDebtor && !!selectedCreditor && (
             <p className="mt-4 font-medium">{`${selectedDebtor?.name} paid ${selectedCreditor.name}`}</p>
@@ -165,6 +163,7 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
                       type="number"
                       min={0.01}
                       step={0.01}
+                      disabled={isPending}
                       {...field}
                       className="form-input h-full max-w-[10rem] text-4xl font-semibold placeholder:text-4xl placeholder:text-neutral-400"
                     />
@@ -173,7 +172,12 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
               )}
             />
           </div>
-          <button ref={submitButtonRef} type="submit" className="hidden" />
+          <button
+            ref={submitButtonRef}
+            type="submit"
+            disabled={isPending}
+            className="hidden"
+          />
         </form>
       </Form>
     </>
