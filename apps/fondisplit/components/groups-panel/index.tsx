@@ -1,46 +1,42 @@
-import Image from "next/image";
+import { IndianRupee } from "@fondingo/ui/lucide";
 import Link from "next/link";
 import { serverClient } from "~/lib/trpc/server-client";
+import { EmptyState } from "./empty-state";
+import { GroupAvatar } from "../group-id-page/group-avatar";
+import { useMediaQuery } from "@fondingo/utils/hooks";
 
 interface IProps {
   groups: Awaited<ReturnType<typeof serverClient.group.getGroups>>;
 }
 
-export function GroupsPanel({ groups = [] }: IProps) {
-  // Empty state
+export async function GroupsPanel({ groups = [] }: IProps) {
   if (!groups.length) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-y-8 px-4 pb-24">
-        <div>
-          <Image
-            src="empty-illustration.svg"
-            alt="No groups yet"
-            height={300}
-            width={300}
-          />
-          <p className="-mt-7 mr-4 text-right text-xs">
-            <a
-              target="_blank"
-              href="https://www.freepik.com/free-vector/shrug-concept-illustration_24488080.htm#query=nothing&position=0&from_view=keyword&track=sph&uuid=cd8a18b9-0346-4a07-aca9-cbc4fdd5d47a"
-            >
-              Image by storyset
-            </a>{" "}
-            on Freepik
-          </p>
-        </div>
-        <div className="text-muted-foreground space-y-2 text-center italic">
-          <p>You don't have any groups yet.</p>
-          <p>Click the "Create Group" button to get started.</p>
-        </div>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (
-    <section className="flex-1 px-4 pb-24">
+    <section className="flex flex-1 flex-col gap-y-8 px-4 pb-24">
       {groups.map((group) => (
         <Link key={group.id} href={`/groups/${group.id}`}>
-          <div>{group.name}</div>
+          <div className="flex items-center">
+            <GroupAvatar
+              variant="sm"
+              groupType={group.type}
+              groupColor={group.color}
+            />
+            <h2 className="mx-2 line-clamp-1 flex-1 font-medium">
+              {group.name}
+            </h2>
+            <div className="flex flex-col items-end justify-center">
+              <span className="text-xs font-medium md:text-sm">
+                you are owed
+              </span>
+              <div className="flex items-center">
+                <IndianRupee className="mr-1 h-4 w-4" />
+                <span className="font-semibold">20.00</span>
+              </div>
+            </div>
+          </div>
         </Link>
       ))}
     </section>

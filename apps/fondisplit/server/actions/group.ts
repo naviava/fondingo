@@ -7,6 +7,8 @@ import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 import { hasDuplicates } from "~/lib/utils";
 
+// TODO: Check all routes that get user data. MUST NOT HAVE hashedPassword returned.
+
 /**
  * Creates a new group with the provided details.
  *
@@ -78,6 +80,18 @@ export const getGroups = privateProcedure.query(async ({ ctx }) => {
     where: {
       members: {
         some: { userId: user.id },
+      },
+    },
+    include: {
+      simplifiedDebts: {
+        include: {
+          from: {
+            include: { user: true },
+          },
+          to: {
+            include: { user: true },
+          },
+        },
       },
     },
   });

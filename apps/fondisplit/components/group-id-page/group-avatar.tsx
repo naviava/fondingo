@@ -9,6 +9,8 @@ import { cn } from "@fondingo/ui/utils";
 interface IProps {
   groupType: TGroupType;
   groupColor: string;
+  className?: string;
+  variant?: "default" | "sm";
 }
 
 const iconMap = {
@@ -18,18 +20,38 @@ const iconMap = {
   OTHER: FaRegListAlt,
 };
 
-export function GroupAvatar({ groupType, groupColor }: IProps) {
+const variantMap = {
+  default: {
+    size: 48,
+    classes: "h-20",
+  },
+  sm: {
+    size: 32,
+    classes: "h-14",
+  },
+};
+
+export function GroupAvatar({
+  groupType,
+  groupColor,
+  variant = "default",
+  className,
+}: IProps) {
   const Icon = iconMap[groupType];
 
   return (
     <div
-      className="absolute -bottom-8 left-20 flex aspect-square h-20 items-center justify-center rounded-2xl border-[6px] border-[#F4F4F4]"
+      className={cn(
+        "flex aspect-square items-center justify-center rounded-2xl border-[6px] border-[#F4F4F4]",
+        variantMap[variant].classes,
+        className,
+      )}
       style={{
         backgroundImage: linearGradientWithAlpha(groupColor, 0.5),
       }}
     >
       <Icon
-        size={48}
+        size={variantMap[variant].size}
         className={cn("text-white", groupType === "TRIP" && "-rotate-[45deg]")}
       />
     </div>

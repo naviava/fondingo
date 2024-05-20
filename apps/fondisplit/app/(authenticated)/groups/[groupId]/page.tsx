@@ -32,7 +32,11 @@ export default async function GroupIdPage({ params }: IProps) {
         }}
       >
         <UtilityButtons groupId={params.groupId} />
-        <GroupAvatar groupType={group.type} groupColor={group.color} />
+        <GroupAvatar
+          groupType={group.type}
+          groupColor={group.color}
+          className="absolute -bottom-8 left-20"
+        />
       </div>
       <section className="flex-1 pb-24 pt-12">
         <GroupHeader

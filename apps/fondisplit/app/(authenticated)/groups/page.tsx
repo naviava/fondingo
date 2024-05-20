@@ -6,6 +6,7 @@ import { GroupsPanel } from "~/components/groups-panel";
 import { serverClient } from "~/lib/trpc/server-client";
 
 export default async function GroupsPage() {
+  const user = await serverClient.user.getAuthProfile();
   const groups = await serverClient.group.getGroups();
 
   return (
