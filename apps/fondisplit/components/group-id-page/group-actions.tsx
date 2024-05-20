@@ -9,11 +9,16 @@ import { Button } from "@fondingo/ui/button";
 
 interface IProps {
   groupId: string;
+  hasExpenses: boolean;
   isGroupManager: boolean;
 }
 
 export const GroupActions = memo(_GroupActions);
-function _GroupActions({ groupId, isGroupManager = false }: IProps) {
+function _GroupActions({
+  groupId,
+  hasExpenses,
+  isGroupManager = false,
+}: IProps) {
   const router = useRouter();
   const { onOpen } = useAddMemberModal();
 
@@ -26,12 +31,15 @@ function _GroupActions({ groupId, isGroupManager = false }: IProps) {
       { label: "Add members", onClick: handleAddMember },
       {
         label: "Settle up",
-        onClick: () => router.push(`/groups/${groupId}/settle-up`),
+        onClick: () => {
+          if (!hasExpenses) return;
+          router.push(`/groups/${groupId}/settle-up`);
+        },
       },
       { label: "Balances", onClick: () => {} },
       { label: "Totals", onClick: () => {} },
     ],
-    [handleAddMember, groupId, router],
+    [handleAddMember, groupId, router, hasExpenses],
   );
 
   return (
