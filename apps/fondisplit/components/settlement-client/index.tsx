@@ -25,12 +25,11 @@ const formSchema = z.object({
 
 interface IProps {
   groupId: string;
-  debtors: GroupMemberClient[];
-  creditors: GroupMemberClient[];
+  members: GroupMemberClient[];
 }
 
 export const SettlementClient = memo(_SettlementClient);
-function _SettlementClient({ groupId, debtors, creditors }: IProps) {
+function _SettlementClient({ groupId, members }: IProps) {
   const router = useRouter();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -75,15 +74,14 @@ function _SettlementClient({ groupId, debtors, creditors }: IProps) {
   );
 
   useEffect(() => {
-    if (!selectedDebtor && !!debtors[0]) {
-      setSelectedDebtor(debtors[0]);
+    if (!selectedDebtor && !!members[0]) {
+      setSelectedDebtor(members[0]);
     }
-    if (!selectedCreditor && !!creditors[0]) {
-      setSelectedCreditor(creditors[0]);
+    if (!selectedCreditor && !!members[1]) {
+      setSelectedCreditor(members[1]);
     }
   }, [
-    debtors,
-    creditors,
+    members,
     selectedDebtor,
     selectedCreditor,
     setSelectedDebtor,
@@ -119,7 +117,7 @@ function _SettlementClient({ groupId, debtors, creditors }: IProps) {
             <SettlementMember
               groupId={groupId}
               drawerType="debtor"
-              members={debtors}
+              members={members}
               selectedMember={selectedDebtor}
               isPending={isPending}
             />
@@ -138,7 +136,7 @@ function _SettlementClient({ groupId, debtors, creditors }: IProps) {
             <SettlementMember
               groupId={groupId}
               drawerType="creditor"
-              members={creditors}
+              members={members}
               selectedMember={selectedCreditor}
               isPending={isPending}
             />

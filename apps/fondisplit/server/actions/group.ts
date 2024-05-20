@@ -105,7 +105,9 @@ export const getGroupById = privateProcedure
         },
       },
       include: {
-        members: true,
+        members: {
+          include: { user: true },
+        },
         expenses: true,
         simplifiedDebts: {
           include: {
