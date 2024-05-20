@@ -1,4 +1,3 @@
-import { title } from "process";
 import { create } from "zustand";
 
 type GroupMemberClient = {
@@ -10,16 +9,18 @@ type GroupMemberClient = {
 type DrawerOpenProps = {
   groupId: string;
   members: GroupMemberClient[];
-  title: "debtor" | "creditor";
+  drawerType: "debtor" | "creditor";
 };
 
-type SettleUpDrawer = {
+type SettlementDrawer = {
+  drawerType: "debtor" | "creditor";
   groupId: string;
   members: GroupMemberClient[];
   drawerTitle: string;
+  breakPoint: number;
 
   isDrawerOpen: boolean;
-  onDrawerOpen: ({ groupId, title, members }: DrawerOpenProps) => void;
+  onDrawerOpen: ({ groupId, drawerType, members }: DrawerOpenProps) => void;
   onDrawerClose: () => void;
 
   selectedDebtor: GroupMemberClient | null;
@@ -32,20 +33,40 @@ type SettleUpDrawer = {
 };
 
 const titleMap = {
-  debtor: "Whos is paying?",
+  debtor: "Who is paying?",
   creditor: "Who is getting paid?",
 };
 
-export const useSettleUpDrawer = create<SettleUpDrawer>((set) => ({
+export const useSettlementDrawer = create<SettlementDrawer>((set) => ({
+  drawerType: "debtor",
   groupId: "",
   members: [],
   drawerTitle: "",
+  breakPoint: 0,
 
   isDrawerOpen: false,
-  onDrawerOpen: ({ groupId, members, title }) =>
-    set({ isDrawerOpen: true, groupId, members, drawerTitle: titleMap[title] }),
+  onDrawerOpen: ({ groupId, members, drawerType }) =>
+    set({
+      drawerType,
+      isDrawerOpen: true,
+      groupId,
+      members,
+      drawerTitle: titleMap[drawerType],
+      breakPoint: Date.now(),
+    }),
   onDrawerClose: () =>
-    set({ isDrawerOpen: false, groupId: "", members: [], drawerTitle: "" }),
+    set((state) => {
+      if (Date.now() - state.breakPoint < 100) {
+        return { ...state, isDrawerOpen: true };
+      }
+      return {
+        drawerType: "debtor",
+        isDrawerOpen: false,
+        groupId: "",
+        members: [],
+        drawerTitle: "",
+      };
+    }),
 
   selectedDebtor: null,
   setSelectedDebtor: (member) => set({ selectedDebtor: member }),
@@ -55,10 +76,12 @@ export const useSettleUpDrawer = create<SettleUpDrawer>((set) => ({
 
   resetDrawer: () =>
     set({
+      drawerType: "debtor",
       isDrawerOpen: false,
       groupId: "",
       members: [],
       drawerTitle: "",
+      breakPoint: 0,
       selectedDebtor: null,
       selectedCreditor: null,
     }),
