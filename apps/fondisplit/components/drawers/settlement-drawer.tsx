@@ -1,16 +1,18 @@
+import { useSettleUpDrawer } from "@fondingo/store/fondisplit";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@fondingo/ui/drawer";
 
-export function SettlementCreditorsDrawer() {
+export function SettlementDrawer() {
+  const { isDrawerOpen, onDrawerClose, members, drawerTitle } =
+    useSettleUpDrawer();
+
   return (
-    <Drawer>
+    <Drawer open={isDrawerOpen} onOpenChange={onDrawerClose}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Are you absolutely sure?</DrawerTitle>

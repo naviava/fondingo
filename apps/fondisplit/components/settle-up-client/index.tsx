@@ -1,8 +1,9 @@
 "use client";
 
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 
+import { useSettleUpDrawer } from "@fondingo/store/fondisplit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GroupMemberClient } from "~/types";
 import { useForm } from "react-hook-form";
@@ -12,19 +13,7 @@ import { ChevronLeft, IndianRupee } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@fondingo/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@fondingo/ui/select";
+import { Form, FormControl, FormField, FormItem } from "@fondingo/ui/form";
 
 const formSchema = z.object({
   groupId: z.string().min(1, { message: "Group ID is required" }),
@@ -43,6 +32,14 @@ export const SettleUpClient = memo(_SettleUpClient);
 function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
+  const {
+    selectedDebtor,
+    selectedCreditor,
+    onDrawerOpen,
+    setSelectedDebtor,
+    setSelectedCreditor,
+  } = useSettleUpDrawer();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,21 +50,28 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
     },
   });
 
-  const [selectedDebtor, setSelectedDebtor] = useState<
-    GroupMemberClient | undefined
-  >(debtors[0]);
-  const [selectedCreditor, setSelectedCreditor] = useState<
-    GroupMemberClient | undefined
-  >(creditors[0]);
+  useEffect(() => {
+    if (!selectedDebtor && !!debtors[0]) {
+      form.setValue("fromId", debtors[0].id);
+      setSelectedDebtor(debtors[0]);
+    }
+    if (!selectedCreditor && !!creditors[0]) {
+      form.setValue("toId", creditors[0].id);
+      setSelectedCreditor(creditors[0]);
+    }
+  }, [
+    debtors,
+    creditors,
+    form,
+    selectedDebtor,
+    selectedCreditor,
+    setSelectedDebtor,
+    setSelectedCreditor,
+  ]);
 
   const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
     console.log({ ...values, amount: Number(values.amount) });
   }, []);
-
-  useEffect(() => {
-    console.log(form.getValues("fromId"));
-    console.log(form.getValues("toId"));
-  }, [form]);
 
   return (
     <>
@@ -147,8 +151,6 @@ function _SettleUpClient({ groupId, debtors, creditors }: IProps) {
             />
           </div>
           <button ref={submitButtonRef} type="submit" className="hidden" />
-          <p>Debtor: {selectedDebtor?.name || "None"}</p>
-          <p>Creditor: {selectedCreditor?.name || "None"}</p>
         </form>
       </Form>
     </>
