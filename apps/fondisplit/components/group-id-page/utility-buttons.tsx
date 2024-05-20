@@ -2,9 +2,11 @@ import { ChevronLeft, Settings } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 import Link from "next/link";
 
-interface IProps {}
+interface IProps {
+  groupId: string;
+}
 
-export function UtilityButtons({}: IProps) {
+export function UtilityButtons({ groupId }: IProps) {
   return (
     <>
       <Button

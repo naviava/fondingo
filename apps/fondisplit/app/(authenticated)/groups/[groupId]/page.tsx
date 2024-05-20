@@ -28,7 +28,7 @@ export default async function GroupIdPage({ params }: IProps) {
           backgroundImage: linearGradientWithAlpha(group.color, 0.5),
         }}
       >
-        <UtilityButtons />
+        <UtilityButtons groupId={params.groupId} />
         <GroupAvatar groupType={group.type} groupColor={group.color} />
       </div>
       <section className="flex-1 pb-24 pt-12">

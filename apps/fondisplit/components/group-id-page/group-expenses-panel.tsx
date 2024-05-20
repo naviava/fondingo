@@ -7,6 +7,7 @@ import { Button } from "@fondingo/ui/button";
 
 import { linearGradientWithAlpha } from "~/lib/utils";
 import { trpc } from "~/lib/trpc/client";
+import { memo } from "react";
 
 interface IProps {
   groupId: string;
@@ -15,8 +16,8 @@ interface IProps {
   hasExpenses: boolean;
   isGroupManager: boolean;
 }
-
-export function GroupExpensesPanel({
+export const GroupExpensesPanel = memo(_GroupExpensesPanel);
+function _GroupExpensesPanel({
   groupId,
   groupColor,
   hasMembers,

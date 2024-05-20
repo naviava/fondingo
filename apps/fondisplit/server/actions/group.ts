@@ -312,6 +312,37 @@ export const getMembers = privateProcedure
     return groupMembers;
   });
 
+/**
+ * This function is used to add an expense to a group. It is a private procedure that takes an input object with the following properties:
+ * - groupId: A string representing the ID of the group. It must be at least 1 character long.
+ * - expenseName: A string representing the name of the expense. It must be at least 1 character long.
+ * - expenseAmount: A number representing the total amount of the expense.
+ * - payments: An array of objects, each representing a payment. Each object should have a 'userId' property (a string of at least 1 character) and an 'amount' property (a number).
+ * - splits: An array of objects, each representing a split. Each object should have a 'userId' property (a string of at least 1 character) and an 'amount' property (a number).
+ *
+ * The function performs several checks:
+ * - It checks if the group exists and if the user is a member of the group.
+ * - It checks if the total amount of payments and splits matches the total expense amount.
+ * - It checks if the expense amount is greater than or equal to 1.
+ * - It checks if there are duplicate users in payments or splits.
+ * - It checks if the payment or split amount is greater than 0.
+ * - It checks if the user making the payment or split is a member of the group.
+ *
+ * If any of these checks fail, it throws an error with a relevant message.
+ *
+ * If all checks pass, it creates a new expense in the database, creates the payments and splits associated with the expense, and calculates the debts for the group.
+ *
+ * If any of these operations fail, it throws an error with a relevant message.
+ *
+ * If all operations are successful, it returns an object with a 'toastTitle' and 'toastDescription' property, indicating that the expense was successfully added.
+ *
+ * @async
+ * @function
+ * @param {Object} ctx - The context object, which includes the user.
+ * @param {Object} input - The input object, which includes the groupId, expenseName, expenseAmount, payments, and splits.
+ * @returns {Promise<Object>} A promise that resolves to an object with a 'toastTitle' and 'toastDescription' property.
+ * @throws {TRPCError} If any of the checks or operations fail.
+ */
 export const addExpense = privateProcedure
   .input(
     z.object({
@@ -487,6 +518,23 @@ export const addExpense = privateProcedure
     }
   });
 
+/**
+ * This function is used to get the debts of a group. It is a private procedure that takes a string input representing the group ID.
+ *
+ * The function performs the following steps:
+ * - It checks if the group ID is at least 1 character long. If not, it throws an error with the message "Group ID cannot be empty".
+ * - It retrieves the user from the context object.
+ * - It queries the database to find a group with the given ID that includes the user as a member. If no such group is found, it throws an error with the code "NOT_FOUND" and the message "Group not found".
+ * - It queries the database to find all simplified debts associated with the group. It includes the 'from' and 'to' fields in the query to get the users involved in each debt.
+ * - It returns the debts as an array. If no debts are found, it returns an empty array.
+ *
+ * @async
+ * @function
+ * @param {Object} ctx - The context object, which includes the user.
+ * @param {string} groupId - The ID of the group.
+ * @returns {Promise<Array>} A promise that resolves to an array of simplified debts.
+ * @throws {TRPCError} If the group ID is too short or if no group is found.
+ */
 export const getDebts = privateProcedure
   .input(z.string().min(1, { message: "Group ID cannot be empty" }))
   .query(async ({ ctx, input: groupId }) => {
@@ -516,31 +564,25 @@ export const getDebts = privateProcedure
   });
 
 /**
- * This function calculates and stores the simplified debts for a given group.
+ * This function is used to calculate and store the simplified debts for a group. It takes a string input representing the group ID.
  *
- * It first deletes any existing simplified debts for the group. Then it calculates the net balances
- * by fetching all payments and splits related to the group. It also fetches any settlement entries
- * for the group.
- *
- * The function then calculates the balances for each group member by adding the amounts they have paid
- * and subtracting the amounts they owe. It also subtracts any settled amounts from the balances.
- *
- * After calculating the balances, the function simplifies the debts. It finds the group member who owes
- * the most and the group member who is owed the most, and creates a debt from the former to the latter.
- * The amount of the debt is the lesser of the amount owed by the former and the amount owed to the latter.
- * This process is repeated until all debts are simplified.
- *
- * Finally, the simplified debts are stored in the database and a success message is returned. If any error
- * occurs during the process, an error message is returned.
- *
- * @param {string} groupId - The ID of the group for which to calculate and store simplified debts.
- * @returns {Promise<{ message: string } | void>} - A promise that resolves to an object containing a success
- * or error message, or resolves to undefined if no group with the given ID exists.
- *
- * @throws {Error} - Throws an error if there is a problem with the database transaction or if any other
- * unexpected error occurs.
+ * The function performs the following steps:
+ * - It starts a transaction on the database.
+ * - It deletes all existing simplified debts for the group.
+ * - It retrieves all payments and splits associated with the group from the database.
+ * - It retrieves all settlements associated with the group from the database.
+ * - It calculates the net balance for each member of the group by adding the amounts they have paid and subtracting the amounts they owe.
+ * - It subtracts the settled amounts from the balances.
+ * - It simplifies the debts by repeatedly finding the member who owes the most and the member who is owed the most, and creating a debt from the former to the latter for the smaller of the two amounts. It updates the balances accordingly and removes any balances that have become zero.
+ * - It stores the simplified debts in the database.
+ * - If all operations are successful, it returns an object with a 'success' property and a message indicating that the simplified debts were calculated and stored.
+ * - If any operation fails, it catches the error, logs it to the console, and returns an object with an 'error' property and a message indicating that there was an error calculating the simplified debts.
  *
  * @async
+ * @function
+ * @param {string} groupId - The ID of the group.
+ * @returns {Promise<{ success: string } | { error: string }>} A promise that resolves to an object with either a 'success' or 'error' property.
+ * @throws {Error} If there is an error calculating the simplified debts.
  */
 export async function calculateDebts(
   groupId: string,
@@ -647,104 +689,3 @@ export async function calculateDebts(
     return { error: "Error calculating simplified debts" };
   }
 }
-
-/**
- * Calculates and stores simplified debts for all users in a specific group.
- *
- * This function performs the following steps:
- * 1. Fetches all expense payments and splits for a specific group from the database.
- * 2. Calculates the net balance for each user in the group by subtracting the amount they paid and adding the amount they owe.
- * 3. Simplifies the debts by repeatedly finding the user who owes the most and the user who is owed the most within the group, and creating a debt from the former to the latter.
- * 4. Stores the simplified debts in the database.
- *
- * @async
- * @function
- * @param {string} groupId - The ID of the group for which to calculate simplified debts.
- * @returns {Promise<{message: string} | void>} A Promise that resolves with a success message when all simplified debts have been stored in the database, or an object with an error message if an error occurred.
- * @throws {Error} Throws an error if there is a problem communicating with the database.
- */
-// export async function calculateSimplifiedDebts(
-//   groupId: string,
-// ): Promise<{ message: string } | void> {
-//   try {
-//     // Delete exiisting simplified debts for the group
-//     await splitdb.simplifiedDebt.deleteMany({
-//       where: { groupId },
-//     });
-
-//     // Calculate net balances.
-//     const payments = await splitdb.expensePayment.findMany({
-//       where: {
-//         expense: { groupId },
-//       },
-//       include: { expense: true },
-//     });
-//     const splits = await splitdb.expenseSplit.findMany({
-//       where: {
-//         expense: { groupId },
-//       },
-//       include: { expense: true },
-//     });
-
-//     const balances: { [key: string]: number } = {};
-//     for (const payment of payments) {
-//       const paidBy = payment.groupMemberId;
-//       const amount = payment.amount;
-
-//       if (!balances[paidBy]) balances[paidBy] = 0;
-//       balances[paidBy] += amount;
-//     }
-
-//     for (const split of splits) {
-//       const owes = split.groupMemberId;
-//       const amount = split.amount;
-
-//       if (!balances[owes]) balances[owes] = 0;
-//       balances[owes] -= amount;
-//     }
-
-//     // Simplify debts
-//     const debts: {
-//       from: string;
-//       to: string;
-//       amount: number;
-//     }[] = [];
-
-//     while (Object.keys(balances).length > 0) {
-//       const maxOwed = Object.keys(balances).reduce((a, b) =>
-//         balances[a]! > balances[b]! ? a : b,
-//       );
-//       const maxOwing = Object.keys(balances).reduce((a, b) =>
-//         balances[a]! < balances[b]! ? a : b,
-//       );
-//       const amount = Math.min(balances[maxOwed]!, -balances[maxOwing]!);
-
-//       debts.push({
-//         from: maxOwing,
-//         to: maxOwed,
-//         amount,
-//       });
-//       balances[maxOwed]! -= amount;
-//       balances[maxOwing]! += amount;
-
-//       if (balances[maxOwed] === 0) delete balances[maxOwed];
-//       if (balances[maxOwing] === 0) delete balances[maxOwing];
-//     }
-
-//     // Store simplified debts in the database
-//     for (const debt of debts) {
-//       await splitdb.simplifiedDebt.create({
-//         data: {
-//           fromId: debt.from,
-//           toId: debt.to,
-//           amount: debt.amount,
-//           groupId,
-//         },
-//       });
-//     }
-//     return { message: "Simplified debts calculated and stored" };
-//   } catch (err) {
-//     console.error("\n\nError calculating simplified debts:\n\n", err);
-//     return { message: "Error calculating simplified debts" };
-//   }
-// }
