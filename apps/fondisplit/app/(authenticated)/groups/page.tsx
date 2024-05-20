@@ -26,9 +26,6 @@ export default async function GroupsPage() {
           <Link href="/create-group">Create group</Link>
         </Button>
       </div>
-      <div className="my-10 px-4 font-semibold">
-        Overall you are owed <span className="text-cta">$12916.39</span>
-      </div>
       <GroupsPanel user={user} groups={groups} />
     </>
   );

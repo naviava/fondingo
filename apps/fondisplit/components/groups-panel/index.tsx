@@ -18,27 +18,32 @@ export async function GroupsPanel({ user, groups = [] }: IProps) {
   if (!groups.length) return <EmptyState />;
 
   return (
-    <section className="flex flex-1 flex-col gap-y-8 px-4 pb-24">
-      {groups.map((group) => (
-        <Link key={group.id} href={`/groups/${group.id}`}>
-          <div>
-            <div className="flex items-center">
-              <GroupAvatar
-                variant="sm"
-                groupType={group.type}
-                groupColor={group.color}
-              />
-              <h2 className="mx-2 line-clamp-1 flex-1 font-medium">
-                {group.name}
-              </h2>
-              <GroupBalance userId={user.id} data={group.simplifiedDebts} />
+    <>
+      <h1 className="my-10 px-4 text-center font-semibold">
+        Groups you are part of
+      </h1>
+      <section className="flex flex-1 flex-col gap-y-8 px-4 pb-24">
+        {groups.map((group) => (
+          <Link key={group.id} href={`/groups/${group.id}`}>
+            <div>
+              <div className="flex items-center">
+                <GroupAvatar
+                  variant="sm"
+                  groupType={group.type}
+                  groupColor={group.color}
+                />
+                <h2 className="mx-2 line-clamp-1 flex-1 font-medium">
+                  {group.name}
+                </h2>
+                <GroupBalance userId={user.id} data={group.simplifiedDebts} />
+              </div>
+              <div className="ml-16">
+                <DebtsOverview userId={user.id} groupId={group.id} />
+              </div>
             </div>
-            <div className="ml-16">
-              <DebtsOverview userId={user.id} groupId={group.id} />
-            </div>
-          </div>
-        </Link>
-      ))}
-    </section>
+          </Link>
+        ))}
+      </section>
+    </>
   );
 }
