@@ -73,7 +73,7 @@ export function Navbar() {
   }, [params.groupId, router]);
 
   return (
-    <nav className="absolute bottom-6 flex h-14 w-full items-center justify-between border-t px-4 pt-2 md:px-6">
+    <nav className="absolute bottom-6 z-50 flex h-14 w-full items-center justify-between border-t bg-[#F4F4F4] px-4 pt-2 md:px-6">
       {optionsLeft.map((option) => (
         <Link key={option.id} href={option.href}>
           <NavbarOption

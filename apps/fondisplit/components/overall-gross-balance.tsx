@@ -1,6 +1,7 @@
 import { IndianRupee } from "@fondingo/ui/lucide";
-import { cn } from "@fondingo/ui/utils";
+
 import { serverClient } from "~/lib/trpc/server-client";
+import { cn } from "@fondingo/ui/utils";
 
 const panelTextMap = {
   positive: "you are owed",
