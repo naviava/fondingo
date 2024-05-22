@@ -9,6 +9,7 @@ const panelTextMap = {
   zero: "you are settled up",
 };
 
+// TODO: Handle different currencies
 export async function OverallGrossBalance() {
   const grossBalance = await serverClient.user.getGrossBalance();
   const isInDebt = grossBalance < 0;

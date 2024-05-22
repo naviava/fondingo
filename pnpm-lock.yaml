@@ -178,6 +178,9 @@ importers:
 
   packages/store:
     dependencies:
+      '@fondingo/db-split':
+        specifier: workspace:*
+        version: link:../db-split
       zustand:
         specifier: ^4.5.2
         version: 4.5.2(@types/react@18.2.61)(react@18.2.0)

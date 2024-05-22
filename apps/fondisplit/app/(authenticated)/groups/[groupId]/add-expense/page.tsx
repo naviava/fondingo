@@ -53,6 +53,7 @@ export default function AddExpensePage({ params }: IProps) {
   const {
     groupId,
     setGroupId,
+    setCurrency,
     expenseName,
     setExpenseName,
     expenseAmount,
@@ -85,11 +86,14 @@ export default function AddExpensePage({ params }: IProps) {
       Math.floor(Number(form.getValues("expenseAmount")) * 100) / 100,
     );
     setGroupId(params.groupId);
+    setCurrency(group?.currency || "USD");
     form.setValue("payments", payments);
     form.setValue("splits", splits);
   }, [
     setGroupId,
     params.groupId,
+    setCurrency,
+    group?.currency,
     form,
     payments,
     splits,
@@ -196,6 +200,7 @@ export default function AddExpensePage({ params }: IProps) {
             />
           </div>
           <div className="flex items-center gap-x-4">
+            {/* TODO: Add currency selector */}
             <div className="rounded-md border-2 border-neutral-300 p-1 shadow-md shadow-neutral-500">
               <IndianRupee size={36} />
             </div>

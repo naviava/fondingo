@@ -2,9 +2,10 @@
   "name": "@fondingo/store",
   "version": "0.0.0",
   "exports": {
-    "./fondisplit": "./src/fondisplit.ts"
+    "./fondisplit": "./src/fondisplit/index.ts"
   },
   "dependencies": {
+    "@fondingo/db-split": "workspace:*",
     "zustand": "^4.5.2"
   }
 }

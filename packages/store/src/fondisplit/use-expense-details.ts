@@ -1,11 +1,17 @@
 import { create } from "zustand";
+import { CurrencyCode } from "@fondingo/db-split";
 
 type ExpenseDetails = {
   groupId: string;
-  expenseName: string;
-  expenseAmount: number;
   setGroupId: (groupId: string) => void;
+
+  currency: CurrencyCode;
+  setCurrency: (currency: CurrencyCode) => void;
+
+  expenseName: string;
   setExpenseName: (expenseName: string) => void;
+
+  expenseAmount: number;
   setExpenseAmount: (expenseAmount: number) => void;
 
   payments: {
@@ -22,6 +28,9 @@ type ExpenseDetails = {
   ) => void;
   clearPayments: () => void;
 
+  splitType: "equally" | "custom";
+  setSplitType: (splitType: "equally" | "custom") => void;
+
   splits: {
     userId: string;
     userName: string;
@@ -35,8 +44,6 @@ type ExpenseDetails = {
     }[],
   ) => void;
   clearSplits: () => void;
-  splitType: "equally" | "custom";
-  setSplitType: (splitType: "equally" | "custom") => void;
 
   breakPoint: number;
 
@@ -53,22 +60,28 @@ type ExpenseDetails = {
 
 export const useExpenseDetails = create<ExpenseDetails>((set) => ({
   groupId: "",
+  setGroupId: (groupId) => set({ groupId }),
+
+  currency: "USD",
+  setCurrency: (currency) => set({ currency }),
+
   expenseName: "",
-  expenseAmount: 0,
   setExpenseName: (expenseName) => set({ expenseName }),
+
+  expenseAmount: 0,
   setExpenseAmount: (expenseAmount) =>
     set({ expenseAmount: Number(expenseAmount) }),
-  setGroupId: (groupId) => set({ groupId }),
 
   payments: [],
   setPayments: (payments) => set({ payments }),
   clearPayments: () => set({ payments: [] }),
 
+  splitType: "equally" as const,
+  setSplitType: (splitType) => set({ splitType }),
+
   splits: [],
   setSplits: (splits) => set({ splits }),
   clearSplits: () => set({ splits: [] }),
-  splitType: "equally" as const,
-  setSplitType: (splitType) => set({ splitType }),
 
   breakPoint: 0,
 
@@ -78,7 +91,7 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
   onPaymentsDrawerClose: () => {
     set((state) => {
       if (Date.now() - state.breakPoint < 100) {
-        return { isPaymentsDrawerOpen: true };
+        return { ...state, isPaymentsDrawerOpen: true };
       }
       return { isPaymentsDrawerOpen: false };
     });
@@ -99,6 +112,7 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
   clearExpenseDetails: () =>
     set({
       groupId: "",
+      currency: "USD",
       expenseName: "",
       expenseAmount: 0,
       payments: [],

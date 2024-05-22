@@ -123,6 +123,7 @@ model Group {
   name            String
   color           String
   type            GroupType
+  currency        CurrencyCode     @default(USD)
   members         GroupMember[]
   expenses        Expense[]
   settlements     Settlement[]
@@ -227,4 +228,13 @@ enum GroupType {
   HOME
   COUPLE
   OTHER
+}
+
+enum CurrencyCode {
+  INR
+  USD
+  GBP
+  EUR
+  JPY
+  CHF
 }

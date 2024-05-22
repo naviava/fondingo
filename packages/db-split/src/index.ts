@@ -1,11 +1,12 @@
 import {
   PrismaClient,
+  SimplifiedDebt as SimplifiedDebtPrisma,
+  GroupMember as GroupMemberPrisma,
   User as UserPrisma,
-  Role as RolePrisma,
+  CurrencyCode as CurrencyCodePrisma,
   GroupRole as GroupRolePrisma,
   GroupType as GroupTypePrisma,
-  GroupMember as GroupMemberPrisma,
-  SimplifiedDebt as SimplifiedDebtPrisma,
+  Role as RolePrisma,
 } from "@prisma/client";
 
 const prismaClientSingleton = () => {
@@ -18,11 +19,12 @@ declare const globalThis: {
 
 const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 
-export const Role = RolePrisma;
 export const GroupRole = GroupRolePrisma;
 export const GroupType = GroupTypePrisma;
+export const Role = RolePrisma;
 
 export type SimplifiedDebt = SimplifiedDebtPrisma;
+export type CurrencyCode = CurrencyCodePrisma;
 export type GroupMember = GroupMemberPrisma;
 export type User = UserPrisma;
 export default prisma;

@@ -1,11 +1,13 @@
 "use client";
 
+import { Dispatch, SetStateAction, useCallback } from "react";
+
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
-import { Check, IndianRupee } from "@fondingo/ui/lucide";
+
 import { cn } from "@fondingo/ui/utils";
-import { Dispatch, SetStateAction, useCallback } from "react";
 
 interface IProps {
   userId: string;

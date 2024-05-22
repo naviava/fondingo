@@ -276,11 +276,13 @@ export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
       where: {
         from: { userId: user.id },
       },
+      include: { group: true },
     });
     const credits = await splitdb.simplifiedDebt.findMany({
       where: {
         to: { userId: user.id },
       },
+      include: { group: true },
     });
     const debtAmount = debts.reduce((acc, debt) => acc + debt.amount, 0);
     const creditAmount = credits.reduce(
