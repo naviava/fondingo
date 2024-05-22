@@ -1,6 +1,7 @@
-import { CurrencyCode } from "@fondingo/db-split";
 import { currencyIconMap } from "@fondingo/ui/constants";
+import { CurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
+import { RefreshButton } from "@fondingo/ui/refresh-button";
 
 interface IProps {
   userId: string | undefined;
@@ -24,7 +25,10 @@ export function GroupHeader({
 
   return (
     <div className="ml-[5.3rem]">
-      <h1 className="text-2xl font-semibold">{groupName}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">{groupName}</h1>
+        <RefreshButton />
+      </div>
       {!hasExpenses && <p className="text-base">No expenses here yet.</p>}
       {hasExpenses && !groupDebts.length && (
         <p className="text-base">All debts settled.</p>

@@ -1,11 +1,13 @@
 "use client";
 
-import { Button } from "@fondingo/ui/button";
-import { RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { cn } from "./lib/utils";
 
+import { Button } from "@fondingo/ui/button";
+import { RefreshCw } from "lucide-react";
+
 interface IProps {
+  size?: "default" | "icon" | "sm" | "lg";
   variant?:
     | "default"
     | "destructive"
@@ -14,17 +16,16 @@ interface IProps {
     | "ghost"
     | "link"
     | "splitCta"
-    | "splitGhost"
-    | null
-    | undefined;
+    | "splitGhost";
 }
 
-export function RefreshButton({ variant = "ghost" }: IProps) {
+export function RefreshButton({ size = "sm", variant = "ghost" }: IProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   return (
     <Button
       type="button"
+      size={size}
       variant={variant}
       onClick={() => {
         setIsRefreshing(true);
