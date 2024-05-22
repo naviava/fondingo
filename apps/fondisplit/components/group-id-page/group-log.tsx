@@ -18,7 +18,7 @@ export async function GroupLog({
   const expenses = await serverClient.expense.getExpenseIds(groupId);
 
   return (
-    <div className="space-y-6 px-4">
+    <div className="space-y-6">
       {expenses?.map((expense) => (
         <Expense
           key={expense.id}

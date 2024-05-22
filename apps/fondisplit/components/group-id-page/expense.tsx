@@ -52,7 +52,10 @@ export async function Expense({
   };
 
   return (
-    <div className="flex items-center gap-x-4">
+    <div
+      role="button"
+      className="flex items-center gap-x-4 px-4 py-1 hover:bg-neutral-200"
+    >
       <div className="text-muted-foreground flex flex-col items-center justify-center text-sm font-medium">
         <p>{format(new Date(expense.createdAt), "LLL")}</p>
         <p>{format(new Date(expense.createdAt), "d")}</p>
@@ -66,9 +69,7 @@ export async function Expense({
         <Wallet className="h-6 w-6 text-rose-800 md:h-8 md:w-8" />
       </div>
       <div className="flex-1">
-        <h5 className="line-clamp-1 text-sm font-semibold md:text-base">
-          {expense.name}
-        </h5>
+        <h5 className="line-clamp-1 font-semibold">{expense.name}</h5>
         {expense.payments.map((payment, idx) => {
           if (idx > 1) return;
           return (

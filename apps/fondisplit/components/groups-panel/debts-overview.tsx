@@ -1,6 +1,5 @@
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { serverClient } from "~/lib/trpc/server-client";
-import { IndianRupee } from "@fondingo/ui/lucide";
 import { CurrencyCode } from "@fondingo/db-split";
 
 interface IProps {
