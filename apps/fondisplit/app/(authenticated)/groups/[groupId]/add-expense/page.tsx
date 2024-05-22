@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
@@ -18,7 +19,6 @@ import { Input } from "@fondingo/ui/input";
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/lib/utils";
-import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   groupId: z.string().min(1, { message: "Group ID is required" }),
@@ -81,7 +81,9 @@ export default function AddExpensePage({ params }: IProps) {
 
   useEffect(() => {
     setExpenseName(form.getValues("expenseName"));
-    setExpenseAmount(Number(form.getValues("expenseAmount")));
+    setExpenseAmount(
+      Math.floor(Number(form.getValues("expenseAmount")) * 100) / 100,
+    );
     setGroupId(params.groupId);
     form.setValue("payments", payments);
     form.setValue("splits", splits);
