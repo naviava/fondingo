@@ -238,3 +238,61 @@ export const acceptFriendRequest = privateProcedure
       };
     });
   });
+
+/**
+ * This function is an asynchronous operation that calculates and returns the gross balance of a user.
+ * The gross balance is calculated as the difference between the total amount of credits and the total amount of debts of the user.
+ *
+ * The function is exported as a `privateProcedure.query` which means it's a private method that can be queried.
+ *
+ * The function takes an object as an argument which contains a `ctx` property. The `ctx` property is an object that contains the `user` object.
+ * The `user` object is expected to have an `id` property which is used to query the database for the user's debts and credits.
+ *
+ * The function queries the `splitdb.simplifiedDebt` table twice:
+ * 1. First, it finds all the debts where the user is the debtor (`from: { userId: user.id }`).
+ * 2. Then, it finds all the credits where the user is the creditor (`to: { userId: user.id }`).
+ *
+ * After retrieving the debts and credits, it calculates the total amount of debts and credits by reducing the arrays of debts and credits.
+ * The `reduce` function is used to sum up the `amount` property of each debt and credit.
+ *
+ * The function then returns the difference between the total credit amount and the total debt amount which represents the user's gross balance.
+ *
+ * If any error occurs during the execution of the function, it logs the error to the console and throws a new `TRPCError` with the code "INTERNAL_SERVER_ERROR" and a message "Failed to get gross balance."
+ *
+ * @async
+ * @function getGrossBalance
+ * @param {Object} arg - The argument object.
+ * @param {Object} arg.ctx - The context object.
+ * @param {Object} arg.ctx.user - The user object.
+ * @param {string} arg.ctx.user.id - The ID of the user.
+ * @returns {Promise<number>} The gross balance of the user.
+ * @throws {TRPCError} Will throw an error if the operation fails.
+ */
+export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
+  const { user } = ctx;
+
+  try {
+    const debts = await splitdb.simplifiedDebt.findMany({
+      where: {
+        from: { userId: user.id },
+      },
+    });
+    const credits = await splitdb.simplifiedDebt.findMany({
+      where: {
+        to: { userId: user.id },
+      },
+    });
+    const debtAmount = debts.reduce((acc, debt) => acc + debt.amount, 0);
+    const creditAmount = credits.reduce(
+      (acc, credit) => acc + credit.amount,
+      0,
+    );
+    return creditAmount - debtAmount;
+  } catch (err) {
+    console.error(err);
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Failed to get gross balance.",
+    });
+  }
+});

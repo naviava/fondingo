@@ -35,7 +35,7 @@ export function GroupBalance({ userId, data }: IProps) {
         {isInDebt ? "you owe" : "you are owed"}
       </span>
       <div className="flex items-center">
-        <IndianRupee className="mr-1 h-4 w-4" />
+        <IndianRupee className="h-4 w-4" />
         <span className="font-semibold">
           {(isInDebt
             ? (grossBalanceAmount / 100) * -1

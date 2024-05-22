@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
+import { OverallGrossBalance } from "./overall-gross-balance";
 import { GroupAvatar } from "~/components/group-avatar";
 import { DebtsOverview } from "./debts-overview";
 import { GroupBalance } from "./group-balance";
@@ -19,9 +20,7 @@ export async function GroupsPanel({ user, groups = [] }: IProps) {
 
   return (
     <>
-      <h1 className="my-10 px-4 text-center font-semibold">
-        Groups you are part of
-      </h1>
+      <OverallGrossBalance />
       <section className="flex flex-1 flex-col gap-y-8 px-4 pb-24">
         {groups.map((group) => (
           <Link key={group.id} href={`/groups/${group.id}`}>

@@ -5,6 +5,7 @@ import {
   sendFriendRequest,
   getAuthProfile,
   acceptFriendRequest,
+  getGrossBalance,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -12,4 +13,5 @@ export const userRouter = router({
   sendFriendRequest,
   declineFriendRequest,
   acceptFriendRequest,
+  getGrossBalance,
 });
