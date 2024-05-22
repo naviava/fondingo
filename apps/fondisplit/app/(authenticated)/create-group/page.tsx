@@ -109,6 +109,7 @@ export default function CreateGroupPage() {
     [form],
   );
 
+  const utils = trpc.useUtils();
   const { mutate: handleCreateGroup, isPending } =
     trpc.group.createGroup.useMutation({
       onError: ({ message }) =>
@@ -123,6 +124,7 @@ export default function CreateGroupPage() {
           description: toastDescription,
         });
         form.reset();
+        utils.group.invalidate();
         router.push(`/groups/${groupId}`);
       },
     });
