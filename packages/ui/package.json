@@ -6,6 +6,7 @@
     "./constants": "./src/constants/index.ts",
     "./utils": "./src/lib/utils.ts",
     "./lucide": "./src/lib/lucide.ts",
+    "./refresh-button": "./src/refresh-button.tsx",
     "./button": "./src/shadcn/button.tsx",
     "./input": "./src/shadcn/input.tsx",
     "./label": "./src/shadcn/label.tsx",
