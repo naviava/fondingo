@@ -1,11 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import splitdb, { GroupType } from "@fondingo/db-split";
 import { privateProcedure } from "~/server/trpc";
-import { revalidatePath } from "next/cache";
+import { hasDuplicates } from "~/lib/utils";
 import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
-import { hasDuplicates } from "~/lib/utils";
 
 // TODO: Check all routes that get user data. MUST NOT HAVE hashedPassword returned.
 

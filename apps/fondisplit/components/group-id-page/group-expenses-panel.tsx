@@ -1,15 +1,16 @@
 "use client";
 
+import { memo } from "react";
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
+
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { UserPlus } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 
 import { linearGradientWithAlpha } from "~/lib/utils";
-import { trpc } from "~/lib/trpc/client";
-import { memo } from "react";
 
 interface IProps {
+  children: React.ReactNode;
   groupId: string;
   groupColor: string;
   hasMembers: boolean;
@@ -18,6 +19,7 @@ interface IProps {
 }
 export const GroupExpensesPanel = memo(_GroupExpensesPanel);
 function _GroupExpensesPanel({
+  children,
   groupId,
   groupColor,
   hasMembers,
@@ -25,7 +27,6 @@ function _GroupExpensesPanel({
   isGroupManager = false,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
-  const { data: debts } = trpc.group.getDebts.useQuery(groupId);
 
   if (!hasMembers) {
     return (
@@ -74,9 +75,7 @@ function _GroupExpensesPanel({
 
   return (
     <ScrollArea className="h-[55vh] flex-1 md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
-      {debts?.map((debt) => (
-        <p>{`${debt.from.name} has to pay ${debt.amount / 100} to ${debt.to.name}`}</p>
-      ))}
+      {children}
     </ScrollArea>
   );
 }

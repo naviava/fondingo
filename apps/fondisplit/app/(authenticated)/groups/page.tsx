@@ -24,32 +24,35 @@ export default async function GroupsPage() {
     <>
       <SocialHeader />
       <ScrollArea className="h-[80vh] md:h-[82vh] lg:h-[79vh]">
-        <section className="flex flex-1 flex-col gap-y-8 px-4 pb-24">
+        <section className="flex flex-1 flex-col gap-y-6 pb-24">
           {groups.map((group) => (
-            <Link key={group.id} href={`/groups/${group.id}`}>
-              <div>
-                <div className="flex items-center">
-                  <GroupAvatar
-                    variant="sm"
-                    groupType={group.type}
-                    groupColor={group.color}
-                  />
-                  <h2 className="mx-2 line-clamp-1 flex-1 font-medium">
-                    {group.name}
-                  </h2>
-                  <GroupBalance
-                    userId={user.id}
-                    data={group.simplifiedDebts}
-                    currency={group.currency}
-                  />
-                </div>
-                <div className="ml-16">
-                  <DebtsOverview
-                    userId={user.id}
-                    groupId={group.id}
-                    currency={group.currency}
-                  />
-                </div>
+            <Link
+              key={group.id}
+              href={`/groups/${group.id}`}
+              className="px-4 py-1 hover:bg-neutral-200"
+            >
+              <div className="flex items-center">
+                <GroupAvatar
+                  variant="sm"
+                  groupType={group.type}
+                  groupColor={group.color}
+                  className="hover:text-neutral-200"
+                />
+                <h2 className="mx-2 line-clamp-1 flex-1 font-medium">
+                  {group.name}
+                </h2>
+                <GroupBalance
+                  userId={user.id}
+                  data={group.simplifiedDebts}
+                  currency={group.currency}
+                />
+              </div>
+              <div className="ml-16">
+                <DebtsOverview
+                  userId={user.id}
+                  groupId={group.id}
+                  currency={group.currency}
+                />
               </div>
             </Link>
           ))}

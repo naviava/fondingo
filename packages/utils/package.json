@@ -2,12 +2,14 @@
   "name": "@fondingo/utils",
   "version": "0.0.0",
   "exports": {
+    "./date-fns": "./src/date-fns.ts",
     "./hooks": "./src/hooks.ts",
     "./uuid": "./src/uuid.ts",
     "./zod": "./src/zod.ts",
     "./jwt": "./src/jwt.ts"
   },
   "dependencies": {
+    "date-fns": "^3.6.0",
     "jsonwebtoken": "^9.0.2",
     "usehooks-ts": "^3.1.0",
     "uuid": "^9.0.1",

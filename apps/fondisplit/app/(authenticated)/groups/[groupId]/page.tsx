@@ -2,11 +2,12 @@ import { GroupExpensesPanel } from "~/components/group-id-page/group-expenses-pa
 import { UtilityButtons } from "~/components/group-id-page/utility-buttons";
 import { GroupActions } from "~/components/group-id-page/group-actions";
 import { GroupHeader } from "~/components/group-id-page/group-header";
+import { GroupLog } from "~/components/group-id-page/group-log";
 import { GroupAvatar } from "~/components/group-avatar";
 
+import { calculateDebts } from "~/server/actions/group";
 import { serverClient } from "~/lib/trpc/server-client";
 import { linearGradientWithAlpha } from "~/lib/utils";
-import { calculateDebts } from "~/server/actions/group";
 
 interface IProps {
   params: {
@@ -59,7 +60,14 @@ export default async function GroupIdPage({ params }: IProps) {
           isGroupManager={currentUserRole === "MANAGER"}
           hasMembers={group.members.length > 1}
           hasExpenses={!!group.expenses.length}
-        />
+        >
+          <GroupLog
+            userId={currentUser?.id}
+            groupId={group.id}
+            groupColor={group.color}
+            currency={group.currency}
+          />
+        </GroupExpensesPanel>
       </section>
     </article>
   );
