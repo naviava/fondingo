@@ -10,7 +10,7 @@ interface IProps {
   hideDebts?: boolean;
 }
 
-export function FriendWithBalance({
+export function FriendEntry({
   friendId,
   friendName,
   imageUrl,

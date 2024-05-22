@@ -1,4 +1,4 @@
-import { FriendWithBalance } from "~/components/friend-entry";
+import { FriendEntry } from "~/components/friend-entry";
 import { SocialHeader } from "~/components/social-header";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 
@@ -14,33 +14,35 @@ export default async function FriendsPage() {
       <SocialHeader />
       <ScrollArea className="h-[80vh] md:h-[82vh] lg:h-[79vh]">
         <section className="flex flex-1 flex-col gap-y-8 px-4 pb-24">
-          {/* TODO: Change to friend in app */}
           {!!friendsInApp.length && (
             <div className="space-y-6">
               {friendsInApp.map((friend) => (
-                <FriendWithBalance
+                <FriendEntry
+                  key={friend.id}
                   friendId={friend.id}
                   friendName={friend.name || "Unknown"}
                   imageUrl={friend.image || ""}
-                  hideDebts
                 />
               ))}
             </div>
           )}
-          <div>
-            <h4 className="text-muted-foreground font-semibold">
-              Friends not on Fondi
-            </h4>
-            <div className="mt-4 space-y-4">
-              {friendsInGroups.map((friend) => (
-                <FriendWithBalance
-                  friendId={friend.id}
-                  friendName={friend.name || "Unknown"}
-                  hideDebts
-                />
-              ))}
+          {!!friendsInGroups.length && (
+            <div>
+              <h4 className="text-muted-foreground font-semibold">
+                Friends not on Fondi
+              </h4>
+              <div className="mt-4 space-y-4">
+                {friendsInGroups.map((friend) => (
+                  <FriendEntry
+                    key={friend.id}
+                    friendId={friend.id}
+                    friendName={friend.name || "Unknown"}
+                    hideDebts
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </section>
       </ScrollArea>
     </>
