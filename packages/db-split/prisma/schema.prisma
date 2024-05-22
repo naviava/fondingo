@@ -55,6 +55,7 @@ model User {
   id                     String          @id @default(cuid())
   email                  String          @unique
   phone                  String?         @unique
+  isMerged               Boolean         @default(false)
   name                   String?
   firstName              String?
   middleName             String?

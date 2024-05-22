@@ -1,12 +1,13 @@
-import "./globals.css";
-import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import type { Metadata } from "next";
+import "./globals.css";
 
-import NextTopLoader from "nextjs-toploader";
 import { getServerSession } from "next-auth";
+import NextTopLoader from "nextjs-toploader";
 
-import { cn } from "@fondingo/ui/utils";
+import { mergeUserAccounts } from "~/server/actions/user";
 import { authOptions } from "~/lib/auth";
+import { cn } from "@fondingo/ui/utils";
 
 import SessionProvider from "~/components/providers/session-provider";
 import { Providers } from "~/components/providers";
@@ -25,6 +26,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
+  await mergeUserAccounts();
 
   return (
     <html lang="en">

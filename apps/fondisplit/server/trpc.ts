@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import splitdb from "@fondingo/db-split";
 
 const t = initTRPC.create();
-export const createCallerFactory = t.createCallerFactory;
 export const middleware = t.middleware;
 
 // Logged in users only middleware.
@@ -66,6 +65,8 @@ const isAdmin = middleware(async (opts) => {
 });
 
 export const router = t.router;
+export const createCallerFactory = t.createCallerFactory;
+
 export const publicProcedure = t.procedure;
 export const adminProcedure = t.procedure.use(isAdmin);
 export const privateProcedure = t.procedure.use(isAuthenticated);
