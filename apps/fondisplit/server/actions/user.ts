@@ -239,6 +239,31 @@ export const acceptFriendRequest = privateProcedure
     });
   });
 
+export const getFriends = privateProcedure.query(async ({ ctx }) => {
+  const { user } = ctx;
+  const friends = await splitdb.friend.findMany({
+    where: {
+      OR: [{ user1Id: user.id }, { user2Id: user.id }],
+    },
+    include: {
+      user1: true,
+      user2: true,
+    },
+  });
+  const formattedFriends = friends.map((friend) =>
+    friend.user1Id === user.id ? friend.user2 : friend.user1,
+  );
+
+  const tempFriends = await splitdb.tempFriend.findMany({
+    where: { userId: user.id },
+  });
+
+  return {
+    friends: !!formattedFriends.length ? formattedFriends : [],
+    tempFriends: !!tempFriends.length ? tempFriends : [],
+  };
+});
+
 /**
  * This function is an asynchronous operation that calculates and returns the gross balance of a user.
  * The gross balance is calculated as the difference between the total amount of credits and the total amount of debts of the user.
