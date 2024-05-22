@@ -41,7 +41,7 @@ export function FriendWithBalance({
             <div
               className={cn(
                 "flex items-center",
-                isInDebt ? "text-rose-700" : "text-cta",
+                isInDebt ? "text-orange-600" : "text-cta",
               )}
             >
               <IndianRupee className="h-4 w-4" />

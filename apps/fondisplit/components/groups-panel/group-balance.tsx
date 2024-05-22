@@ -31,7 +31,7 @@ export function GroupBalance({ userId, currency, data }: IProps) {
     <div
       className={cn(
         "flex flex-col items-end justify-center",
-        isInDebt ? "text-rose-700" : "text-cta",
+        isInDebt ? "text-orange-600" : "text-cta",
       )}
     >
       <span className="text-xs font-medium md:text-sm">

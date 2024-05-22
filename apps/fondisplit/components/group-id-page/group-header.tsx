@@ -46,7 +46,7 @@ export function GroupHeader({
           myDebts.map((debt) => (
             <div className="text-muted-foreground flex items-center text-sm">
               You owe {debt.to.name}{" "}
-              <div className="ml-0.5 flex items-center text-rose-700">
+              <div className="ml-0.5 flex items-center text-orange-600">
                 <CurrencyIcon className="h-3 w-3" />
                 <span className="font-semibold">
                   {(debt.amount / 100).toFixed(2)}

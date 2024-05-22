@@ -40,7 +40,7 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
           className="text-muted-foreground flex items-center text-sm font-medium"
         >
           You owe {debt.to.name}
-          <div className="ml-1 flex items-center text-rose-700">
+          <div className="ml-1 flex items-center text-orange-600">
             <CurrencyIcon size={11} />
             <span className="font-semibold">
               {(debt.amount / 100).toFixed(2)}

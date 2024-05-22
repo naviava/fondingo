@@ -44,7 +44,7 @@ export async function Expense({
   const isInDebt = grossBalance < 0;
 
   const displayText = {
-    className: isInDebt ? "text-rose-700" : "text-cta",
+    className: isInDebt ? "text-orange-600" : "text-cta",
     label: isInDebt ? "you borrowed" : "you lent",
     amount: isInDebt
       ? `${((grossBalance / 100) * -1).toFixed(2)}`
