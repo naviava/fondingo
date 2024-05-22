@@ -40,9 +40,11 @@ export default async function GroupIdPage({ params }: IProps) {
       </div>
       <section className="flex-1 pb-24 pt-12">
         <GroupHeader
+          userId={currentUser?.id}
           groupName={group.name}
+          currency={group.currency}
           hasExpenses={!!group.expenses.length}
-          debts={group.simplifiedDebts}
+          groupDebts={group.simplifiedDebts}
         />
         <GroupActions
           groupId={group.id}

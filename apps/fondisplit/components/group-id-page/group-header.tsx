@@ -1,20 +1,60 @@
+import { CurrencyCode } from "@fondingo/db-split";
+import { currencyIconMap } from "@fondingo/ui/constants";
 import { DebtWithDetails } from "~/types";
 
 interface IProps {
+  userId: string | undefined;
   groupName: string;
+  currency: CurrencyCode;
   hasExpenses: boolean;
-  debts: DebtWithDetails[];
+  groupDebts: DebtWithDetails[];
 }
 
-export function GroupHeader({ groupName, hasExpenses, debts }: IProps) {
+export function GroupHeader({
+  userId,
+  groupName,
+  currency,
+  hasExpenses,
+  groupDebts,
+}: IProps) {
+  const myCredits = groupDebts.filter((credit) => credit.to.userId === userId);
+  const myDebts = groupDebts.filter((credit) => credit.from.userId === userId);
+
+  const CurrencyIcon = currencyIconMap[currency].icon;
+
   return (
     <div className="ml-[5.3rem]">
       <h1 className="text-2xl font-semibold">{groupName}</h1>
       {!hasExpenses && <p className="text-base">No expenses here yet.</p>}
-      {hasExpenses && !debts.length && (
+      {hasExpenses && !groupDebts.length && (
         <p className="text-base">All debts settled.</p>
       )}
-      {/* TODO: Show group debts. */}
+      <div className="mt-2 space-y-1">
+        {!!myCredits.length &&
+          myCredits.map((credit) => (
+            <div className="text-muted-foreground flex items-center text-sm">
+              {credit.from.name} owes you{" "}
+              <div className="text-cta ml-0.5 flex items-center">
+                <CurrencyIcon className="h-3 w-3" />
+                <span className="font-semibold">
+                  {(credit.amount / 100).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          ))}
+        {!!myDebts.length &&
+          myDebts.map((debt) => (
+            <div className="text-muted-foreground flex items-center text-sm">
+              You owe {debt.to.name}{" "}
+              <div className="ml-0.5 flex items-center text-rose-700">
+                <CurrencyIcon className="h-3 w-3" />
+                <span className="font-semibold">
+                  {(debt.amount / 100).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          ))}
+      </div>
     </div>
   );
 }
