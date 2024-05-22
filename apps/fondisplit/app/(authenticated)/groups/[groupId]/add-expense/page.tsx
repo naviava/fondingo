@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -16,6 +16,7 @@ import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 
+import { currencyIconMap } from "@fondingo/ui/constants";
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/lib/utils";
@@ -53,6 +54,7 @@ export default function AddExpensePage({ params }: IProps) {
   const {
     groupId,
     setGroupId,
+    currency,
     setCurrency,
     expenseName,
     setExpenseName,
@@ -68,6 +70,11 @@ export default function AddExpensePage({ params }: IProps) {
     onSplitsDrawerOpen,
     clearExpenseDetails,
   } = useExpenseDetails((state) => state);
+
+  const CurrencyIcon = useMemo(
+    () => currencyIconMap[currency].icon,
+    [currency],
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -202,7 +209,7 @@ export default function AddExpensePage({ params }: IProps) {
           <div className="flex items-center gap-x-4">
             {/* TODO: Add currency selector */}
             <div className="rounded-md border-2 border-neutral-300 p-1 shadow-md shadow-neutral-500">
-              <IndianRupee size={36} />
+              <CurrencyIcon size={36} />
             </div>
             <FormField
               control={form.control}

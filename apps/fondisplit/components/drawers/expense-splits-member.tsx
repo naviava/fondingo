@@ -9,6 +9,7 @@ import { Input } from "@fondingo/ui/input";
 
 import { adjustMinorAmount } from "~/lib/utils";
 import { cn } from "@fondingo/ui/utils";
+import { currencyIconMap } from "@fondingo/ui/constants";
 
 interface IProps {
   userId: string;
@@ -31,7 +32,13 @@ export function ExpenseSplitsMember({
   userImageUrl,
   setSplitsState,
 }: IProps) {
-  const { splitType, splits, expenseAmount, setSplits } = useExpenseDetails();
+  const { splitType, splits, expenseAmount, setSplits, currency } =
+    useExpenseDetails();
+
+  const CurrencyIcon = useMemo(
+    () => currencyIconMap[currency].icon,
+    [currency],
+  );
 
   const isInSplits = useMemo(
     () => splits.find((split) => split.userId === userId),
@@ -83,7 +90,7 @@ export function ExpenseSplitsMember({
       )}
       {splitType === "custom" && (
         <div className="flex items-center">
-          <IndianRupee className="text-muted-foreground mr-2 h-4 w-4" />
+          <CurrencyIcon className="text-muted-foreground mr-2 h-4 w-4" />
           <Input
             type="number"
             defaultValue={

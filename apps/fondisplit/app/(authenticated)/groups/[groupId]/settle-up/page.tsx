@@ -51,5 +51,11 @@ export default async function SettleUpPage({ params }: IProps) {
   //     [],
   //   );
 
-  return <SettlementClient groupId={params.groupId} members={members} />;
+  return (
+    <SettlementClient
+      groupId={params.groupId}
+      members={members}
+      currency={group.currency}
+    />
+  );
 }

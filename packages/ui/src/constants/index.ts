@@ -32,4 +32,4 @@ export const currencyIconMap = {
     name: "Swiss Franc",
     icon: SwissFranc,
   },
-};
+} as const;

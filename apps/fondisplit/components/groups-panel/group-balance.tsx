@@ -1,13 +1,15 @@
-import { IndianRupee } from "@fondingo/ui/lucide";
+import { currencyIconMap } from "@fondingo/ui/constants";
+import { CurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   userId: string;
+  currency: CurrencyCode;
   data: DebtWithDetails[];
 }
 
-export function GroupBalance({ userId, data }: IProps) {
+export function GroupBalance({ userId, currency, data }: IProps) {
   const grossBalanceAmount = data.reduce((acc, debt) => {
     if (debt.from.userId === userId) {
       acc -= debt.amount;
@@ -19,6 +21,7 @@ export function GroupBalance({ userId, data }: IProps) {
   }, 0);
 
   const isInDebt = grossBalanceAmount < 0;
+  const CurrencyIcon = currencyIconMap[currency].icon;
 
   if (grossBalanceAmount === 0) {
     return <div className="text-xs font-semibold md:text-sm">settled up</div>;
@@ -35,7 +38,7 @@ export function GroupBalance({ userId, data }: IProps) {
         {isInDebt ? "you owe" : "you are owed"}
       </span>
       <div className="flex items-center">
-        <IndianRupee className="h-4 w-4" />
+        <CurrencyIcon className="h-4 w-4" />
         <span className="font-semibold">
           {(isInDebt
             ? (grossBalanceAmount / 100) * -1

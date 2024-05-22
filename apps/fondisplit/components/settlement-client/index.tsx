@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -17,6 +17,8 @@ import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 
+import { currencyIconMap } from "@fondingo/ui/constants";
+import { CurrencyCode } from "@fondingo/db-split";
 import { trpc } from "~/lib/trpc/client";
 
 const formSchema = z.object({
@@ -25,13 +27,18 @@ const formSchema = z.object({
 
 interface IProps {
   groupId: string;
+  currency: CurrencyCode;
   members: GroupMemberClient[];
 }
 
 export const SettlementClient = memo(_SettlementClient);
-function _SettlementClient({ groupId, members }: IProps) {
+function _SettlementClient({ groupId, currency, members }: IProps) {
   const router = useRouter();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const CurrencyIcon = useMemo(
+    () => currencyIconMap[currency].icon,
+    [currency],
+  );
 
   const {
     selectedDebtor,
@@ -146,7 +153,7 @@ function _SettlementClient({ groupId, members }: IProps) {
           )}
           <div className="mt-10 flex items-center gap-x-4">
             <div className="rounded-md border-2 border-neutral-300 p-1 shadow-md shadow-neutral-500">
-              <IndianRupee size={36} />
+              <CurrencyIcon size={36} />
             </div>
             <FormField
               control={form.control}

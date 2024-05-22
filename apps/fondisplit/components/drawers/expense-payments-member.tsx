@@ -1,12 +1,13 @@
 "use client";
 
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
 import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
 
+import { currencyIconMap } from "@fondingo/ui/constants";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
@@ -32,8 +33,18 @@ export function ExpensePaymentsMember({
   isMultiple,
   setPaymentsState,
 }: IProps) {
-  const { onPaymentsDrawerClose, payments, expenseAmount, setPayments } =
-    useExpenseDetails();
+  const {
+    onPaymentsDrawerClose,
+    payments,
+    setPayments,
+    expenseAmount,
+    currency,
+  } = useExpenseDetails();
+
+  const CurrencyIcon = useMemo(
+    () => currencyIconMap[currency].icon,
+    [currency],
+  );
 
   const handleSinglePayer = useCallback(
     ({ userId, userName }: { userId: string; userName: string }) => {
@@ -81,7 +92,7 @@ export function ExpensePaymentsMember({
         payments[0]?.userName === userName && <Check className="text-cta" />}
       {isMultiple && (
         <div className="flex items-center">
-          <IndianRupee className="text-muted-foreground mr-2 h-4 w-4" />
+          <CurrencyIcon className="text-muted-foreground mr-2 h-4 w-4" />
           <Input
             type="number"
             defaultValue={

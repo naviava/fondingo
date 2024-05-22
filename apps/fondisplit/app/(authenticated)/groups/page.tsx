@@ -37,10 +37,18 @@ export default async function GroupsPage() {
                   <h2 className="mx-2 line-clamp-1 flex-1 font-medium">
                     {group.name}
                   </h2>
-                  <GroupBalance userId={user.id} data={group.simplifiedDebts} />
+                  <GroupBalance
+                    userId={user.id}
+                    data={group.simplifiedDebts}
+                    currency={group.currency}
+                  />
                 </div>
                 <div className="ml-16">
-                  <DebtsOverview userId={user.id} groupId={group.id} />
+                  <DebtsOverview
+                    userId={user.id}
+                    groupId={group.id}
+                    currency={group.currency}
+                  />
                 </div>
               </div>
             </Link>
