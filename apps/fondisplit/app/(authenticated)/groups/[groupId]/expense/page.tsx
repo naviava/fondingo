@@ -112,12 +112,18 @@ export default function AddExpensePage({ params }: IProps) {
     isPaymentsDrawerOpen,
   ]);
 
+  const utils = trpc.useUtils();
   const { mutate: handleAddExpense, isPending } =
     trpc.group.addExpense.useMutation({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
         toast({ title: toastTitle, description: toastDescription });
+        utils.expense.getExpenseById.invalidate();
+        utils.expense.getExpenseIds.invalidate();
+        utils.group.getGroupById.invalidate();
+        utils.group.getGroups.invalidate();
+        utils.group.getDebts.invalidate();
         form.reset();
         clearExpenseDetails();
         router.push(`/groups/${params.groupId}`);

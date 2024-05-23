@@ -51,6 +51,7 @@ export function AddMemberModal() {
     },
   });
 
+  const utils = trpc.useUtils();
   const { mutate: handleAddMember, isPending } =
     trpc.group.addMember.useMutation({
       onError: ({ message }) =>
@@ -64,6 +65,9 @@ export function AddMemberModal() {
           title: toastTitle,
           description: toastDescription,
         });
+        utils.group.getGroupById.invalidate();
+        utils.group.getMembers.invalidate();
+        utils.group.getGroups.invalidate();
         setIsAddingContact(false);
         form.reset();
         onClose();

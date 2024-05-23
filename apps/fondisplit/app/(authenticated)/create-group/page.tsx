@@ -124,6 +124,7 @@ export default function CreateGroupPage() {
           description: toastDescription,
         });
         form.reset();
+        utils.group.getGroupById.invalidate();
         utils.group.getGroups.invalidate();
         router.push(`/groups/${groupId}`);
       },
