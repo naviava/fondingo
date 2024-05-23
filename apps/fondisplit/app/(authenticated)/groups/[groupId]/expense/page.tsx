@@ -127,6 +127,7 @@ export default function AddExpensePage({ params }: IProps) {
         form.reset();
         clearExpenseDetails();
         router.push(`/groups/${params.groupId}`);
+        router.refresh();
       },
     });
 

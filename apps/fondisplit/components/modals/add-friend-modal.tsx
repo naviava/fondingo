@@ -1,10 +1,16 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+
 import { useAddFriendModal } from "@fondingo/store/fondisplit";
 import { useDebounceValue } from "@fondingo/utils/hooks";
 
 import { Separator } from "@fondingo/ui/separator";
+import { toast } from "@fondingo/ui/use-toast";
 import { Avatar } from "@fondingo/ui/avatar";
+import { Button } from "@fondingo/ui/button";
+import { Input } from "@fondingo/ui/input";
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,8 +18,6 @@ import {
   Search,
   UserPlus,
 } from "@fondingo/ui/lucide";
-import { Button } from "@fondingo/ui/button";
-import { Input } from "@fondingo/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -22,10 +26,9 @@ import {
 } from "@fondingo/ui/dialog";
 
 import { trpc } from "~/lib/trpc/client";
-import { toast } from "@fondingo/ui/use-toast";
-import { useMemo } from "react";
 
 export function AddFriendModal() {
+  const router = useRouter();
   const { isOpen, onClose } = useAddFriendModal();
   const [debouncedValue, setValue] = useDebounceValue("", 500);
   const { data: foundUsers } = trpc.user.findUsers.useQuery(debouncedValue);
@@ -49,11 +52,12 @@ export function AddFriendModal() {
           description: message,
         }),
       onSuccess: ({ toastTitle, toastDescription }) => {
-        utils.user.getFriendRequests.invalidate();
         toast({
           title: toastTitle,
           description: toastDescription,
         });
+        utils.user.getFriendRequests.invalidate();
+        router.refresh();
       },
     });
 

@@ -70,6 +70,7 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
         utils.group.getGroups.invalidate();
         utils.group.getDebts.invalidate();
         router.push(`/groups/${groupId}`);
+        router.refresh();
       },
     });
 

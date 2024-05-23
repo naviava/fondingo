@@ -31,9 +31,9 @@ export function ExpenseActions({ groupId, expenseId }: IProps) {
           description: toastDescription,
         });
         utils.expense.getExpenseById.invalidate();
-        utils.group.getGroupById.invalidate();
-        utils.user.getGrossBalance.invalidate();
         utils.user.getDebtWithFriend.invalidate();
+        utils.user.getGrossBalance.invalidate();
+        utils.group.getGroupById.invalidate();
         router.push(`/groups/${groupId}`);
         router.refresh();
       },

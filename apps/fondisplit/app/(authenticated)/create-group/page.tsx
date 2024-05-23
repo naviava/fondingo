@@ -127,6 +127,7 @@ export default function CreateGroupPage() {
         utils.group.getGroupById.invalidate();
         utils.group.getGroups.invalidate();
         router.push(`/groups/${groupId}`);
+        router.refresh();
       },
     });
 
