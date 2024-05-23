@@ -3,6 +3,7 @@ import { FriendEntry } from "~/components/friend-entry";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 import { serverClient } from "~/lib/trpc/server-client";
+import { OverallGrossBalance } from "~/components/overall-gross-balance";
 
 export default async function FriendsPage() {
   const { friends: friendsInApp, tempFriends: friendsInGroups } =
@@ -12,6 +13,7 @@ export default async function FriendsPage() {
     // TODO: Add UI when there are no friends
     <>
       <SocialHeader />
+      <OverallGrossBalance />
       <ScrollArea className="h-[80vh] md:h-[82vh] lg:h-[79vh]">
         <section className="flex flex-1 flex-col gap-y-8 px-4 pb-24">
           {!!friendsInApp.length && (

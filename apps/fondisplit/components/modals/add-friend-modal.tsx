@@ -13,10 +13,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@fondingo/ui/dialog";
+import { trpc } from "~/lib/trpc/client";
 
 export function AddFriendModal() {
   const [debouncedValue, setValue] = useDebounceValue("", 500);
   const { isOpen, onClose } = useAddFriendModal();
+
+  const { data: foundUsers } = trpc.user.findUsers.useQuery(debouncedValue);
+
+  console.log(foundUsers);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -26,7 +31,7 @@ export function AddFriendModal() {
             <Button
               variant="splitGhost"
               size="sm"
-              onClick={() => {}}
+              onClick={onClose}
               className="min-w-[5rem]"
             >
               Close
@@ -35,7 +40,7 @@ export function AddFriendModal() {
             <Button
               variant="splitGhost"
               size="sm"
-              onClick={() => {}}
+              onClick={onClose}
               className="min-w-[5rem]"
             >
               Done
@@ -58,6 +63,7 @@ export function AddFriendModal() {
           </div>
         </DialogHeader>
         <Separator />
+        {foundUsers?.map((user) => <div key={user?.id}>{user?.email}</div>)}
       </DialogContent>
     </Dialog>
   );

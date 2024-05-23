@@ -451,3 +451,54 @@ export async function mergeUserAccounts() {
     });
   });
 }
+
+export const findUsers = privateProcedure
+  .input(z.string().min(1, { message: "Search query cannot be empty" }))
+  .query(async ({ ctx, input: searchTerm }) => {
+    const { user } = ctx;
+
+    const users = await splitdb.user.findMany({
+      where: {
+        id: { not: user.id },
+        OR: [
+          { email: { contains: searchTerm } },
+          { name: { contains: searchTerm } },
+          { phone: { contains: searchTerm } },
+        ],
+      },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        image: true,
+        friends1: {
+          select: { id: true },
+        },
+        friends2: {
+          select: { id: true },
+        },
+      },
+    });
+
+    const friendIds = await splitdb.friend.findMany({
+      where: {
+        OR: [{ user1Id: user.id }, { user2Id: user.id }],
+      },
+      select: { user1Id: true, user2Id: true },
+    });
+
+    const filteredUsers = users
+      .map((user) => {
+        const isFriend = friendIds.some(
+          (friendId) =>
+            user.id === friendId.user1Id || user.id === friendId.user2Id,
+        );
+        if (isFriend) return;
+        return user;
+      })
+      .filter(Boolean);
+
+    return filteredUsers || [];
+  });

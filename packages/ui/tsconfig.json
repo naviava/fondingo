@@ -1,8 +1,9 @@
 {
   "extends": "@fondingo/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
-  "include": ["src"],
+  "include": ["./src"],
   "exclude": ["node_modules", "dist"]
 }

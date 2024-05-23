@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { OverallGrossBalance } from "~/components/overall-gross-balance";
 import { DebtsOverview } from "~/components/groups-panel/debts-overview";
 import { GroupBalance } from "~/components/groups-panel/group-balance";
 import { EmptyState } from "~/components/groups-panel/empty-state";
@@ -22,6 +23,7 @@ export default async function GroupsPage() {
   return (
     <>
       <SocialHeader />
+      <OverallGrossBalance />
       {!groups.length ? (
         <EmptyState />
       ) : (

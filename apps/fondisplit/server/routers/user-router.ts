@@ -8,6 +8,7 @@ import {
   getGrossBalance,
   getFriends,
   getDebtWithFriend,
+  findUsers,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -18,4 +19,5 @@ export const userRouter = router({
   getGrossBalance,
   getFriends,
   getDebtWithFriend,
+  findUsers,
 });
