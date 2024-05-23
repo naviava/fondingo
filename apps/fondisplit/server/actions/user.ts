@@ -51,17 +51,17 @@ export const getAuthProfile = publicProcedure.query(async () => {
  * @returns {Promise<Object>} A Promise that resolves with a toast message when the friend request has been successfully sent.
  */
 export const sendFriendRequest = privateProcedure
-  .input(z.string().email({ message: "Invalid email" }))
-  .mutation(async ({ ctx, input: email }) => {
+  .input(z.string().min(1, { message: "Requested ID is required" }))
+  .mutation(async ({ ctx, input: requestedId }) => {
     const { user } = ctx;
-    if (user.email === email)
+    if (user.id === requestedId)
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: "You cannot send a friend request to yourself.",
       });
 
     const existingUser = await splitdb.user.findUnique({
-      where: { email: email },
+      where: { id: requestedId },
     });
     if (!existingUser)
       throw new TRPCError({
@@ -74,10 +74,10 @@ export const sendFriendRequest = privateProcedure
         OR: [
           {
             user1Id: user.id,
-            user2: { email: email },
+            user2: { id: requestedId },
           },
           {
-            user1: { email: email },
+            user1: { id: requestedId },
             user2Id: user.id,
           },
         ],
@@ -114,6 +114,11 @@ export const sendFriendRequest = privateProcedure
         fromId: user.id,
         toId: existingUser.id,
       },
+      include: {
+        to: {
+          select: { email: true },
+        },
+      },
     });
     if (!friendRequest)
       throw new TRPCError({
@@ -123,9 +128,23 @@ export const sendFriendRequest = privateProcedure
 
     return {
       toastTitle: "Friend request sent",
-      toastDescription: `Friend request has been sent to ${email}.`,
+      toastDescription: `Friend request has been sent to ${friendRequest.to.email}.`,
     };
   });
+
+export const getFriendRequests = privateProcedure.query(async ({ ctx }) => {
+  const { user } = ctx;
+  const sentFriendRequests = await splitdb.friendRequest.findMany({
+    where: { fromId: user.id },
+  });
+  const receivedFriendRequests = await splitdb.friendRequest.findMany({
+    where: { toId: user.id },
+  });
+  return {
+    sentFriendRequests,
+    receivedFriendRequests,
+  };
+});
 
 /**
  * This function is used to decline a friend request in the application.
@@ -403,55 +422,6 @@ export const getDebtWithFriend = privateProcedure
     }
   });
 
-export async function mergeUserAccounts() {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user || !session.user.email) {
-    return null;
-  }
-
-  const existingUser = await splitdb.user.findUnique({
-    where: {
-      email: session.user.email,
-      isMerged: false,
-    },
-  });
-  if (!existingUser) return null;
-
-  return splitdb.$transaction(async (db) => {
-    await db.groupMember.updateMany({
-      where: {
-        email: existingUser.email,
-        userId: null,
-      },
-      data: { userId: existingUser.id },
-    });
-
-    const tempFriends = await db.tempFriend.findMany({
-      where: {
-        email: existingUser.email,
-      },
-    });
-
-    if (!!tempFriends.length) {
-      await db.friend.createMany({
-        data: tempFriends.map((tempFriend) => ({
-          user1Id: tempFriend.userId,
-          user2Id: existingUser.id,
-        })),
-      });
-
-      await db.tempFriend.deleteMany({
-        where: { email: existingUser.email },
-      });
-    }
-
-    await db.user.update({
-      where: { id: existingUser.id },
-      data: { isMerged: true },
-    });
-  });
-}
-
 export const findUsers = privateProcedure
   .input(z.string().min(1, { message: "Search query cannot be empty" }))
   .query(async ({ ctx, input: searchTerm }) => {
@@ -502,3 +472,52 @@ export const findUsers = privateProcedure
 
     return filteredUsers || [];
   });
+
+export async function mergeUserAccounts() {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user || !session.user.email) {
+    return null;
+  }
+
+  const existingUser = await splitdb.user.findUnique({
+    where: {
+      email: session.user.email,
+      isMerged: false,
+    },
+  });
+  if (!existingUser) return null;
+
+  return splitdb.$transaction(async (db) => {
+    await db.groupMember.updateMany({
+      where: {
+        email: existingUser.email,
+        userId: null,
+      },
+      data: { userId: existingUser.id },
+    });
+
+    const tempFriends = await db.tempFriend.findMany({
+      where: {
+        email: existingUser.email,
+      },
+    });
+
+    if (!!tempFriends.length) {
+      await db.friend.createMany({
+        data: tempFriends.map((tempFriend) => ({
+          user1Id: tempFriend.userId,
+          user2Id: existingUser.id,
+        })),
+      });
+
+      await db.tempFriend.deleteMany({
+        where: { email: existingUser.email },
+      });
+    }
+
+    await db.user.update({
+      where: { id: existingUser.id },
+      data: { isMerged: true },
+    });
+  });
+}

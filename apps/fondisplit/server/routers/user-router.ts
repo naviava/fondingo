@@ -9,11 +9,13 @@ import {
   getFriends,
   getDebtWithFriend,
   findUsers,
+  getFriendRequests,
 } from "../actions/user";
 
 export const userRouter = router({
   getAuthProfile,
   sendFriendRequest,
+  getFriendRequests,
   declineFriendRequest,
   acceptFriendRequest,
   getGrossBalance,

@@ -4,7 +4,14 @@ import { useAddFriendModal } from "@fondingo/store/fondisplit";
 import { useDebounceValue } from "@fondingo/utils/hooks";
 
 import { Separator } from "@fondingo/ui/separator";
-import { Search } from "@fondingo/ui/lucide";
+import { Avatar } from "@fondingo/ui/avatar";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Loader,
+  Search,
+  UserPlus,
+} from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 import {
@@ -13,15 +20,42 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@fondingo/ui/dialog";
+
 import { trpc } from "~/lib/trpc/client";
+import { toast } from "@fondingo/ui/use-toast";
+import { useMemo } from "react";
 
 export function AddFriendModal() {
-  const [debouncedValue, setValue] = useDebounceValue("", 500);
   const { isOpen, onClose } = useAddFriendModal();
-
+  const [debouncedValue, setValue] = useDebounceValue("", 500);
   const { data: foundUsers } = trpc.user.findUsers.useQuery(debouncedValue);
 
-  console.log(foundUsers);
+  const utils = trpc.useUtils();
+  const { data } = trpc.user.getFriendRequests.useQuery();
+  const sentFriendRequestIds = useMemo(
+    () => data?.sentFriendRequests.map((req) => req.toId),
+    [data],
+  );
+  const receivedFriendRequestIds = useMemo(
+    () => data?.receivedFriendRequests.map((req) => req.fromId),
+    [data],
+  );
+
+  const { mutate: handleFriendRequest, isPending } =
+    trpc.user.sendFriendRequest.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        utils.user.getFriendRequests.invalidate();
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+      },
+    });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -31,6 +65,7 @@ export function AddFriendModal() {
             <Button
               variant="splitGhost"
               size="sm"
+              disabled={isPending}
               onClick={onClose}
               className="min-w-[5rem]"
             >
@@ -40,6 +75,7 @@ export function AddFriendModal() {
             <Button
               variant="splitGhost"
               size="sm"
+              disabled={isPending}
               onClick={onClose}
               className="min-w-[5rem]"
             >
@@ -50,6 +86,7 @@ export function AddFriendModal() {
             <div className="relative px-4">
               <Input
                 type="text"
+                disabled={isPending}
                 defaultValue={debouncedValue}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="Search by email or phone number"
@@ -63,7 +100,52 @@ export function AddFriendModal() {
           </div>
         </DialogHeader>
         <Separator />
-        {foundUsers?.map((user) => <div key={user?.id}>{user?.email}</div>)}
+        <ul className="mx-auto grid w-[90%] select-none grid-cols-1 gap-x-4 gap-y-4 px-4 md:w-full md:grid-cols-2">
+          {foundUsers?.map((user) => (
+            <li
+              key={user?.id}
+              className="flex cursor-pointer items-center justify-between gap-x-2 rounded-md px-2 py-1 transition hover:bg-neutral-100"
+            >
+              <div className="flex items-center gap-x-2">
+                <Avatar
+                  variant="sm"
+                  userName={user?.name}
+                  userImageUrl={user?.image}
+                />
+                <p className="line-clamp-1 text-sm font-medium">{user?.name}</p>
+              </div>
+              {!!user?.id &&
+                (sentFriendRequestIds?.includes(user.id) ? (
+                  <div className="text-muted-foreground flex items-center text-xs font-medium italic">
+                    Sent
+                    <ArrowRight className="h-3 w-3 md:hidden" />
+                  </div>
+                ) : receivedFriendRequestIds?.includes(user.id) ? (
+                  <div className="text-muted-foreground flex items-center text-xs font-medium italic">
+                    <ArrowLeft className="h-3 w-3 md:hidden" />
+                    Received
+                  </div>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="splitGhost"
+                    disabled={isPending}
+                    onClick={() => handleFriendRequest(user?.id || "")}
+                    className="px-0 text-sm"
+                  >
+                    {isPending ? (
+                      <Loader className="animate-spin" />
+                    ) : (
+                      <>
+                        <UserPlus className="mr-1 h-4 w-4" />
+                        <span>Add</span>
+                      </>
+                    )}
+                  </Button>
+                ))}
+            </li>
+          ))}
+        </ul>
       </DialogContent>
     </Dialog>
   );
