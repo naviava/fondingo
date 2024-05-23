@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 
 import { Pencil, Trash2 } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
@@ -14,6 +15,8 @@ interface IProps {
 
 export function ExpenseActions({ groupId, expenseId }: IProps) {
   const router = useRouter();
+
+  const { onOpen, onClose } = useConfirmModal();
 
   const utils = trpc.useUtils();
   const { mutate: handleDeleteExpense, isPending } =
@@ -42,7 +45,16 @@ export function ExpenseActions({ groupId, expenseId }: IProps) {
         size="sm"
         variant="ghost"
         disabled={isPending}
-        onClick={() => handleDeleteExpense({ groupId, expenseId })}
+        onClick={() =>
+          onOpen({
+            id: expenseId,
+            title: "Delete expense?",
+            description:
+              "Are you sure you want to delete this expense? This will remove the expense for ALL people involved, not just you. This action cannot be undone.",
+            confirmAction: () => handleDeleteExpense({ expenseId, groupId }),
+            cancelAction: onClose,
+          })
+        }
       >
         <Trash2 />
       </Button>

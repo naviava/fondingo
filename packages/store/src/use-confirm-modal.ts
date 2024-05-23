@@ -1,38 +1,52 @@
 import { create } from "zustand";
 
 type ConfirmModalStore = {
-  confirmId: string;
+  id: string;
+  title: string;
+  description: string;
+  confirmAction: () => void;
+  cancelAction: () => void;
+
   isOpen: boolean;
   onOpen: ({
     id,
+    title,
+    description,
     confirmAction,
     cancelAction,
   }: {
     id: string;
+    title: string;
+    description: string;
     confirmAction: () => void;
     cancelAction: () => void;
   }) => void;
   onClose: () => void;
-  confirmAction: () => void;
-  cancelAction: () => void;
 };
 
 export const useConfirmModal = create<ConfirmModalStore>((set) => ({
-  confirmId: "",
-  isOpen: false,
+  id: "",
+  title: "",
+  description: "",
   confirmAction: () => {},
   cancelAction: () => {},
-  onOpen: ({ id, confirmAction, cancelAction }) =>
+
+  isOpen: false,
+  onOpen: ({ id, title, description, confirmAction, cancelAction }) =>
     set({
       isOpen: true,
-      confirmId: id,
+      id,
+      title,
+      description,
       confirmAction,
       cancelAction,
     }),
   onClose: () =>
     set({
       isOpen: false,
-      confirmId: "",
+      id: "",
+      title: "",
+      description: "",
       confirmAction: () => {},
       cancelAction: () => {},
     }),
