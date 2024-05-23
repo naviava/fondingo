@@ -1,9 +1,9 @@
 import { IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Button } from "@fondingo/ui/button";
-import { cn } from "@fondingo/ui/utils";
-import { getDebtWithFriend } from "~/server/actions/user";
+
 import { serverClient } from "~/lib/trpc/server-client";
+import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   friendId: string;

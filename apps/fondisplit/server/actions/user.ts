@@ -136,9 +136,13 @@ export const getFriendRequests = privateProcedure.query(async ({ ctx }) => {
   const { user } = ctx;
   const sentFriendRequests = await splitdb.friendRequest.findMany({
     where: { fromId: user.id },
+    include: { to: true },
+    orderBy: { createdAt: "desc" },
   });
   const receivedFriendRequests = await splitdb.friendRequest.findMany({
     where: { toId: user.id },
+    include: { from: true },
+    orderBy: { createdAt: "desc" },
   });
   return {
     sentFriendRequests,
@@ -160,11 +164,24 @@ export const getFriendRequests = privateProcedure.query(async ({ ctx }) => {
  * @returns {Promise<Object>} A Promise that resolves with a toast message when the friend request has been successfully deleted.
  */
 export const declineFriendRequest = privateProcedure
-  .input(z.string().min(1, { message: "Friend request ID cannot be empty" }))
-  .mutation(async ({ ctx, input: friendReqId }) => {
+  .input(
+    z.object({
+      requestId: z
+        .string()
+        .min(1, { message: "Friend request ID cannot be empty" }),
+      fromId: z.string().min(1, { message: "Friend ID cannot be empty" }),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
+    const { requestId, fromId } = input;
+
     const friendRequest = await splitdb.friendRequest.findUnique({
-      where: { id: friendReqId },
+      where: {
+        id: requestId,
+        fromId,
+        toId: user.id,
+      },
     });
     if (!friendRequest)
       throw new TRPCError({
@@ -178,7 +195,7 @@ export const declineFriendRequest = privateProcedure
       });
 
     const deletedFriendRequest = await splitdb.friendRequest.delete({
-      where: { id: friendReqId },
+      where: { id: friendRequest.id },
     });
     if (!deletedFriendRequest)
       throw new TRPCError({
@@ -206,11 +223,24 @@ export const declineFriendRequest = privateProcedure
  * @throws {TRPCError} Will throw an error if the deletion of the friend request fails.
  */
 export const acceptFriendRequest = privateProcedure
-  .input(z.string().min(1, { message: "Friend request ID cannot be empty" }))
-  .mutation(async ({ ctx, input: friendReqId }) => {
+  .input(
+    z.object({
+      requestId: z
+        .string()
+        .min(1, { message: "Friend request ID cannot be empty" }),
+      fromId: z.string().min(1, { message: "Friend ID cannot be empty" }),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
+    const { requestId, fromId } = input;
+
     const friendRequest = await splitdb.friendRequest.findUnique({
-      where: { id: friendReqId },
+      where: {
+        id: requestId,
+        fromId,
+        toId: user.id,
+      },
     });
     if (!friendRequest)
       throw new TRPCError({
@@ -245,7 +275,7 @@ export const acceptFriendRequest = privateProcedure
         });
 
       const deletedFriendRequest = await db.friendRequest.delete({
-        where: { id: friendReqId },
+        where: { id: requestId },
       });
       if (!deletedFriendRequest)
         throw new TRPCError({
