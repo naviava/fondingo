@@ -63,7 +63,10 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
       onSuccess: () => {
         form.reset();
         resetDrawer();
-        utils.group.invalidate();
+        utils.expense.getSettlements.invalidate();
+        utils.group.getGroupById.invalidate();
+        utils.group.getGroups.invalidate();
+        utils.group.getDebts.invalidate();
         router.push(`/groups/${groupId}`);
       },
     });
