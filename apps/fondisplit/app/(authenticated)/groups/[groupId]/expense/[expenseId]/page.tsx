@@ -9,6 +9,7 @@ import { Button } from "@fondingo/ui/button";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { format } from "@fondingo/utils/date-fns";
+import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 interface IProps {
   params: {
@@ -31,7 +32,7 @@ export default async function ExpenseIdPage({ params }: IProps) {
   const updatedAt = format(new Date(expense.updatedAt), "d MMMM yyyy");
 
   return (
-    <>
+    <div className="pb-24">
       <div className="relative flex items-center justify-between px-2 pt-4 text-neutral-700">
         <Button asChild size="sm" variant="ghost">
           <Link href={`/groups/${params.groupId}`}>
@@ -53,34 +54,42 @@ export default async function ExpenseIdPage({ params }: IProps) {
         updatedAt={updatedAt}
       />
       <Separator className="my-4" />
-      <div className="px-6">
-        <ul>
-          {expense.payments.map((payment) => (
-            <ExpenseEntry
-              key={payment.id}
-              type="payment"
-              creditorName={payment.groupMember.name}
-              didIPay={payment.groupMember.user?.id === user?.id}
-              amount={payment.amount}
-              currency={group.currency}
-              imageUrl={payment.groupMember.user?.image}
-            />
-          ))}
-        </ul>
-        <ul className="text-muted-foreground ml-10 mt-2 text-sm">
-          {expense.splits.map((split) => (
-            <ExpenseEntry
-              key={split.id}
-              type="split"
-              debtorName={split.groupMember.name}
-              amount={split.amount}
-              currency={group.currency}
-              imageUrl={split.groupMember.user?.image}
-              avatarSize="sm"
-            />
-          ))}
-        </ul>
-      </div>
-    </>
+      <ScrollArea className="h-[67vh]">
+        <div className="px-6">
+          <ul>
+            {expense.payments.map((payment) => (
+              <ExpenseEntry
+                key={payment.id}
+                type="payment"
+                creditorName={payment.groupMember.name}
+                didIPay={payment.groupMember.user?.id === user?.id}
+                amount={payment.amount}
+                currency={group.currency}
+                imageUrl={payment.groupMember.user?.image}
+              />
+            ))}
+          </ul>
+          <ul className="text-muted-foreground ml-10 mt-2 text-sm">
+            {expense.splits.map((split) => (
+              <ExpenseEntry
+                key={split.id}
+                type="split"
+                debtorName={split.groupMember.name}
+                doIOwe={split.groupMember.user?.id === user?.id}
+                amount={split.amount}
+                currency={group.currency}
+                imageUrl={split.groupMember.user?.image}
+                avatarSize="sm"
+              />
+            ))}
+          </ul>
+        </div>
+        <Separator className="my-4" />
+        <div className="px-6">
+          <h4 className="text-xl font-semibold">Activity</h4>
+          <div className="mt-4 font-medium">Ticket log goes here.</div>
+        </div>
+      </ScrollArea>
+    </div>
   );
 }

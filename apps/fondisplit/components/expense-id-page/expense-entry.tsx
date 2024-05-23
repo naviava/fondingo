@@ -6,8 +6,9 @@ import { cn } from "@fondingo/ui/utils";
 interface IProps {
   type: "payment" | "split";
   creditorName?: string;
-  debtorName?: string;
   didIPay?: boolean;
+  debtorName?: string;
+  doIOwe?: boolean;
   amount: number;
   currency: CurrencyCode;
   imageUrl?: string | null | undefined;
@@ -17,8 +18,9 @@ interface IProps {
 export function ExpenseEntry({
   type,
   creditorName = "Unknown",
-  debtorName = "Unknown",
   didIPay,
+  debtorName = "Unknown",
+  doIOwe,
   amount,
   currency,
   imageUrl = "",
@@ -34,7 +36,7 @@ export function ExpenseEntry({
         userImageUrl={imageUrl}
       />
       <div className="flex items-center">
-        {`${type === "payment" ? (didIPay ? "You paid" : creditorName + " paid") : debtorName + " owes"}`}
+        {`${type === "payment" ? (didIPay ? "You paid" : creditorName + " paid") : doIOwe ? "You owe" : debtorName + " owes"}`}
         <CurrencyIcon
           className={cn("ml-1 h-4 w-4", avatarSize === "sm" && "h-3 w-3")}
         />
