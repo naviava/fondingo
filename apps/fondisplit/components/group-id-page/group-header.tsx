@@ -21,6 +21,7 @@ export function GroupHeader({
   const myCredits = groupDebts.filter((credit) => credit.to.userId === userId);
   const myDebts = groupDebts.filter((credit) => credit.from.userId === userId);
 
+  const isEven = !myCredits.length && !myDebts.length;
   const CurrencyIcon = currencyIconMap[currency].icon;
 
   return (
@@ -34,7 +35,12 @@ export function GroupHeader({
         <p className="text-base">All debts settled.</p>
       )}
       <div className="mt-2 space-y-1">
-        {!!myCredits.length &&
+        {isEven ? (
+          <p className="text-muted-foreground flex items-center text-sm">
+            You're all settled up.
+          </p>
+        ) : (
+          !!myCredits.length &&
           myCredits.map((credit) => (
             <div className="text-muted-foreground flex items-center text-sm">
               {credit.from.name} owes you{" "}
@@ -45,7 +51,8 @@ export function GroupHeader({
                 </span>
               </div>
             </div>
-          ))}
+          ))
+        )}
         {!!myDebts.length &&
           myDebts.map((debt) => (
             <div className="text-muted-foreground flex items-center text-sm">

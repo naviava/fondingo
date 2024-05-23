@@ -54,7 +54,7 @@ export async function ExpenseEntry({
   return (
     <div
       role="button"
-      className="mb-6 flex items-center gap-x-4 px-4 py-1 hover:bg-neutral-200"
+      className="mb-2 flex items-center gap-x-4 px-4 py-4 hover:bg-neutral-200"
     >
       <EntryDate createdAt={expense.createdAt} />
       <ExpenseAvatar groupColor={groupColor} />
