@@ -326,6 +326,83 @@ export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
   }
 });
 
+/**
+ * This function is a private procedure that calculates the debt between the current user and a friend.
+ * It takes a friend's ID as input and returns an object containing information about the debt.
+ *
+ * @function getDebtWithFriend
+ * @memberof module:splitdb
+ * @param {string} friendId - The ID of the friend with whom the debt is to be calculated. It must be a non-empty string.
+ * @returns {Promise<Object>} A promise that resolves to an object containing the following properties:
+ * @property {boolean} isInDebt - A boolean indicating whether the current user is in debt to the friend.
+ * @property {string|null} displayAmountText - A string representing the amount of debt in a displayable format. If there is no debt, this property is null.
+ * @property {number} amount - The total amount of debt. It is a positive number if the user owes the friend, and a negative number if the friend owes the user.
+ *
+ * @throws {TRPCError} Throws a TRPCError with code "INTERNAL_SERVER_ERROR" if there is an error during the execution of the function.
+ *
+ * @description
+ * The function first checks if the friend exists in the database. If the friend does not exist, it returns an object indicating that there is no debt.
+ * If the friend exists, it fetches all the credit and debt records between the user and the friend.
+ * It then calculates the total credit and debt amounts, and the balance amount (credit - debt).
+ * If the balance amount is positive, it means the user owes the friend. If it's negative, the friend owes the user.
+ * The function then returns an object containing the debt information.
+ */
+export const getDebtWithFriend = privateProcedure
+  .input(z.string().min(1, { message: "Friend ID cannot be empty" }))
+  .query(async ({ ctx, input: friendId }) => {
+    const { user } = ctx;
+
+    try {
+      const existingFriend = await splitdb.user.findUnique({
+        where: { id: friendId },
+      });
+      if (!existingFriend)
+        return {
+          isInDebt: false,
+          displayAmountText: null,
+          amount: 0,
+        };
+
+      const credits = await splitdb.simplifiedDebt.findMany({
+        where: {
+          from: { userId: existingFriend.id },
+          to: { userId: user.id },
+        },
+      });
+      const debts = await splitdb.simplifiedDebt.findMany({
+        where: {
+          from: { userId: user.id },
+          to: { userId: existingFriend.id },
+        },
+      });
+
+      const creditAmount = credits.reduce(
+        (acc, credit) => acc + credit.amount,
+        0,
+      );
+      const debtAmount = debts.reduce((acc, debt) => acc + debt.amount, 0);
+      const balanceAmount = creditAmount - debtAmount;
+
+      const isInDebt = debtAmount > creditAmount;
+      const displayAmountText =
+        balanceAmount > 0
+          ? (balanceAmount / 100).toFixed(2)
+          : ((balanceAmount / 100) * -1).toFixed(2);
+
+      return {
+        isInDebt,
+        displayAmountText,
+        amount: balanceAmount,
+      };
+    } catch (err) {
+      console.error(err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to get debt with friend.",
+      });
+    }
+  });
+
 export async function mergeUserAccounts() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user || !session.user.email) {

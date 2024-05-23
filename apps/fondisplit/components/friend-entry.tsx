@@ -2,6 +2,8 @@ import { IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";
+import { getDebtWithFriend } from "~/server/actions/user";
+import { serverClient } from "~/lib/trpc/server-client";
 
 interface IProps {
   friendId: string;
@@ -10,15 +12,15 @@ interface IProps {
   hideDebts?: boolean;
 }
 
-export function FriendEntry({
+export async function FriendEntry({
   friendId,
   friendName,
   imageUrl,
   hideDebts,
 }: IProps) {
   // TODO: Handle logic for these variables
-  const isInDebt = false;
-  const amount = 0;
+  const { isInDebt, amount, displayAmountText } =
+    await serverClient.user.getDebtWithFriend(friendId);
 
   return (
     <div className="flex items-center gap-x-4">
@@ -45,7 +47,7 @@ export function FriendEntry({
               )}
             >
               <IndianRupee className="h-4 w-4" />
-              <span className="font-semibold">{(amount / 100).toFixed(2)}</span>
+              <span className="font-semibold">{displayAmountText}</span>
             </div>
           </>
         )}

@@ -7,6 +7,7 @@ import {
   acceptFriendRequest,
   getGrossBalance,
   getFriends,
+  getDebtWithFriend,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -16,4 +17,5 @@ export const userRouter = router({
   acceptFriendRequest,
   getGrossBalance,
   getFriends,
+  getDebtWithFriend,
 });

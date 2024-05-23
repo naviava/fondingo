@@ -1,5 +1,5 @@
-import { FriendEntry } from "~/components/friend-entry";
 import { SocialHeader } from "~/components/social-header";
+import { FriendEntry } from "~/components/friend-entry";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 import { serverClient } from "~/lib/trpc/server-client";
