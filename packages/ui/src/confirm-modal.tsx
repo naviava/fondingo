@@ -13,7 +13,8 @@ import {
 import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 
 export function ConfirmModal() {
-  const { isOpen, onClose, title, description } = useConfirmModal();
+  const { isOpen, onClose, title, description, confirmAction, cancelAction } =
+    useConfirmModal();
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -23,8 +24,11 @@ export function ConfirmModal() {
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction className="bg-cta hover:bg-cta/90">
+          <AlertDialogCancel onClick={cancelAction}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={confirmAction}
+            className="bg-cta hover:bg-cta/90"
+          >
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>
