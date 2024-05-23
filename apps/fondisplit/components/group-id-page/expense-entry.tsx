@@ -1,5 +1,5 @@
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { ExpenseWallet } from "../expense-wallet";
+import { ExpenseAvatar } from "../expense-avatar";
 import { CurrencyCode } from "@fondingo/db-split";
 
 import { serverClient } from "~/lib/trpc/server-client";
@@ -57,7 +57,7 @@ export async function ExpenseEntry({
       className="mb-6 flex items-center gap-x-4 px-4 py-1 hover:bg-neutral-200"
     >
       <EntryDate createdAt={expense.createdAt} />
-      <ExpenseWallet groupColor={groupColor} />
+      <ExpenseAvatar groupColor={groupColor} />
       <div className="flex-1">
         <h5 className="line-clamp-1 font-semibold">{expense.name}</h5>
         {expense.payments.map((payment, idx) => {

@@ -26,7 +26,7 @@ export function SettlementEntry({
       className="text-muted-foreground mb-6 flex items-center gap-x-4 px-4 py-1 font-semibold hover:bg-neutral-200"
     >
       <EntryDate createdAt={createdAt} />
-      <div className="px-3 md:px-4">
+      <div className="px-2">
         <FcMoneyTransfer className="h-6 w-6 md:h-8 md:w-8" />
       </div>
       <div className="flex items-center text-sm">

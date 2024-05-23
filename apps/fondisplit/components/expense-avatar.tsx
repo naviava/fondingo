@@ -5,15 +5,15 @@ interface IProps {
   groupColor: string;
 }
 
-export function ExpenseWallet({ groupColor }: IProps) {
+export function ExpenseAvatar({ groupColor }: IProps) {
   return (
     <div
-      className="p-3"
+      className="p-1"
       style={{
         border: `2px solid ${hexToRgb(groupColor, 0.3)}`,
       }}
     >
-      <FcComboChart className="h-6 w-6 md:h-8 md:w-8" />
+      <FcComboChart className="h-8 w-8 md:h-9 md:w-9" />
     </div>
   );
 }

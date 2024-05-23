@@ -672,6 +672,7 @@ export const addSettlement = privateProcedure
         groupId,
         fromId,
         toId,
+        createdById: user.id,
         amount: Math.floor(amount * 100),
       },
       include: {

@@ -1,5 +1,5 @@
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { ExpenseWallet } from "../expense-wallet";
+import { ExpenseAvatar } from "../expense-avatar";
 import { CurrencyCode } from "@fondingo/db-split";
 
 interface IProps {
@@ -25,7 +25,7 @@ export function ExpenseHeader({
 
   return (
     <div className="mt-6 flex items-start gap-x-4 px-6">
-      <ExpenseWallet groupColor={groupColor} />
+      <ExpenseAvatar groupColor={groupColor} />
       <div className="space-y-1">
         <p className="text-lg font-medium">{expenseName}</p>
         <h1 className="flex items-center text-3xl font-bold">
