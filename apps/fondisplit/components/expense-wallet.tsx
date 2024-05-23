@@ -1,4 +1,4 @@
-import { Wallet } from "@fondingo/ui/lucide";
+import { FcComboChart } from "react-icons/fc";
 import { hexToRgb } from "~/lib/utils";
 
 interface IProps {
@@ -13,7 +13,7 @@ export function ExpenseWallet({ groupColor }: IProps) {
         border: `2px solid ${hexToRgb(groupColor, 0.3)}`,
       }}
     >
-      <Wallet className="h-6 w-6 text-rose-800 md:h-8 md:w-8" />
+      <FcComboChart className="h-6 w-6 md:h-8 md:w-8" />
     </div>
   );
 }

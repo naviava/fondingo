@@ -69,6 +69,7 @@ model User {
   sessions               Session[]
   groups                 GroupMember[]
   createdExpenses        Expense[]
+  createdSettlements     Settlement[]    @relation("SettlementCreatedBy")
   tempfriends            TempFriend[]
   friends1               Friend[]        @relation("Friend1")
   friends2               Friend[]        @relation("Friend2")
@@ -190,14 +191,16 @@ model ExpenseSplit {
 }
 
 model Settlement {
-  id      String      @id @default(cuid())
-  amount  Int
-  groupId String
-  group   Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  fromId  String
-  from    GroupMember @relation("SettlementFromUser", fields: [fromId], references: [id], onDelete: Restrict)
-  toId    String
-  to      GroupMember @relation("SettlementToUser", fields: [toId], references: [id], onDelete: Restrict)
+  id          String      @id @default(cuid())
+  amount      Int
+  groupId     String
+  group       Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User        @relation("SettlementCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  fromId      String
+  from        GroupMember @relation("SettlementFromUser", fields: [fromId], references: [id], onDelete: Restrict)
+  toId        String
+  to          GroupMember @relation("SettlementToUser", fields: [toId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

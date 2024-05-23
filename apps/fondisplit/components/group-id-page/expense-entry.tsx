@@ -3,7 +3,7 @@ import { ExpenseWallet } from "../expense-wallet";
 import { CurrencyCode } from "@fondingo/db-split";
 
 import { serverClient } from "~/lib/trpc/server-client";
-import { format } from "@fondingo/utils/date-fns";
+import { EntryDate } from "./entry-date";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
@@ -14,7 +14,7 @@ interface IProps {
   currency: CurrencyCode;
 }
 
-export async function Expense({
+export async function ExpenseEntry({
   userId,
   expenseId,
   groupId,
@@ -56,10 +56,7 @@ export async function Expense({
       role="button"
       className="mb-6 flex items-center gap-x-4 px-4 py-1 hover:bg-neutral-200"
     >
-      <div className="text-muted-foreground flex flex-col items-center justify-center text-sm font-medium">
-        <p>{format(new Date(expense.createdAt), "LLL")}</p>
-        <p>{format(new Date(expense.createdAt), "d")}</p>
-      </div>
+      <EntryDate createdAt={expense.createdAt} />
       <ExpenseWallet groupColor={groupColor} />
       <div className="flex-1">
         <h5 className="line-clamp-1 font-semibold">{expense.name}</h5>

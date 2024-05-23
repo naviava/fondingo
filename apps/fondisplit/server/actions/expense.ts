@@ -27,7 +27,10 @@ export const getExpenseIds = privateProcedure
     const expenses = await splitdb.expense.findMany({
       where: { groupId },
       orderBy: { createdAt: "desc" },
-      select: { id: true },
+      select: {
+        id: true,
+        createdAt: true,
+      },
     });
     return expenses || [];
   });
