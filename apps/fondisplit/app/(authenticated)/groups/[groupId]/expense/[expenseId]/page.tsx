@@ -1,8 +1,8 @@
 import Link from "next/link";
 
+import { PaymentSplitEntry } from "~/components/expense-id-page/payment-split-entry";
 import { ExpenseActions } from "~/components/expense-id-page/expense-actions";
 import { ExpenseHeader } from "~/components/expense-id-page/expense-header";
-import { ExpenseEntry } from "~/components/expense-id-page/expense-entry";
 import { Separator } from "@fondingo/ui/separator";
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
@@ -42,7 +42,7 @@ export default async function ExpenseIdPage({ params }: IProps) {
         <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-semibold">
           Details
         </h2>
-        <ExpenseActions />
+        <ExpenseActions groupId={group.id} expenseId={expense.id} />
       </div>
       <ExpenseHeader
         groupColor={group.color}
@@ -58,7 +58,7 @@ export default async function ExpenseIdPage({ params }: IProps) {
         <div className="px-6">
           <ul>
             {expense.payments.map((payment) => (
-              <ExpenseEntry
+              <PaymentSplitEntry
                 key={payment.id}
                 type="payment"
                 creditorName={payment.groupMember.name}
@@ -71,7 +71,7 @@ export default async function ExpenseIdPage({ params }: IProps) {
           </ul>
           <ul className="text-muted-foreground ml-10 mt-2 text-sm">
             {expense.splits.map((split) => (
-              <ExpenseEntry
+              <PaymentSplitEntry
                 key={split.id}
                 type="split"
                 debtorName={split.groupMember.name}
@@ -85,6 +85,7 @@ export default async function ExpenseIdPage({ params }: IProps) {
           </ul>
         </div>
         <Separator className="my-4" />
+        {/* TODO: Add expense activity */}
         <div className="px-6">
           <h4 className="text-xl font-semibold">Activity</h4>
           <div className="mt-4 font-medium">Ticket log goes here.</div>

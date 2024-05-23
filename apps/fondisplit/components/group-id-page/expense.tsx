@@ -74,11 +74,11 @@ export async function Expense({
                 ? "You"
                 : payment.groupMember.name}{" "}
               paid{" "}
-              <div className="flex items-center space-x-1">
-                <CurrencyIcon className="h-3 w-3" />
+              <div className="flex items-center">
+                <CurrencyIcon className="ml-1 h-3 w-3" />
                 <span>{(payment.amount / 100).toFixed(2)}</span>
                 {idx === 1 && expense.payments.length > 2 && (
-                  <span>{`and ${expense.payments.length - 2} more`}</span>
+                  <span className="ml-1">{`and ${expense.payments.length - 2} more`}</span>
                 )}
               </div>
             </div>

@@ -15,7 +15,7 @@ interface IProps {
   avatarSize?: "default" | "sm" | "lg" | undefined;
 }
 
-export function ExpenseEntry({
+export function PaymentSplitEntry({
   type,
   creditorName = "Unknown",
   didIPay,
