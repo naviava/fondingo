@@ -335,6 +335,7 @@ export async function mergeUserAccounts() {
   const existingUser = await splitdb.user.findUnique({
     where: {
       email: session.user.email,
+      isMerged: false,
     },
   });
   if (!existingUser) return null;
@@ -371,6 +372,5 @@ export async function mergeUserAccounts() {
       where: { id: existingUser.id },
       data: { isMerged: true },
     });
-    return { session };
   });
 }
