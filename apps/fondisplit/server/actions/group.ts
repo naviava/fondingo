@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import splitdb, { GroupType } from "@fondingo/db-split";
 import { privateProcedure } from "~/server/trpc";
 import { hasDuplicates } from "~/lib/utils";
@@ -59,7 +57,6 @@ export const createGroup = privateProcedure
         message: "Failed to create group. Try again later.",
       });
 
-    revalidatePath("/groups");
     return {
       groupId: group.id,
       toastTitle: `${group.name} created.`,

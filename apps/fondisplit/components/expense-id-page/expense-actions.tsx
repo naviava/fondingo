@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
+import { trpc } from "~/lib/trpc/client";
 
+import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 import { Pencil, Trash2 } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
-import { trpc } from "~/lib/trpc/client";
 
 interface IProps {
   groupId: string;

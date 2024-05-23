@@ -157,3 +157,115 @@ export const getSettlements = privateProcedure
     });
     return settlements || [];
   });
+
+export const getSettlementById = privateProcedure
+  .input(
+    z.object({
+      groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
+      settlementId: z
+        .string()
+        .min(1, { message: "Settlement ID cannot be empty" }),
+    }),
+  )
+  .query(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupId, settlementId } = input;
+
+    const existingSettlement = await splitdb.settlement.findUnique({
+      where: {
+        id: settlementId,
+        groupId,
+        group: {
+          members: {
+            some: { userId: user.id },
+          },
+        },
+      },
+      include: {
+        createdBy: true,
+        from: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
+        to: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!existingSettlement)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Settlement not found",
+      });
+
+    return existingSettlement;
+  });
+
+export const deleteSettlementById = privateProcedure
+  .input(
+    z.object({
+      groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
+      settlementId: z
+        .string()
+        .min(1, { message: "Settlement ID cannot be empty" }),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupId, settlementId } = input;
+
+    const existingSettlement = await splitdb.settlement.findUnique({
+      where: {
+        id: settlementId,
+        groupId,
+        group: {
+          members: {
+            some: { userId: user.id },
+          },
+        },
+      },
+    });
+    if (!existingSettlement)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Settlement not found",
+      });
+    const deletedSettlement = await splitdb.settlement.delete({
+      where: { id: existingSettlement.id },
+    });
+    if (!deletedSettlement)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to delete Settlement",
+      });
+
+    const res = await calculateDebts(groupId);
+    if (!("success" in res) || !res.success) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to calculate debts",
+      });
+    }
+
+    return {
+      toastTitle: `Payment deleted`,
+      toastDescription: `The payment of ${(deletedSettlement.amount / 100).toFixed(2)} has been deleted successfully.`,
+    };
+  });

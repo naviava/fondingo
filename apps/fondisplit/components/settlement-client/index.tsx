@@ -11,8 +11,8 @@ import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
 
 import { Form, FormControl, FormField, FormItem } from "@fondingo/ui/form";
-import { ChevronLeft, IndianRupee } from "@fondingo/ui/lucide";
 import { SettlementMember } from "./settlement-member";
+import { ChevronLeft } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
@@ -64,6 +64,8 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
         form.reset();
         resetDrawer();
         utils.expense.getSettlements.invalidate();
+        utils.expense.getExpenseById.invalidate();
+        utils.expense.getExpenseIds.invalidate();
         utils.group.getGroupById.invalidate();
         utils.group.getGroups.invalidate();
         utils.group.getDebts.invalidate();

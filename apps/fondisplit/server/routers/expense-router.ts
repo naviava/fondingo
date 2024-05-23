@@ -5,6 +5,8 @@ import {
   getExpenseById,
   deleteExpenseById,
   getSettlements,
+  getSettlementById,
+  deleteSettlementById,
 } from "../actions/expense";
 
 export const expenseRouter = router({
@@ -12,4 +14,6 @@ export const expenseRouter = router({
   getExpenseById,
   deleteExpenseById,
   getSettlements,
+  getSettlementById,
+  deleteSettlementById,
 });

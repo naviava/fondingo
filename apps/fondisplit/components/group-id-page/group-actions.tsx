@@ -40,7 +40,7 @@ function _GroupActions({
         onClick: () => {
           if (!hasExpenses) return;
           if (!hasDebts) return toast({ title: "No debts to settle" });
-          router.push(`/groups/${groupId}/settle-up`);
+          router.push(`/groups/${groupId}/settlement`);
         },
       },
       { label: "Balances", onClick: () => {} },
