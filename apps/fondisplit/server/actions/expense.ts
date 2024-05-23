@@ -122,3 +122,35 @@ export const deleteExpenseById = privateProcedure
       toastDescription: `The expense of ${(deletedExpense.amount / 100).toFixed(2)} has been deleted successfully.`,
     };
   });
+
+export const getSettlements = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .query(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const settlements = await splitdb.settlement.findMany({
+      where: { groupId },
+      include: {
+        from: {
+          include: { user: true },
+        },
+        to: {
+          include: { user: true },
+        },
+      },
+    });
+    return settlements || [];
+  });
