@@ -1,9 +1,9 @@
+import { currencyIconMap } from "@fondingo/ui/constants";
+import { ExpenseWallet } from "../expense-wallet";
+import { CurrencyCode } from "@fondingo/db-split";
+
 import { serverClient } from "~/lib/trpc/server-client";
 import { format } from "@fondingo/utils/date-fns";
-import { Wallet } from "@fondingo/ui/lucide";
-import { CurrencyCode } from "@fondingo/db-split";
-import { currencyIconMap } from "@fondingo/ui/constants";
-import { hexToRgb } from "~/lib/utils";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
@@ -54,20 +54,13 @@ export async function Expense({
   return (
     <div
       role="button"
-      className="flex items-center gap-x-4 px-4 py-1 hover:bg-neutral-200"
+      className="mb-6 flex items-center gap-x-4 px-4 py-1 hover:bg-neutral-200"
     >
       <div className="text-muted-foreground flex flex-col items-center justify-center text-sm font-medium">
         <p>{format(new Date(expense.createdAt), "LLL")}</p>
         <p>{format(new Date(expense.createdAt), "d")}</p>
       </div>
-      <div
-        className="p-3"
-        style={{
-          border: `2px solid ${hexToRgb(groupColor, 0.3)}`,
-        }}
-      >
-        <Wallet className="h-6 w-6 text-rose-800 md:h-8 md:w-8" />
-      </div>
+      <ExpenseWallet groupColor={groupColor} />
       <div className="flex-1">
         <h5 className="line-clamp-1 font-semibold">{expense.name}</h5>
         {expense.payments.map((payment, idx) => {

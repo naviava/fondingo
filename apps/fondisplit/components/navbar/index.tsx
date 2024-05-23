@@ -67,7 +67,7 @@ export function Navbar() {
 
   const handleClick = useCallback(() => {
     if (!!params.groupId) {
-      return router.push(`/groups/${params.groupId}/add-expense`);
+      return router.push(`/groups/${params.groupId}/expense`);
     }
     return null;
   }, [params.groupId, router]);

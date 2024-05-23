@@ -47,6 +47,7 @@ export const getExpenseById = privateProcedure
         groupId,
       },
       include: {
+        createdBy: true,
         payments: {
           include: {
             groupMember: {

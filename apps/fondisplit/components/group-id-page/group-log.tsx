@@ -1,6 +1,7 @@
 import { serverClient } from "~/lib/trpc/server-client";
 import { CurrencyCode } from "@fondingo/db-split";
 import { Expense } from "./expense";
+import Link from "next/link";
 
 interface IProps {
   userId: string | undefined;
@@ -18,16 +19,21 @@ export async function GroupLog({
   const expenses = await serverClient.expense.getExpenseIds(groupId);
 
   return (
-    <div className="space-y-6">
+    <div>
       {expenses?.map((expense) => (
-        <Expense
+        <Link
           key={expense.id}
-          userId={userId}
-          expenseId={expense.id}
-          groupId={groupId}
-          groupColor={groupColor}
-          currency={currency}
-        />
+          href={`/groups/${groupId}/expense/${expense.id}`}
+        >
+          <Expense
+            key={expense.id}
+            userId={userId}
+            expenseId={expense.id}
+            groupId={groupId}
+            groupColor={groupColor}
+            currency={currency}
+          />
+        </Link>
       ))}
     </div>
   );

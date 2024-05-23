@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
 
 import { Form, FormControl, FormField, FormItem } from "@fondingo/ui/form";
-import { IndianRupee, LayoutList, X } from "@fondingo/ui/lucide";
+import { LayoutList, X } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
 import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
