@@ -8,14 +8,19 @@ import { GroupAvatar } from "~/components/group-avatar";
 import { calculateDebts } from "~/server/actions/group";
 import { serverClient } from "~/lib/trpc/server-client";
 import { linearGradientWithAlpha } from "~/lib/utils";
+import { Separator } from "@fondingo/ui/separator";
 
 interface IProps {
   params: {
     groupId: string;
   };
+  searchParams: {
+    showBalances: boolean;
+    showTotals: boolean;
+  };
 }
 
-export default async function GroupIdPage({ params }: IProps) {
+export default async function GroupIdPage({ params, searchParams }: IProps) {
   // TODO: Handle this better
   await calculateDebts(params.groupId);
   const currentUser = await serverClient.user.getAuthProfile();
@@ -23,6 +28,8 @@ export default async function GroupIdPage({ params }: IProps) {
   const currentUserRole = group.members.find(
     (member) => member.userId === currentUser?.id,
   )?.role;
+
+  const groupMemberIds = group.members.map((member) => member.id);
 
   return (
     <article className="flex flex-col">
@@ -32,7 +39,11 @@ export default async function GroupIdPage({ params }: IProps) {
           backgroundImage: linearGradientWithAlpha(group.color, 0.5),
         }}
       >
-        <UtilityButtons groupId={params.groupId} />
+        <UtilityButtons
+          groupId={params.groupId}
+          showTotals={searchParams.showTotals}
+          showBalances={searchParams.showBalances}
+        />
         <GroupAvatar
           groupType={group.type}
           groupColor={group.color}
@@ -61,12 +72,26 @@ export default async function GroupIdPage({ params }: IProps) {
           hasMembers={group.members.length > 1}
           hasExpenses={!!group.expenses.length}
         >
-          <GroupLog
-            userId={currentUser?.id}
-            groupId={group.id}
-            groupColor={group.color}
-            currency={group.currency}
-          />
+          {searchParams.showBalances && (
+            <ul>
+              <h2 className="text-center text-lg font-semibold">
+                Group balances
+              </h2>
+              <Separator className="my-2" />
+              {groupMemberIds.map((id) => (
+                <li key={id}>{id}</li>
+              ))}
+            </ul>
+          )}
+          {searchParams.showTotals && <div>Totals section</div>}
+          {!searchParams.showBalances && !searchParams.showTotals && (
+            <GroupLog
+              userId={currentUser?.id}
+              groupId={group.id}
+              groupColor={group.color}
+              currency={group.currency}
+            />
+          )}
         </GroupExpensesPanel>
       </section>
     </article>

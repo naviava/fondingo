@@ -4,9 +4,11 @@ import Link from "next/link";
 
 interface IProps {
   groupId: string;
+  showTotals: boolean;
+  showBalances: boolean;
 }
 
-export function UtilityButtons({ groupId }: IProps) {
+export function UtilityButtons({ groupId, showBalances, showTotals }: IProps) {
   return (
     <>
       <Button
@@ -14,7 +16,9 @@ export function UtilityButtons({ groupId }: IProps) {
         variant="splitGhost"
         className="absolute left-4 top-4 text-white"
       >
-        <Link href="/groups">
+        <Link
+          href={showBalances || showTotals ? `/groups/${groupId}` : "/groups"}
+        >
           <ChevronLeft />
         </Link>
       </Button>

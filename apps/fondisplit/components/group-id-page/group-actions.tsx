@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
@@ -10,6 +10,7 @@ import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { hexToRgb } from "~/lib/utils";
+import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   groupId: string;
@@ -28,6 +29,7 @@ function _GroupActions({
   isGroupManager = false,
 }: IProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const topDivRef = useRef<HTMLDivElement>(null);
 
   const { onOpen } = useAddMemberModal();
@@ -48,10 +50,24 @@ function _GroupActions({
           router.push(`/groups/${groupId}/settlement`);
         },
       },
-      { label: "Balances", onClick: () => {} },
-      { label: "Totals", onClick: () => {} },
+      {
+        label: "Balances",
+        isActive: searchParams.get("showBalances"),
+        onClick: () => {
+          router.push(`/groups/${groupId}?showBalances=true`);
+          router.refresh();
+        },
+      },
+      {
+        label: "Totals",
+        isActive: searchParams.get("showTotals"),
+        onClick: () => {
+          router.push(`/groups/${groupId}?showTotals=true`);
+          router.refresh();
+        },
+      },
     ],
-    [handleAddMember, groupId, router, hasExpenses, hasDebts],
+    [handleAddMember, groupId, router, hasExpenses, hasDebts, searchParams],
   );
 
   useEffect(() => {
@@ -71,11 +87,18 @@ function _GroupActions({
           {options.map((option) => (
             <Button
               key={option.label}
+              ref={(ref) => {
+                if (option.isActive && !!ref)
+                  ref.style.setProperty("--tw-shadow-color", groupColor);
+              }}
               type="button"
               size="sm"
               variant="outline"
               onClick={option.onClick}
-              className="min-w-[7rem] font-bold shadow-sm shadow-neutral-600"
+              className={cn(
+                "min-w-[7rem] font-bold shadow-sm shadow-neutral-600",
+                option.isActive && "shadow-md",
+              )}
               style={{
                 backgroundColor:
                   option.label === "Settle up" ? hexToRgb(groupColor, 0.3) : "",

@@ -82,18 +82,24 @@ export async function ExpenseEntry({
           );
         })}
       </div>
-      <div
-        className={cn(
-          "flex flex-col items-end justify-center",
-          displayText.className,
-        )}
-      >
-        <p className="text-xs font-medium md:text-sm">{displayText.label}</p>
-        <div className="flex items-center">
-          <CurrencyIcon className="h-4 w-4" />
-          <span className="font-semibold">{displayText.amount}</span>
+      {!!grossBalance ? (
+        <div
+          className={cn(
+            "flex flex-col items-end justify-center",
+            displayText.className,
+          )}
+        >
+          <p className="text-xs font-medium md:text-sm">{displayText.label}</p>
+          <div className="flex items-center">
+            <CurrencyIcon className="h-4 w-4" />
+            <span className="font-semibold">{displayText.amount}</span>
+          </div>
         </div>
-      </div>
+      ) : (
+        <span className="text-xs font-medium italic text-neutral-400">
+          all settled up
+        </span>
+      )}
     </div>
   );
 }
