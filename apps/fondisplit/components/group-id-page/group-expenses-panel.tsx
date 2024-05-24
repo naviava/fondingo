@@ -8,6 +8,7 @@ import { UserPlus } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 
 import { linearGradientWithAlpha } from "~/lib/utils";
+import { usePanelHeight } from "@fondingo/store/use-panel-height";
 
 interface IProps {
   children: React.ReactNode;
@@ -27,22 +28,25 @@ function _GroupExpensesPanel({
   isGroupManager = false,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
+  const { topRef, bottomRef } = usePanelHeight((state) => state);
 
   if (!hasMembers) {
     return (
       <div className="flex h-[55vh] flex-col items-center justify-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
-        <h2 className="mb-10 text-center text-gray-500">
-          You're the only one here!
-        </h2>
-        <Button
-          type="button"
-          variant="splitCta"
-          onClick={() => onOpen(groupId, isGroupManager)}
-          className="h-14 w-64 text-lg shadow-md shadow-neutral-500"
-        >
-          <UserPlus className="mr-2" size={24} />
-          Add members
-        </Button>
+        <div className="flex -translate-y-1/2 flex-col items-center justify-center">
+          <h2 className="mb-10 text-center text-gray-500">
+            You're the only one here!
+          </h2>
+          <Button
+            type="button"
+            variant="splitCta"
+            onClick={() => onOpen(groupId, isGroupManager)}
+            className="h-14 w-64 text-lg shadow-md shadow-neutral-500"
+          >
+            <UserPlus className="mr-2" size={24} />
+            Add members
+          </Button>
+        </div>
       </div>
     );
   }
@@ -74,7 +78,13 @@ function _GroupExpensesPanel({
   }
 
   return (
-    <ScrollArea className="h-[55vh] flex-1 md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
+    // <ScrollArea className="h-[55vh] md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
+    <ScrollArea
+      style={{
+        height:
+          topRef && bottomRef ? `${bottomRef - topRef - 130}px` : "default",
+      }}
+    >
       {children}
     </ScrollArea>
   );

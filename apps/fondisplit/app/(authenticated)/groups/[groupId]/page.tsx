@@ -25,7 +25,7 @@ export default async function GroupIdPage({ params }: IProps) {
   )?.role;
 
   return (
-    <article className="flex h-full flex-col">
+    <article className="flex flex-col">
       <div
         className="relative h-[7.5rem]"
         style={{
@@ -39,7 +39,7 @@ export default async function GroupIdPage({ params }: IProps) {
           className="absolute -bottom-8 left-20"
         />
       </div>
-      <section className="flex-1 pb-24 pt-12">
+      <section className="pb-24 pt-12">
         <GroupHeader
           userId={currentUser?.id}
           groupName={group.name}

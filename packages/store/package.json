@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "exports": {
     "./fondisplit": "./src/fondisplit/index.ts",
-    "./use-confirm-modal": "./src/use-confirm-modal.ts"
+    "./use-confirm-modal": "./src/use-confirm-modal.ts",
+    "./use-panel-height": "./src/use-panel-height.ts"
   },
   "dependencies": {
     "@fondingo/db-split": "workspace:*",
