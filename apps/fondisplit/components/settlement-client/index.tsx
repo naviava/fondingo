@@ -1,7 +1,7 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { useSettlementDrawer } from "@fondingo/store/fondisplit";
@@ -34,7 +34,11 @@ interface IProps {
 export const SettlementClient = memo(_SettlementClient);
 function _SettlementClient({ groupId, currency, members }: IProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [flag, setFlag] = useState(false);
+
   const CurrencyIcon = useMemo(
     () => currencyIconMap[currency].icon,
     [currency],
@@ -61,8 +65,6 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: () => {
-        form.reset();
-        resetDrawer();
         utils.expense.getSettlements.invalidate();
         utils.expense.getExpenseById.invalidate();
         utils.expense.getExpenseIds.invalidate();
@@ -71,6 +73,8 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
         utils.group.getDebts.invalidate();
         router.push(`/groups/${groupId}`);
         router.refresh();
+        resetDrawer();
+        form.reset();
       },
     });
 
@@ -86,7 +90,24 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
     [groupId, selectedDebtor, selectedCreditor, handleAddSettlement],
   );
 
+  const amount = useMemo(
+    () => Number(searchParams.get("amount")) / 100,
+    [searchParams],
+  );
+  const fromId = useMemo(() => searchParams.get("from"), [searchParams]);
+  const toId = useMemo(() => searchParams.get("to"), [searchParams]);
+
   useEffect(() => {
+    if (!flag && !!fromId && !!toId) {
+      const debtor = members.find((member) => member.id === fromId);
+      const creditor = members.find((member) => member.id === toId);
+      if (debtor && creditor) {
+        setSelectedDebtor(debtor);
+        setSelectedCreditor(creditor);
+        form.setValue("amount", amount?.toFixed(2) || "");
+        setFlag(true);
+      }
+    }
     if (!selectedDebtor && !!members[0]) {
       setSelectedDebtor(members[0]);
     }
@@ -94,6 +115,11 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
       setSelectedCreditor(members[1]);
     }
   }, [
+    flag,
+    form,
+    toId,
+    fromId,
+    amount,
     members,
     selectedDebtor,
     selectedCreditor,
@@ -104,10 +130,13 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
   return (
     <>
       <div className="flex items-center justify-between px-2 pt-4">
-        <Button asChild variant="ghost" size="sm" disabled={isPending}>
-          <Link href={`/groups/${groupId}`}>
-            <ChevronLeft />
-          </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={isPending}
+          onClick={() => router.back()}
+        >
+          <ChevronLeft />
         </Button>
         <h1 className="text-lg font-semibold">Record a payment</h1>
         <Button
