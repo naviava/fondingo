@@ -6,6 +6,7 @@ import {
   addSettlement,
   createGroup,
   getDebts,
+  getDebtsByMemberId,
   getGroupById,
   getGroups,
   getMembers,
@@ -18,6 +19,7 @@ export const groupRouter = router({
   addMember,
   getMembers,
   addExpense,
-  getDebts,
   addSettlement,
+  getDebts,
+  getDebtsByMemberId,
 });

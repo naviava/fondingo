@@ -75,7 +75,12 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
           {searchParams.showBalances && (
             <ul>
               {groupMemberIds.map((id) => (
-                <GroupBalanceEntry key={id} memberId={id} />
+                <GroupBalanceEntry
+                  key={id}
+                  groupId={group.id}
+                  memberId={id}
+                  currency={group.currency}
+                />
               ))}
             </ul>
           )}

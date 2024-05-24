@@ -600,9 +600,7 @@ export const getDebtsByMemberId = privateProcedure
       where: {
         id: groupId,
         members: {
-          some: {
-            AND: [{ userId: user.id }, { id: memberId }],
-          },
+          some: { userId: user.id },
         },
       },
     });
@@ -611,6 +609,23 @@ export const getDebtsByMemberId = privateProcedure
         code: "NOT_FOUND",
         message: "Group not found",
       });
+
+    const member = await splitdb.groupMember.findUnique({
+      where: {
+        groupId,
+        id: memberId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
 
     const credits = await splitdb.simplifiedDebt.findMany({
       where: {
@@ -681,9 +696,13 @@ export const getDebtsByMemberId = privateProcedure
     const grossBalance = totalCredit - totalDebt;
 
     return {
+      member,
+      totalDebt,
+      totalCredit,
       grossBalance,
       debts: debts || [],
       credits: credits || [],
+      isInDebt: grossBalance < 0,
     };
   });
 
