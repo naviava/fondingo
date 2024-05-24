@@ -2,9 +2,11 @@ import { currencyIconMap } from "@fondingo/ui/constants";
 import { Separator } from "@fondingo/ui/separator";
 import { CurrencyCode } from "@fondingo/db-split";
 import { Avatar } from "@fondingo/ui/avatar";
+import { DebtEntry } from "./debt-entry";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
+import { group } from "console";
 
 interface IProps {
   groupId: string;
@@ -30,6 +32,8 @@ export async function GroupBalanceEntry({
   const CurrencyIcon = currencyIconMap[currency].icon;
   const displayAmount = isInDebt ? -grossBalance : grossBalance;
 
+  if (!grossBalance) return null;
+
   return (
     <>
       <li className="flex items-center gap-x-4 px-4 text-sm">
@@ -49,6 +53,47 @@ export async function GroupBalanceEntry({
           <span>in total</span>
         </div>
       </li>
+      <div className="ml-[4.5rem] mt-2 space-y-4">
+        <>
+          {credits.map((credit) => (
+            <DebtEntry
+              key={credit.id}
+              groupId={groupId}
+              from={{
+                id: credit.fromId,
+                name: credit.from.name,
+                image: credit.from.user?.image,
+              }}
+              to={{
+                id: credit.toId,
+                name: credit.to.name,
+                image: credit.to.user?.image,
+              }}
+              currency={currency}
+              amount={credit.amount}
+            />
+          ))}
+          {debts.map((debt) => (
+            <DebtEntry
+              key={debt.id}
+              groupId={groupId}
+              from={{
+                id: debt.fromId,
+                name: debt.from.name,
+                image: debt.from.user?.image,
+              }}
+              to={{
+                id: debt.toId,
+                name: debt.to.name,
+                image: debt.to.user?.image,
+              }}
+              currency={currency}
+              amount={debt.amount}
+              isDebt
+            />
+          ))}
+        </>
+      </div>
       <Separator className="my-4" />
     </>
   );
