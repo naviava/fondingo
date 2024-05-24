@@ -79,7 +79,6 @@ export function Navbar() {
     function updateNavbarPosition() {
       const navbar = navbarRef.current?.getBoundingClientRect();
       setBottomRef(navbar?.top);
-      console.log(navbar?.top);
     }
     updateNavbarPosition();
     window.addEventListener("resize", updateNavbarPosition);

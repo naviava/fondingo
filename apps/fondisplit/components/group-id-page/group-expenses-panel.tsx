@@ -82,7 +82,7 @@ function _GroupExpensesPanel({
     <ScrollArea
       style={{
         height:
-          topRef && bottomRef ? `${bottomRef - topRef - 130}px` : "default",
+          topRef && bottomRef ? `${bottomRef - topRef - 16}px` : "default",
       }}
     >
       {children}

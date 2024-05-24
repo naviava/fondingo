@@ -57,8 +57,7 @@ function _GroupActions({
   useEffect(() => {
     function updateTopDivPosition() {
       const topDiv = topDivRef.current?.getBoundingClientRect();
-      setTopRef(topDiv?.top);
-      console.log(topDiv?.top);
+      setTopRef(topDiv?.bottom);
     }
     updateTopDivPosition();
     window.addEventListener("resize", updateTopDivPosition);
