@@ -51,6 +51,12 @@ function _GroupActions({
         },
       },
       {
+        label: "Group Logs",
+        onClick: () => {
+          router.push(`/groups/${groupId}`);
+        },
+      },
+      {
         label: "Balances",
         isActive: searchParams.get("showBalances"),
         onClick: () => {
@@ -84,29 +90,45 @@ function _GroupActions({
     <div ref={topDivRef}>
       <ScrollArea hideVerticalScrollbar>
         <div className="my-8 flex gap-x-4 px-4">
-          {options.map((option) => (
-            <Button
-              key={option.label}
-              ref={(ref) => {
-                if (option.isActive && !!ref)
-                  ref.style.setProperty("--tw-shadow-color", groupColor);
-              }}
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={option.onClick}
-              className={cn(
-                "min-w-[7rem] font-bold shadow-sm shadow-neutral-600",
-                option.isActive && "shadow-md",
-              )}
-              style={{
-                backgroundColor:
-                  option.label === "Settle up" ? hexToRgb(groupColor, 0.3) : "",
-              }}
-            >
-              {option.label}
-            </Button>
-          ))}
+          {options.map((option) => {
+            if (
+              option.label === "Settle up" &&
+              (!!searchParams.get("showBalances") ||
+                !!searchParams.get("showTotals"))
+            )
+              return null;
+            if (
+              option.label === "Group Logs" &&
+              !searchParams.get("showBalances") &&
+              !searchParams.get("showTotals")
+            )
+              return null;
+            return (
+              <Button
+                key={option.label}
+                ref={(ref) => {
+                  if (option.isActive && !!ref)
+                    ref.style.setProperty("--tw-shadow-color", groupColor);
+                }}
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={option.onClick}
+                className={cn(
+                  "min-w-[7rem] font-bold shadow-sm shadow-neutral-600",
+                  option.isActive && "shadow-md",
+                )}
+                style={{
+                  backgroundColor:
+                    option.label === "Settle up"
+                      ? hexToRgb(groupColor, 0.3)
+                      : "",
+                }}
+              >
+                {option.label}
+              </Button>
+            );
+          })}
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
