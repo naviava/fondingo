@@ -2,13 +2,13 @@ import { GroupExpensesPanel } from "~/components/group-id-page/group-expenses-pa
 import { UtilityButtons } from "~/components/group-id-page/utility-buttons";
 import { GroupActions } from "~/components/group-id-page/group-actions";
 import { GroupHeader } from "~/components/group-id-page/group-header";
+import { GroupBalanceEntry } from "~/components/group-balance-entry";
 import { GroupLog } from "~/components/group-id-page/group-log";
 import { GroupAvatar } from "~/components/group-avatar";
 
 import { calculateDebts } from "~/server/actions/group";
 import { serverClient } from "~/lib/trpc/server-client";
 import { linearGradientWithAlpha } from "~/lib/utils";
-import { Separator } from "@fondingo/ui/separator";
 
 interface IProps {
   params: {
@@ -74,12 +74,8 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
         >
           {searchParams.showBalances && (
             <ul>
-              <h2 className="text-center text-lg font-semibold">
-                Group balances
-              </h2>
-              <Separator className="my-2" />
               {groupMemberIds.map((id) => (
-                <li key={id}>{id}</li>
+                <GroupBalanceEntry key={id} memberId={id} />
               ))}
             </ul>
           )}

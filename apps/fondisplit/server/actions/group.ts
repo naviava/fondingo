@@ -585,6 +585,108 @@ export const getDebts = privateProcedure
     return debts || [];
   });
 
+export const getDebtsByMemberId = privateProcedure
+  .input(
+    z.object({
+      groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
+      memberId: z.string().min(1, { message: "Member ID cannot be empty" }),
+    }),
+  )
+  .query(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupId, memberId } = input;
+
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: {
+            AND: [{ userId: user.id }, { id: memberId }],
+          },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const credits = await splitdb.simplifiedDebt.findMany({
+      where: {
+        groupId,
+        toId: memberId,
+      },
+      include: {
+        from: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
+        to: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const debts = await splitdb.simplifiedDebt.findMany({
+      where: {
+        groupId,
+        fromId: memberId,
+      },
+      include: {
+        from: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
+        to: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const totalCredit = credits.reduce((acc, credit) => acc + credit.amount, 0);
+    const totalDebt = debts.reduce((acc, debt) => acc + debt.amount, 0);
+    const grossBalance = totalCredit - totalDebt;
+
+    return {
+      grossBalance,
+      debts: debts || [],
+      credits: credits || [],
+    };
+  });
+
 /**
  *
  * This function is a private procedure that adds a settlement to a group.
