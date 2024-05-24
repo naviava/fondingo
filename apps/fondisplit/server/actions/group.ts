@@ -697,8 +697,6 @@ export const getDebtsByMemberId = privateProcedure
 
     return {
       member,
-      totalDebt,
-      totalCredit,
       grossBalance,
       debts: debts || [],
       credits: credits || [],

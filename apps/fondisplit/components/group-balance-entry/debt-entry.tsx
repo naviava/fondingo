@@ -61,7 +61,7 @@ function _DebtEntry({
           <span> to {to.name}</span>
         </div>
       </div>
-      <div className="ml-8 mt-1">
+      <div className="ml-8 mt-2">
         <Button
           size="sm"
           variant="outline"

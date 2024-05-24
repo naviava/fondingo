@@ -51,7 +51,7 @@ function _GroupActions({
         },
       },
       {
-        label: "Group Logs",
+        label: "Group Log",
         onClick: () => {
           router.push(`/groups/${groupId}`);
         },
@@ -98,7 +98,7 @@ function _GroupActions({
             )
               return null;
             if (
-              option.label === "Group Logs" &&
+              option.label === "Group Log" &&
               !searchParams.get("showBalances") &&
               !searchParams.get("showTotals")
             )
