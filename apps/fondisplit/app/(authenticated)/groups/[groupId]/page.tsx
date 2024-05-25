@@ -58,12 +58,14 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
         />
         <GroupActions
           groupId={group.id}
+          userId={currentUser?.id}
           groupColor={group.color}
           hasDebts={!!group.simplifiedDebts.length}
           hasExpenses={!!group.expenses.length}
           isGroupManager={currentUserRole === "MANAGER"}
         />
         <GroupExpensesPanel
+          userId={currentUser?.id}
           groupId={group.id}
           groupColor={group.color}
           isGroupManager={currentUserRole === "MANAGER"}

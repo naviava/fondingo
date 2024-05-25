@@ -13,6 +13,7 @@ import { hexToRgb } from "~/lib/utils";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
+  userId?: string;
   groupId: string;
   groupColor: string;
   hasDebts: boolean;
@@ -22,6 +23,7 @@ interface IProps {
 
 export const GroupActions = memo(_GroupActions);
 function _GroupActions({
+  userId = "",
   groupId,
   groupColor,
   hasDebts,
@@ -36,8 +38,8 @@ function _GroupActions({
   const { setTopRef } = usePanelHeight((state) => state);
 
   const handleAddMember = useCallback(() => {
-    onOpen(groupId);
-  }, [groupId, onOpen]);
+    onOpen({ groupId, userId });
+  }, [userId, groupId, onOpen]);
 
   const options = useMemo(
     () => [

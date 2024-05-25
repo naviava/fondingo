@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
@@ -12,13 +14,6 @@ import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@fondingo/ui/dialog";
-import {
   Form,
   FormControl,
   FormField,
@@ -26,9 +21,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@fondingo/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@fondingo/ui/dialog";
 
 import { trpc } from "~/lib/trpc/client";
-import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   memberName: z.string().min(1, { message: "Name cannot be empty" }),

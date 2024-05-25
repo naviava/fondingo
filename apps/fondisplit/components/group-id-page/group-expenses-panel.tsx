@@ -12,6 +12,7 @@ import { usePanelHeight } from "@fondingo/store/use-panel-height";
 
 interface IProps {
   children: React.ReactNode;
+  userId?: string;
   groupId: string;
   groupColor: string;
   hasMembers: boolean;
@@ -21,6 +22,7 @@ interface IProps {
 export const GroupExpensesPanel = memo(_GroupExpensesPanel);
 function _GroupExpensesPanel({
   children,
+  userId = "",
   groupId,
   groupColor,
   hasMembers,
@@ -39,7 +41,7 @@ function _GroupExpensesPanel({
           <Button
             type="button"
             variant="splitCta"
-            onClick={() => onOpen(groupId)}
+            onClick={() => onOpen({ userId, groupId })}
             className="h-14 w-64 text-lg shadow-md shadow-neutral-500"
           >
             <UserPlus className="mr-2" size={24} />

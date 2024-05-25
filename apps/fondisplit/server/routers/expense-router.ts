@@ -2,6 +2,7 @@ import { router } from "~/server/trpc";
 
 import {
   addExpense,
+  updateExpense,
   getExpenseIds,
   getExpenseById,
   deleteExpenseById,
@@ -12,6 +13,7 @@ import {
 
 export const expenseRouter = router({
   addExpense,
+  updateExpense,
   getExpenseIds,
   getExpenseById,
   deleteExpenseById,

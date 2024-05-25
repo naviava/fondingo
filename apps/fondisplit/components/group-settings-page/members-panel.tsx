@@ -1,17 +1,17 @@
 import { serverClient } from "~/lib/trpc/server-client";
 import { MemberEntry } from "./member-entry";
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { AddMemberOption } from "./add-member-option";
 
 interface IProps {
+  userId?: string;
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;
 }
 
-export function MembersPanel({ group }: IProps) {
+export function MembersPanel({ userId = "", group }: IProps) {
   return (
     <section className="space-y-6">
       <h3 className="px-4 text-base font-semibold">Group members</h3>
-      <AddMemberOption groupId={group.id} />
+      <AddMemberOption userId={userId} groupId={group.id} />
       <ul className="space-y-4 px-4">
         {group.members.map((member) => (
           <MemberEntry

@@ -214,7 +214,7 @@ export const addExpense = privateProcedure
     }
   });
 
-export const editExpense = privateProcedure
+export const updateExpense = privateProcedure
   .input(
     z.object({
       groupId: z.string().min(1, { message: "Group ID is required" }),

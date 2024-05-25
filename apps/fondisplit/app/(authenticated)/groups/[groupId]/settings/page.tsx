@@ -29,7 +29,7 @@ export default async function GroupIdSettingspage({ params }: IProps) {
           currency={group.currency}
         />
         <Separator className="mb-6 mt-2" />
-        <MembersPanel group={group} />
+        <MembersPanel userId={user?.id} group={group} />
         <Separator className="my-6" />
         <AdvancedSettings userId={user?.id} group={group} />
       </ScrollArea>
