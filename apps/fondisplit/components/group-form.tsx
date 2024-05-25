@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -16,23 +16,33 @@ import { FaRegListAlt } from "react-icons/fa";
 import { Loader } from "@fondingo/ui/lucide";
 
 import { CurrencyCode, GroupType, ZCurrencyCode } from "@fondingo/db-split";
+import { trpc } from "~/lib/trpc/client";
 import { TGroupType } from "~/types";
 
 import { GroupTypeOptions } from "~/components/create-group/group-type-options";
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
+import { currencyIconMap } from "@fondingo/ui/constants";
 import { ColorPicker } from "~/components/color-picker";
 import { useToast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
+import { Label } from "@fondingo/ui/label";
 import { Input } from "@fondingo/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@fondingo/ui/select";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@fondingo/ui/form";
-
-import { trpc } from "~/lib/trpc/client";
 
 const formSchema = z.object({
   groupName: z
@@ -55,14 +65,18 @@ interface IProps {
   };
 }
 
-export default function GroupForm({ isEditing, initialData }: IProps) {
+export const GroupForm = memo(_GroupForm);
+function _GroupForm({ isEditing, initialData }: IProps) {
   const router = useRouter();
   const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const [color, setColor] = useState(initialData?.color || "#00968a");
+  const [currency, setCurrency] = useState<CurrencyCode>(
+    initialData?.currency || "USD",
+  );
   const [selectedGroupType, setSelectedGroupType] = useState<TGroupType>(
-    initialData?.type || GroupType.TRIP,
+    initialData?.type || "TRIP",
   );
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -104,6 +118,11 @@ export default function GroupForm({ isEditing, initialData }: IProps) {
       },
     ],
     [],
+  );
+
+  const CurrencyIcon = useMemo(
+    () => currencyIconMap[currency].icon,
+    [currency],
   );
 
   const handleColorChange = useCallback(
@@ -151,6 +170,11 @@ export default function GroupForm({ isEditing, initialData }: IProps) {
     },
     [isEditing, handleCreateGroup],
   );
+
+  useEffect(() => {
+    const newValue = form.getValues("currency");
+    setCurrency(newValue);
+  }, [form]);
 
   return (
     <>
@@ -218,6 +242,45 @@ export default function GroupForm({ isEditing, initialData }: IProps) {
             </ul>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
+          <div className="mt-6 flex flex-col items-center justify-center space-y-8">
+            <Label className="text-base font-bold">Currency</Label>
+            <div className="border-2 border-dashed border-neutral-300 p-3">
+              <CurrencyIcon className="h-16 w-16" />
+            </div>
+            <FormField
+              control={form.control}
+              name="currency"
+              // @ts-ignore
+              render={({ field }) => (
+                <FormItem>
+                  <Select
+                    onValueChange={(value: CurrencyCode) => {
+                      setCurrency(value);
+                      return field.onChange(value);
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="mx-auto w-[13rem] font-medium">
+                        <SelectValue placeholder="Select a currency" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.values(currencyIconMap).map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {`${c.code} - ${c.name}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    This will be the default currency for the group.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <button ref={submitButtonRef} type="submit" className="hidden">
             Submit
           </button>

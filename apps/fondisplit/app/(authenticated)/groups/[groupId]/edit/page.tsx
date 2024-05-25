@@ -1,5 +1,5 @@
 import { CurrencyCode } from "@fondingo/db-split";
-import GroupForm from "~/components/group-form";
+import { GroupForm } from "~/components/group-form";
 import { TGroupType } from "~/types";
 
 interface IProps {
