@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, RefObject, SetStateAction } from "react";
+import { Dispatch, RefObject, SetStateAction, useMemo } from "react";
 
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { UseFormReturn } from "react-hook-form";
@@ -31,7 +31,16 @@ export function Header({
   disabled = false,
   setIsAddingContact,
 }: IProps) {
-  const { onClose } = useAddMemberModal();
+  const { addedMembers, onClose } = useAddMemberModal();
+  const submissionData = useMemo(
+    () =>
+      Object.values(addedMembers).map((member) => ({
+        id: member.id,
+        name: member.name,
+        email: member.email,
+      })),
+    [addedMembers],
+  );
 
   return (
     <div className="flex items-center justify-between">
@@ -75,7 +84,7 @@ export function Header({
           variant="splitGhost"
           size="sm"
           disabled={disabled}
-          onClick={() => console.log("Submitted")}
+          onClick={() => console.log(submissionData)}
           className="min-w-[5rem]"
         >
           Done

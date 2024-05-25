@@ -42,8 +42,8 @@ export function FriendEntry({
           <Avatar variant="lg" userName={friendName} userImageUrl={imageUrl} />
         </div>
         <div className="flex-1 font-medium">
-          <p className="text-base">{friendName}</p>
-          <p className="text-sm text-neutral-400">{friendEmail}</p>
+          <p className="text-left text-base">{friendName}</p>
+          <p className="text-left text-sm text-neutral-400">{friendEmail}</p>
         </div>
         <div
           className={cn(

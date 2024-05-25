@@ -174,6 +174,7 @@ export const getGroupById = privateProcedure
     return group;
   });
 
+// TODO: Consolidate these 2 functions into one.
 /**
  * This function is used to add a member to a group. It takes an input object with the following properties:
  * - groupId: A string representing the ID of the group to which the member is to be added. It cannot be empty.
@@ -320,6 +321,143 @@ export const addMember = privateProcedure
         toastDescription: `You can now split expenses with them. ${newTempFriend.email} has been added to your friends list.`,
       };
     });
+  });
+
+export const addMultipleMembers = privateProcedure
+  .input(
+    z.object({
+      groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
+      newMembers: z.array(
+        z.object({
+          userId: z.string().min(1, { message: "User ID cannot be empty" }),
+          memberName: z.string().min(1, { message: "Name cannot be empty" }),
+          email: z.string().email({ message: "Invalid email" }),
+        }),
+      ),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupId, newMembers } = input;
+
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const existingMembers = await splitdb.groupMember.findMany({
+      where: {
+        groupId,
+        userId: {
+          in: [...newMembers.map((member) => member.userId), user.id],
+        },
+      },
+    });
+    if (!!existingMembers.length)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Some members are already in the group",
+      });
+
+    const updates = await splitdb.$transaction(async (db) => {
+      return newMembers.map(async (member) => {
+        // Check if the user exists in the database and is a friend.
+        const existingUser = await db.user.findUnique({
+          where: { email: member.email },
+        });
+
+        let isFriend = false;
+        if (!!existingUser) {
+          const existingUserInFriendsList = await db.friend.findFirst({
+            where: {
+              OR: [
+                {
+                  user1Id: user.id,
+                  user2Id: existingUser.id,
+                },
+                {
+                  user1Id: existingUser.id,
+                  user2Id: user.id,
+                },
+              ],
+            },
+          });
+
+          // If user exists in the database but is not a friend, throw an error.
+          if (!existingUserInFriendsList)
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "You can add an existing account only if they are your friend.",
+            });
+          else {
+            isFriend = true;
+          }
+        }
+
+        // If the user exists and is a friend, add them to the group.
+        if (!!existingUser && isFriend) {
+          const newGroupMember = await db.groupMember.create({
+            data: {
+              groupId,
+              name: member.memberName,
+              email: existingUser.email,
+              userId: existingUser.id,
+              role: "MEMBER",
+            },
+          });
+          return newGroupMember;
+        }
+
+        // TODO: Send an invitation email to the user.
+        // If the user does not exist, add them to the group, and add them as a temp friend.
+        const newGroupMember = await db.groupMember.create({
+          data: {
+            groupId,
+            name: member.memberName,
+            email: member.email,
+            role: "MEMBER",
+          },
+        });
+
+        const existingTempFriend = await db.tempFriend.findUnique({
+          where: {
+            userId_email: {
+              userId: user.id,
+              email: member.email,
+            },
+          },
+        });
+        if (!!existingTempFriend) return newGroupMember;
+
+        await db.tempFriend.create({
+          data: {
+            name: member.memberName,
+            email: member.email,
+            userId: user.id,
+          },
+        });
+        return newGroupMember;
+      });
+    });
+    if (!updates.length)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to add members to the group",
+      });
+    return {
+      toastTitle: `${updates.length} members added to the group.`,
+      toastDescription: "You can now split expenses with them.",
+    };
   });
 
 /**
@@ -616,6 +754,7 @@ export const addSettlement = privateProcedure
         fromId,
         toId,
         createdById: user.id,
+        lastModifiedById: user.id,
         amount: Math.floor(amount * 100),
       },
       include: {
