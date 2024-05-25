@@ -24,7 +24,11 @@ export function GroupNameEdit({
       </div>
       {/* TODO: Activate this link */}
       <Button asChild size="sm" variant="splitGhost">
-        <Link href={`/groups/${groupId}/edit`}>Edit</Link>
+        <Link
+          href={`/groups/${groupId}/edit?groupName=${groupName}&color=${groupColor.slice(1)}&type=${groupType}`}
+        >
+          Edit
+        </Link>
       </Button>
     </section>
   );

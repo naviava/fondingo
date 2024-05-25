@@ -40,7 +40,11 @@ export function AdvancedSettings({ userId, group }: IProps) {
           title="Change currency"
           currency={group.currency}
           description="Change the currency used in this group."
-          action={() => router.push(`/groups/${group.id}/edit`)}
+          action={() =>
+            router.push(
+              `/groups/${group.id}/edit?groupName=${group.name}&color=${group.color.slice(1)}&type=${group.type}`,
+            )
+          }
         />
         <AdvancedSettingEntry
           groupId={group.id}
