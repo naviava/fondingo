@@ -15,7 +15,7 @@ import { IoHomeOutline } from "react-icons/io5";
 import { FaRegListAlt } from "react-icons/fa";
 import { Loader } from "@fondingo/ui/lucide";
 
-import { CurrencyCode, GroupType, ZCurrencyCode } from "@fondingo/db-split";
+import { CurrencyCode, ZGroupType, ZCurrencyCode } from "@fondingo/db-split";
 import { trpc } from "~/lib/trpc/client";
 import { TGroupType } from "~/types";
 
@@ -50,7 +50,7 @@ const formSchema = z.object({
     .min(1, { message: "Group name cannot be empty" })
     .max(50, { message: "Group name cannot be longer than 50 characters" }),
   color: z.string().min(1, { message: "Color cannot be empty" }),
-  type: z.nativeEnum(GroupType),
+  type: z.nativeEnum(ZGroupType),
   currency: z.nativeEnum(ZCurrencyCode),
 });
 
@@ -84,7 +84,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
     defaultValues: {
       groupName: initialData?.groupName || "",
       color,
-      type: GroupType.TRIP,
+      type: ZGroupType.TRIP,
       currency: initialData?.currency || ZCurrencyCode.USD,
     },
   });
@@ -94,26 +94,26 @@ function _GroupForm({ isEditing, initialData }: IProps) {
       {
         id: uuid(),
         label: "Trip",
-        value: GroupType.TRIP,
+        value: ZGroupType.TRIP,
         icon: IoAirplaneOutline,
         customClasses: "-rotate-[30deg]",
       },
       {
         id: uuid(),
         label: "Home",
-        value: GroupType.HOME,
+        value: ZGroupType.HOME,
         icon: IoHomeOutline,
       },
       {
         id: uuid(),
         label: "Couple",
-        value: GroupType.COUPLE,
+        value: ZGroupType.COUPLE,
         icon: IoMdHeartEmpty,
       },
       {
         id: uuid(),
         label: "Other",
-        value: GroupType.OTHER,
+        value: ZGroupType.OTHER,
         icon: FaRegListAlt,
       },
     ],
@@ -142,7 +142,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
   );
 
   const utils = trpc.useUtils();
-  const { mutate: handleCreateGroup, isPending } =
+  const { mutate: handleCreateGroup, isPending: isPendingCreate } =
     trpc.group.createGroup.useMutation({
       onError: ({ message }) =>
         toast({
@@ -162,24 +162,43 @@ function _GroupForm({ isEditing, initialData }: IProps) {
         router.refresh();
       },
     });
+  const { mutate: handleEditGroup, isPending: isPendingEdit } =
+    trpc.group.editGroup.useMutation({
+      onError: ({ message }) =>
+        toast({
+          variant: "destructive",
+          title: "Something went wrong.",
+          description: message,
+        }),
+      onSuccess: ({ groupId, toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        form.reset();
+        utils.group.getGroupById.invalidate();
+        utils.group.getGroups.invalidate();
+        router.push(`/groups/${groupId}/settings`);
+        router.refresh();
+      },
+    });
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
-      if (isEditing) console.log(values);
+      if (isEditing)
+        handleEditGroup({ ...values, groupId: initialData?.groupId || "" });
       else handleCreateGroup(values);
     },
-    [isEditing, handleCreateGroup],
+    [isEditing, handleCreateGroup, handleEditGroup, initialData?.groupId],
   );
-
-  useEffect(() => {
-    const newValue = form.getValues("currency");
-    setCurrency(newValue);
-  }, [form]);
 
   return (
     <>
       <div className="flex items-center justify-between px-2 pt-4">
-        <Button variant="splitGhost" disabled={isPending}>
+        <Button
+          variant="splitGhost"
+          disabled={isPendingCreate || isPendingEdit}
+        >
           <Link
             href={
               isEditing ? `/groups/${initialData?.groupId}/settings` : "/groups"
@@ -194,7 +213,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
         <Button
           type="button"
           variant="splitGhost"
-          disabled={isPending}
+          disabled={isPendingCreate || isPendingEdit}
           className="w-20"
           onClick={() => {
             if (submitButtonRef.current) {
@@ -202,7 +221,11 @@ function _GroupForm({ isEditing, initialData }: IProps) {
             }
           }}
         >
-          {isPending ? <Loader className="h-6 w-6 animate-spin" /> : "Done"}
+          {isPendingCreate || isPendingEdit ? (
+            <Loader className="h-6 w-6 animate-spin" />
+          ) : (
+            "Done"
+          )}
         </Button>
       </div>
       <Form {...form}>
@@ -220,7 +243,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
                     <Input
                       autoComplete="off"
                       placeholder="NYC Trip"
-                      disabled={isPending}
+                      disabled={isPendingCreate || isPendingEdit}
                       {...field}
                       className="form-input"
                     />

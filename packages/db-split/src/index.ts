@@ -21,9 +21,9 @@ const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 
 // TODO: Prefix all with Z to mark them as Zod native enum
 export const ZCurrencyCode = CurrencyCodePrisma;
-export const GroupRole = GroupRolePrisma;
-export const GroupType = GroupTypePrisma;
-export const Role = RolePrisma;
+export const ZGroupRole = GroupRolePrisma;
+export const ZGroupType = GroupTypePrisma;
+export const ZRole = RolePrisma;
 
 export type SimplifiedDebt = SimplifiedDebtPrisma;
 export type CurrencyCode = CurrencyCodePrisma;

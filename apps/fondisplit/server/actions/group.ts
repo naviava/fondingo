@@ -1,6 +1,6 @@
 "use server";
 
-import splitdb, { GroupType } from "@fondingo/db-split";
+import splitdb, { ZGroupType, ZCurrencyCode } from "@fondingo/db-split";
 import { privateProcedure } from "~/server/trpc";
 import { hasDuplicates } from "~/lib/utils";
 import { TRPCError } from "@trpc/server";
@@ -8,18 +8,6 @@ import { z } from "@fondingo/utils/zod";
 
 // TODO: Check all routes that get user data. MUST NOT HAVE hashedPassword returned.
 
-/**
- * Creates a new group with the provided details.
- *
- * @function
- * @param {Object} ctx - The context object containing the user information.
- * @param {Object} input - The input object containing the group details.
- * @param {string} input.groupName - The name of the group.
- * @param {string} input.color - The color associated with the group.
- * @param {GroupType} input.type - The type of the group.
- * @returns {Promise<Object>} A promise that resolves to an object containing the new group's ID, a toast title, and a toast description.
- * @throws {TRPCError} Will throw an error if the group creation fails.
- */
 export const createGroup = privateProcedure
   .input(
     z.object({
@@ -28,18 +16,20 @@ export const createGroup = privateProcedure
         .min(1, { message: "Group name cannot be empty" })
         .max(50, { message: "Group name cannot be longer than 50 characters" }),
       color: z.string().min(1, { message: "Color cannot be empty" }),
-      type: z.nativeEnum(GroupType),
+      type: z.nativeEnum(ZGroupType, { message: "Invalid group type" }),
+      currency: z.nativeEnum(ZCurrencyCode, { message: "Invalid currency" }),
     }),
   )
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { groupName, color, type } = input;
+    const { groupName, color, type, currency } = input;
 
     const group = await splitdb.group.create({
       data: {
         name: groupName,
         color,
         type,
+        currency,
         members: {
           create: {
             userId: user.id,
@@ -61,6 +51,50 @@ export const createGroup = privateProcedure
       groupId: group.id,
       toastTitle: `${group.name} created.`,
       toastDescription: "You can now invite members to the group.",
+    };
+  });
+
+export const editGroup = privateProcedure
+  .input(
+    z.object({
+      groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
+      groupName: z
+        .string()
+        .min(1, { message: "Group name cannot be empty" })
+        .max(50, { message: "Group name cannot be longer than 50 characters" }),
+      color: z.string().min(1, { message: "Color cannot be empty" }),
+      type: z.nativeEnum(ZGroupType, { message: "Invalid group type" }),
+      currency: z.nativeEnum(ZCurrencyCode, { message: "Invalid currency" }),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupId, groupName, color, type, currency } = input;
+
+    const updatedGroup = await splitdb.group.update({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+      data: {
+        name: groupName,
+        color,
+        type,
+        currency,
+      },
+    });
+    if (!updatedGroup)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to update group. Try again later.",
+      });
+
+    return {
+      groupId: updatedGroup.id,
+      toastTitle: `${updatedGroup.name} updated.`,
+      toastDescription: "Group details have been updated.",
     };
   });
 

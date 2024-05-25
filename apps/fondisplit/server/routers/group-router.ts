@@ -5,6 +5,7 @@ import {
   addMember,
   addSettlement,
   createGroup,
+  editGroup,
   getDebts,
   getDebtsByMemberId,
   getGroupById,
@@ -14,6 +15,7 @@ import {
 
 export const groupRouter = router({
   createGroup,
+  editGroup,
   getGroups,
   getGroupById,
   addMember,
