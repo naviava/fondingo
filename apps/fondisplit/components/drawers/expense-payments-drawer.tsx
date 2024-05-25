@@ -41,7 +41,7 @@ export function ExpensePaymentsDrawer() {
       userName: string;
       amount: number;
     }[]
-  >([]);
+  >(payments);
 
   const sum = useMemo(() => {
     return paymentsState.reduce((total, payment) => {

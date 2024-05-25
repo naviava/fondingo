@@ -7,6 +7,7 @@ import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 import { Pencil, Trash2 } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
+import Link from "next/link";
 
 interface IProps {
   groupId: string;
@@ -57,15 +58,10 @@ export function ExpenseActions({ groupId, expenseId }: IProps) {
       >
         <Trash2 />
       </Button>
-      <Button
-        size="sm"
-        variant="ghost"
-        disabled={isPending}
-        onClick={() => {
-          // TODO: Handle edit expense
-        }}
-      >
-        <Pencil />
+      <Button asChild size="sm" variant="ghost" disabled={isPending}>
+        <Link href={`/groups/${groupId}/expense/${expenseId}/edit`}>
+          <Pencil />
+        </Link>
       </Button>
     </div>
   );

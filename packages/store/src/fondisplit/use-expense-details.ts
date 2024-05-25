@@ -3,7 +3,6 @@ import { CurrencyCode } from "@fondingo/db-split";
 
 type ExpenseDetails = {
   groupId: string;
-  setGroupId: (groupId: string) => void;
 
   currency: CurrencyCode;
   setCurrency: (currency: CurrencyCode) => void;
@@ -48,11 +47,11 @@ type ExpenseDetails = {
   breakPoint: number;
 
   isPaymentsDrawerOpen: boolean;
-  onPaymentsDrawerOpen: () => void;
+  onPaymentsDrawerOpen: (groupId: string) => void;
   onPaymentsDrawerClose: () => void;
 
   isSplitsDrawerOpen: boolean;
-  onSplitsDrawerOpen: () => void;
+  onSplitsDrawerOpen: (groupId: string) => void;
   onSplitsDrawerClose: () => void;
 
   clearExpenseDetails: () => void;
@@ -60,52 +59,61 @@ type ExpenseDetails = {
 
 export const useExpenseDetails = create<ExpenseDetails>((set) => ({
   groupId: "",
-  setGroupId: (groupId) => set({ groupId }),
 
   currency: "USD",
-  setCurrency: (currency) => set({ currency }),
+  setCurrency: (currency) => set((state) => ({ ...state, currency })),
 
   expenseName: "",
-  setExpenseName: (expenseName) => set({ expenseName }),
+  setExpenseName: (expenseName) => set((state) => ({ ...state, expenseName })),
 
   expenseAmount: 0,
   setExpenseAmount: (expenseAmount) =>
-    set({ expenseAmount: Number(expenseAmount) }),
+    set((state) => ({ ...state, expenseAmount: Number(expenseAmount) })),
 
   payments: [],
-  setPayments: (payments) => set({ payments }),
-  clearPayments: () => set({ payments: [] }),
+  setPayments: (payments) => set((state) => ({ ...state, payments })),
+  clearPayments: () => set((state) => ({ ...state, payments: [] })),
 
   splitType: "equally" as const,
-  setSplitType: (splitType) => set({ splitType }),
+  setSplitType: (splitType) => set((state) => ({ ...state, splitType })),
 
   splits: [],
-  setSplits: (splits) => set({ splits }),
-  clearSplits: () => set({ splits: [] }),
+  setSplits: (splits) => set((state) => ({ ...state, splits })),
+  clearSplits: () => set((state) => ({ ...state, splits: [] })),
 
   breakPoint: 0,
 
   isPaymentsDrawerOpen: false,
-  onPaymentsDrawerOpen: () =>
-    set({ isPaymentsDrawerOpen: true, breakPoint: Date.now() }),
+  onPaymentsDrawerOpen: (groupId: string) =>
+    set((state) => ({
+      ...state,
+      groupId,
+      isPaymentsDrawerOpen: true,
+      breakPoint: Date.now(),
+    })),
   onPaymentsDrawerClose: () => {
     set((state) => {
       if (Date.now() - state.breakPoint < 100) {
         return { ...state, isPaymentsDrawerOpen: true };
       }
-      return { isPaymentsDrawerOpen: false };
+      return { ...state, groupId: "", isPaymentsDrawerOpen: false };
     });
   },
 
   isSplitsDrawerOpen: false,
-  onSplitsDrawerOpen: () =>
-    set({ isSplitsDrawerOpen: true, breakPoint: Date.now() }),
+  onSplitsDrawerOpen: (groupId: string) =>
+    set((state) => ({
+      ...state,
+      groupId,
+      isSplitsDrawerOpen: true,
+      breakPoint: Date.now(),
+    })),
   onSplitsDrawerClose: () => {
     set((state) => {
       if (Date.now() - state.breakPoint < 100) {
-        return { isSplitsDrawerOpen: true };
+        return { ...state, isSplitsDrawerOpen: true };
       }
-      return { isSplitsDrawerOpen: false };
+      return { ...state, groupId: "", isSplitsDrawerOpen: false };
     });
   },
 

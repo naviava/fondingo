@@ -34,6 +34,7 @@ export function ExpenseSplitsDrawer() {
     onSplitsDrawerClose,
     groupId,
     expenseAmount,
+    splits,
     setSplits,
     splitType,
     setSplitType,
@@ -47,7 +48,7 @@ export function ExpenseSplitsDrawer() {
       userName: string;
       amount: number;
     }[]
-  >([]);
+  >(splits);
 
   const sum = useMemo(
     () =>

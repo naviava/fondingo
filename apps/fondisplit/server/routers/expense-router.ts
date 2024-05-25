@@ -1,6 +1,7 @@
 import { router } from "~/server/trpc";
 
 import {
+  addExpense,
   getExpenseIds,
   getExpenseById,
   deleteExpenseById,
@@ -10,6 +11,7 @@ import {
 } from "../actions/expense";
 
 export const expenseRouter = router({
+  addExpense,
   getExpenseIds,
   getExpenseById,
   deleteExpenseById,
