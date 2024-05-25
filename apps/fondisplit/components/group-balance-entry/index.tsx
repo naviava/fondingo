@@ -60,7 +60,7 @@ export async function GroupBalanceEntry({
           </AccordionTrigger>
           <AccordionContent>
             <div className="ml-[4.5rem] space-y-4">
-              <>
+              <ul>
                 {credits.map((credit) => (
                   <DebtEntry
                     key={credit.id}
@@ -98,7 +98,7 @@ export async function GroupBalanceEntry({
                     isDebt
                   />
                 ))}
-              </>
+              </ul>
             </div>
           </AccordionContent>
         </AccordionItem>

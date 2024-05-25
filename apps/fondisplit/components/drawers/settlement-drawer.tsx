@@ -43,9 +43,9 @@ export function SettlementDrawer() {
           <DrawerTitle className="py-2 text-center">{drawerTitle}</DrawerTitle>
         </DrawerHeader>
         <Separator />
-        <div className="px-4">
+        <ul className="px-4">
           {members.map((member) => (
-            <Fragment key={member.id}>
+            <li key={member.id}>
               <div
                 role="button"
                 onClick={() => handleSelection(member)}
@@ -72,9 +72,9 @@ export function SettlementDrawer() {
                   )}
               </div>
               <Separator />
-            </Fragment>
+            </li>
           ))}
-        </div>
+        </ul>
       </DrawerContent>
     </Drawer>
   );

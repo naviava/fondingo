@@ -23,7 +23,7 @@ export async function FriendEntry({
     await serverClient.user.getDebtWithFriend(friendId);
 
   return (
-    <div className="flex items-center gap-x-4">
+    <li className="flex items-center gap-x-4">
       <div className="flex flex-1 items-center gap-x-3">
         <Avatar userName={friendName} userImageUrl={imageUrl || ""} />
         <p className="line-clamp-1 font-medium">{friendName}</p>
@@ -52,6 +52,6 @@ export async function FriendEntry({
           </>
         )}
       </div>
-    </div>
+    </li>
   );
 }

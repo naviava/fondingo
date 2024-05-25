@@ -184,7 +184,7 @@ export default function CreateGroupPage() {
             />
           </div>
           <ScrollArea hideVerticalScrollbar>
-            <div className="flex items-center gap-x-4 px-6 py-4">
+            <ul className="flex items-center gap-x-4 px-6 py-4">
               {groupTypeOptions.map((option) => (
                 <GroupTypeOptions
                   key={option.id}
@@ -193,7 +193,7 @@ export default function CreateGroupPage() {
                   onClick={handleGroupTypeClick}
                 />
               ))}
-            </div>
+            </ul>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
           <button ref={submitButtonRef} type="submit" className="hidden">

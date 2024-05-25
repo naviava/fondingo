@@ -44,7 +44,7 @@ function _DebtEntry({
   );
 
   return (
-    <div>
+    <li>
       <div className="flex items-center gap-x-2">
         <Avatar variant="sm" userName={from.name} userImageUrl={from.image} />
         <div className="text-muted-foreground flex items-center gap-x-1 text-sm font-medium">
@@ -75,6 +75,6 @@ function _DebtEntry({
           Settle up
         </Button>
       </div>
-    </div>
+    </li>
   );
 }

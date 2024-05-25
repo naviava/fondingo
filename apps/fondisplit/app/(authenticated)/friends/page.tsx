@@ -22,7 +22,7 @@ export default async function FriendsPage() {
       <ScrollArea className="h-[80vh] md:h-[82vh] lg:h-[79vh]">
         <section className="flex flex-1 flex-col gap-y-12 px-4 pb-24">
           {!!friendsInApp.length && (
-            <div className="space-y-6">
+            <ul className="space-y-6">
               {friendsInApp.map((friend) => (
                 <FriendEntry
                   key={friend.id}
@@ -31,7 +31,7 @@ export default async function FriendsPage() {
                   imageUrl={friend.image || ""}
                 />
               ))}
-            </div>
+            </ul>
           )}
           {!!receivedFriendRequests.length && (
             <div>
@@ -56,7 +56,7 @@ export default async function FriendsPage() {
               <h4 className="text-muted-foreground font-semibold">
                 Friends not on Fondi
               </h4>
-              <div className="mt-4 space-y-4">
+              <ul className="mt-4 space-y-4">
                 {friendsInGroups.map((friend) => (
                   <FriendEntry
                     key={friend.id}
@@ -65,7 +65,7 @@ export default async function FriendsPage() {
                     hideDebts
                   />
                 ))}
-              </div>
+              </ul>
             </div>
           )}
         </section>

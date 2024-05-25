@@ -26,7 +26,7 @@ function _GroupTypeOptions({
   onClick,
 }: IProps) {
   return (
-    <div
+    <li
       role="button"
       onClick={() => onClick(value)}
       className={cn(
@@ -36,6 +36,6 @@ function _GroupTypeOptions({
     >
       <Icon size={25} className={cn("mr-2", customClasses)} />
       <span className="select-none font-semibold tracking-wide">{label}</span>
-    </div>
+    </li>
   );
 }

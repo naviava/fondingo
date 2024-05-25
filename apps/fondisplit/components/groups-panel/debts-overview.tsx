@@ -18,9 +18,9 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
   const myDebts = allMyBalances.filter((debt) => debt.from.user?.id === userId);
 
   return (
-    <div className="space-y-1.5">
+    <ul className="space-y-1.5">
       {myCredits.map((credit) => (
-        <div
+        <li
           key={credit.id}
           className="text-muted-foreground flex items-center text-sm font-medium"
         >
@@ -31,10 +31,10 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
               {(credit.amount / 100).toFixed(2)}
             </span>
           </div>
-        </div>
+        </li>
       ))}
       {myDebts.map((debt) => (
-        <div
+        <li
           key={debt.id}
           className="text-muted-foreground flex items-center text-sm font-medium"
         >
@@ -45,8 +45,8 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
               {(debt.amount / 100).toFixed(2)}
             </span>
           </div>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

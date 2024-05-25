@@ -34,7 +34,7 @@ export function GroupHeader({
       {hasExpenses && !groupDebts.length && (
         <p className="text-base">All debts settled.</p>
       )}
-      <div className="mt-2 space-y-1">
+      <ul className="mt-2 space-y-1">
         {isEven ? (
           <p className="text-muted-foreground flex items-center text-sm">
             You're all settled up.
@@ -42,7 +42,10 @@ export function GroupHeader({
         ) : (
           !!myCredits.length &&
           myCredits.map((credit) => (
-            <div className="text-muted-foreground flex items-center text-sm">
+            <li
+              key={credit.id}
+              className="text-muted-foreground flex items-center text-sm"
+            >
               {credit.from.name} owes you{" "}
               <div className="text-cta ml-0.5 flex items-center">
                 <CurrencyIcon className="h-3 w-3" />
@@ -50,12 +53,15 @@ export function GroupHeader({
                   {(credit.amount / 100).toFixed(2)}
                 </span>
               </div>
-            </div>
+            </li>
           ))
         )}
         {!!myDebts.length &&
           myDebts.map((debt) => (
-            <div className="text-muted-foreground flex items-center text-sm">
+            <li
+              key={debt.id}
+              className="text-muted-foreground flex items-center text-sm"
+            >
               You owe {debt.to.name}{" "}
               <div className="ml-0.5 flex items-center text-orange-600">
                 <CurrencyIcon className="h-3 w-3" />
@@ -63,9 +69,9 @@ export function GroupHeader({
                   {(debt.amount / 100).toFixed(2)}
                 </span>
               </div>
-            </div>
+            </li>
           ))}
-      </div>
+      </ul>
     </div>
   );
 }
