@@ -2,12 +2,14 @@ import { Button } from "@fondingo/ui/button";
 import { GroupAvatar } from "../group-avatar";
 import { TGroupType } from "~/types";
 import Link from "next/link";
+import { CurrencyCode } from "@fondingo/db-split";
 
 interface IProps {
   groupId: string;
   groupName: string;
   groupColor: string;
   groupType: TGroupType;
+  currency: CurrencyCode;
 }
 
 export function GroupNameEdit({
@@ -15,6 +17,7 @@ export function GroupNameEdit({
   groupName,
   groupColor,
   groupType,
+  currency,
 }: IProps) {
   return (
     <section className="mt-6 flex items-center justify-between px-4">
@@ -25,7 +28,7 @@ export function GroupNameEdit({
       {/* TODO: Activate this link */}
       <Button asChild size="sm" variant="splitGhost">
         <Link
-          href={`/groups/${groupId}/edit?groupName=${groupName}&color=${groupColor.slice(1)}&type=${groupType}`}
+          href={`/groups/${groupId}/edit?groupName=${groupName}&color=${groupColor.slice(1)}&type=${groupType}&currency=${currency}`}
         >
           Edit
         </Link>

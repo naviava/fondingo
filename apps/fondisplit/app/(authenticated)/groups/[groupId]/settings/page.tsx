@@ -26,6 +26,7 @@ export default async function GroupIdSettingspage({ params }: IProps) {
           groupName={group.name}
           groupType={group.type}
           groupColor={group.color}
+          currency={group.currency}
         />
         <Separator className="mb-6 mt-2" />
         <MembersPanel group={group} />
