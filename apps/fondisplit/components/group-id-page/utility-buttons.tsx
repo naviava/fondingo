@@ -23,11 +23,14 @@ export function UtilityButtons({ groupId, showBalances, showTotals }: IProps) {
         </Link>
       </Button>
       <Button
+        asChild
         type="button"
         variant="splitGhost"
         className="absolute right-4 top-4 text-white"
       >
-        <Settings />
+        <Link href={`/groups/${groupId}/settings`}>
+          <Settings />
+        </Link>
       </Button>
     </>
   );

@@ -2,7 +2,6 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 import { useSettlementDrawer } from "@fondingo/store/fondisplit";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -10,7 +10,7 @@ interface IProps {
   groupType: TGroupType;
   groupColor: string;
   className?: string;
-  variant?: "default" | "sm";
+  variant?: "default" | "md" | "sm";
 }
 
 const iconMap = {
@@ -24,6 +24,10 @@ const variantMap = {
   default: {
     size: 48,
     classes: "h-20",
+  },
+  md: {
+    size: 40,
+    classes: "h-16",
   },
   sm: {
     size: 32,

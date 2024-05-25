@@ -17,13 +17,15 @@ interface IProps {
 const variantMap = {
   default: "h-10 w-10",
   sm: "h-6 w-6",
-  lg: "h-20 w-20",
+  lg: "h-12 w-12",
+  xl: "h-20 w-20",
 };
 
 const textSizeMap = {
   default: "text-base",
   sm: "text-sm",
-  lg: "text-6xl font-semibold",
+  lg: "text-3xl font-semibold",
+  xl: "text-6xl font-semibold",
 };
 
 export const Avatar = memo(_Avatar);
