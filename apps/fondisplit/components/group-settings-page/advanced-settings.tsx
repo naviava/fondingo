@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import { AdvancedSettingEntry } from "./advanced-setting-entry";
@@ -14,6 +15,7 @@ interface IProps {
 }
 
 export function AdvancedSettings({ userId, group }: IProps) {
+  const router = useRouter();
   const hasBalances = useMemo(
     () =>
       group.simplifiedDebts.filter(
@@ -37,8 +39,8 @@ export function AdvancedSettings({ userId, group }: IProps) {
           groupId={group.id}
           title="Change currency"
           currency={group.currency}
-          description="Automatically combines debts to reduce the total number of repayments between group members."
-          action={() => {}}
+          description="Change the currency used in this group."
+          action={() => router.push(`/groups/${group.id}/edit`)}
         />
         <AdvancedSettingEntry
           groupId={group.id}
