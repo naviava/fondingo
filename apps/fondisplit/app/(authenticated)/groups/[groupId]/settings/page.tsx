@@ -19,7 +19,7 @@ export default async function GroupIdSettingspage({ params }: IProps) {
 
   return (
     <>
-      <PageHeader />
+      <PageHeader groupId={group.id} />
       <ScrollArea className="h-[84vh]">
         <GroupNameEdit
           groupId={group.id}
