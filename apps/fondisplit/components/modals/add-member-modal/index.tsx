@@ -3,16 +3,20 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { trpc } from "~/lib/trpc/client";
 import { z } from "@fondingo/utils/zod";
 
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
-import { Loader, Search, UserPlus } from "@fondingo/ui/lucide";
+import { Dialog, DialogContent, DialogHeader } from "@fondingo/ui/dialog";
+import { Search, UserPlus } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
 import { useToast } from "@fondingo/ui/use-toast";
-import { Button } from "@fondingo/ui/button";
+import { AddedMembers } from "./added-members";
+import { FriendsList } from "./friends-list";
 import { Input } from "@fondingo/ui/input";
+import { Header } from "./header";
 import {
   Form,
   FormControl,
@@ -21,14 +25,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@fondingo/ui/form";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@fondingo/ui/dialog";
-
-import { trpc } from "~/lib/trpc/client";
 
 const formSchema = z.object({
   memberName: z.string().min(1, { message: "Name cannot be empty" }),
@@ -86,64 +82,13 @@ export function AddMemberModal() {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent hideDefaultCloseButton className="px-0 py-4">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            {isAddingContact ? (
-              <Button
-                variant="splitGhost"
-                size="sm"
-                disabled={isPending}
-                onClick={() => {
-                  form.reset();
-                  setIsAddingContact(false);
-                }}
-                className="min-w-[5rem]"
-              >
-                Back
-              </Button>
-            ) : (
-              <Button
-                variant="splitGhost"
-                size="sm"
-                disabled={isPending}
-                onClick={onClose}
-                className="min-w-[5rem]"
-              >
-                Cancel
-              </Button>
-            )}
-            <DialogTitle>Add group members</DialogTitle>
-            {isAddingContact ? (
-              <Button
-                variant="splitGhost"
-                size="sm"
-                disabled={isPending}
-                onClick={() => submitButtonRef.current?.click()}
-                className="min-w-[5rem]"
-              >
-                {isPending ? (
-                  <Loader className="h-6 w-6 animate-spin" />
-                ) : (
-                  "Add"
-                )}
-              </Button>
-            ) : (
-              <Button
-                variant="splitGhost"
-                size="sm"
-                disabled={isPending}
-                onClick={onClose}
-                className="min-w-[5rem]"
-              >
-                Done
-              </Button>
-            )}
-          </div>
-          {/* When group management feature is available */}
-          {/* {!isGroupManager && (
-            <DialogDescription className="p-6 text-center">
-              Only group managers can add members to the group.
-            </DialogDescription>
-          )} */}
+          <Header
+            form={form}
+            disabled={isPending}
+            isAddingContact={isAddingContact}
+            submitButtonRef={submitButtonRef}
+            setIsAddingContact={setIsAddingContact}
+          />
           <div className="space-y-4">
             {!isAddingContact && (
               <div className="relative px-4">
@@ -158,12 +103,13 @@ export function AddMemberModal() {
                 />
               </div>
             )}
+            <AddedMembers />
             <Separator />
             {!isAddingContact && (
               <div
                 role="button"
                 onClick={() => setIsAddingContact(true)}
-                className="flex select-none items-center px-4"
+                className="flex select-none items-center px-4 py-3 hover:bg-neutral-200"
               >
                 <UserPlus className="mr-4" />
                 <span className="text-base font-medium">
@@ -171,7 +117,10 @@ export function AddMemberModal() {
                 </span>
               </div>
             )}
-            {isAddingContact && (
+            {}
+            {!isAddingContact ? (
+              <FriendsList />
+            ) : (
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}

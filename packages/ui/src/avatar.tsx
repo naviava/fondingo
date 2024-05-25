@@ -11,14 +11,14 @@ import {
 interface IProps {
   userName: string | null | undefined;
   userImageUrl: string | null | undefined;
-  variant?: "default" | "sm" | "lg";
+  variant?: "default" | "sm" | "lg" | "xl";
 }
 
 const variantMap = {
   default: "h-10 w-10",
   sm: "h-6 w-6",
   lg: "h-12 w-12",
-  xl: "h-20 w-20",
+  xl: "h-16 w-16",
 };
 
 const textSizeMap = {
