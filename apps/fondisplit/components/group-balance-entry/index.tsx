@@ -1,11 +1,12 @@
+"use client";
+
+import { useLocalStorage } from "@fondingo/utils/hooks";
+import { useCallback, useMemo } from "react";
+
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { Separator } from "@fondingo/ui/separator";
 import { CurrencyCode } from "@fondingo/db-split";
 import { Avatar } from "@fondingo/ui/avatar";
 import { DebtEntry } from "./debt-entry";
-
-import { serverClient } from "~/lib/trpc/server-client";
-import { cn } from "@fondingo/ui/utils";
 import {
   Accordion,
   AccordionContent,
@@ -13,30 +14,70 @@ import {
   AccordionTrigger,
 } from "@fondingo/ui/accordion";
 
+import { trpc } from "~/lib/trpc/client";
+import { cn } from "@fondingo/ui/utils";
+
 interface IProps {
   groupId: string;
   memberId: string;
   currency: CurrencyCode;
 }
 
-export async function GroupBalanceEntry({
-  groupId,
-  memberId,
-  currency,
-}: IProps) {
-  const { member, debts, credits, isInDebt, grossBalance } =
-    await serverClient.group.getDebtsByMemberId({ groupId, memberId });
+export function GroupBalanceEntry({ groupId, memberId, currency }: IProps) {
+  const { data } = trpc.group.getDebtsByMemberId.useQuery({
+    groupId,
+    memberId,
+  });
 
-  const CurrencyIcon = currencyIconMap[currency].icon;
-  const displayAmount = isInDebt ? -grossBalance : grossBalance;
+  const { member, debts, credits, grossBalance, isInDebt } = useMemo(
+    () =>
+      data || {
+        member: null,
+        debts: [],
+        credits: [],
+        grossBalance: 0,
+        isInDebt: false,
+      },
+    [data],
+  );
+  const CurrencyIcon = useMemo(
+    () => currencyIconMap[currency].icon,
+    [currency],
+  );
+  const displayAmount = useMemo(
+    () => (isInDebt ? -grossBalance : grossBalance),
+    [isInDebt, grossBalance],
+  );
 
-  if (!grossBalance) return null;
+  const [expanded, setExpanded] = useLocalStorage<Record<string, boolean>>(
+    `accordion-group-balance-state`,
+    {},
+  );
+  const toggleExpand = useCallback(
+    (id: string) => {
+      setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+    },
+    [setExpanded],
+  );
+
+  if (!data || !grossBalance) return null;
 
   return (
     <li>
-      <Accordion type="single" collapsible defaultValue={`item-${memberId}`}>
-        <AccordionItem value={`item-${memberId}`}>
-          <AccordionTrigger className="pb-1 pr-4 pt-2">
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue={
+          expanded[`item-${groupId}${memberId}`]
+            ? `item-${groupId}${memberId}`
+            : ""
+        }
+      >
+        <AccordionItem value={`item-${groupId}${memberId}`}>
+          <AccordionTrigger
+            onClick={() => toggleExpand(`item-${groupId}${memberId}`)}
+            className="pb-1 pr-4 pt-2"
+          >
             <div className="flex items-center gap-x-4 px-4 text-sm">
               <Avatar
                 userName={member?.name}
@@ -44,7 +85,7 @@ export async function GroupBalanceEntry({
               />
               <div className="flex items-center gap-x-1 font-medium">
                 <span className="font-bold">{member?.name}</span>
-                <span>{isInDebt ? "owes" : "gets back"}</span>
+                <span>{data.isInDebt ? "owes" : "gets back"}</span>
                 <div
                   className={cn(
                     "flex items-center font-semibold",
@@ -60,7 +101,7 @@ export async function GroupBalanceEntry({
           </AccordionTrigger>
           <AccordionContent>
             <div className="ml-[4.5rem] space-y-4">
-              <ul>
+              <ul className="space-y-2">
                 {credits.map((credit) => (
                   <DebtEntry
                     key={credit.id}
@@ -103,7 +144,6 @@ export async function GroupBalanceEntry({
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-      {/* <Separator className="my-4" /> */}
     </li>
   );
 }
