@@ -30,6 +30,7 @@ export async function MemberEntry({
   const displayAmount = isInDebt ? -grossBalance : grossBalance;
   const CurrencyIcon = currencyIconMap[currency].icon;
 
+  // TODO: Handle rendering when member is all settled up.
   return (
     <li className="flex items-center gap-x-4">
       <div className="flex h-14 w-14 items-center justify-center">

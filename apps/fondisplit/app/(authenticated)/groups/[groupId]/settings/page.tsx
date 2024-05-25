@@ -5,6 +5,7 @@ import { PageHeader } from "~/components/group-settings-page/page-header";
 import { Separator } from "@fondingo/ui/separator";
 
 import { serverClient } from "~/lib/trpc/server-client";
+import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 interface IProps {
   params: {
@@ -19,15 +20,17 @@ export default async function GroupIdSettingspage({ params }: IProps) {
   return (
     <>
       <PageHeader />
-      <GroupNameEdit
-        groupName={group.name}
-        groupType={group.type}
-        groupColor={group.color}
-      />
-      <Separator className="mb-6 mt-2" />
-      <MembersPanel group={group} />
-      <Separator className="my-6" />
-      <AdvancedSettings group={group} />
+      <ScrollArea className="h-[84vh]">
+        <GroupNameEdit
+          groupName={group.name}
+          groupType={group.type}
+          groupColor={group.color}
+        />
+        <Separator className="mb-6 mt-2" />
+        <MembersPanel group={group} />
+        <Separator className="my-6" />
+        <AdvancedSettings userId={user?.id} group={group} />
+      </ScrollArea>
     </>
   );
 }

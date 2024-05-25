@@ -1,39 +1,74 @@
+"use client";
+
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { serverClient } from "~/lib/trpc/server-client";
-import { Avatar } from "@fondingo/ui/avatar";
 import { CurrencyCode } from "@fondingo/db-split";
+import { IconType } from "react-icons";
+import { useMemo } from "react";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   groupId: string;
-  memberId: string;
-  memberName: string;
-  memberEmail: string;
-  currency: CurrencyCode;
-  imageUrl: string | null | undefined;
+  title: string;
+  description?: string;
+  disabled?: boolean;
+  currency?: CurrencyCode;
+  icon?: IconType;
+  smallIcon?: boolean;
+  action: () => void;
 }
 
-export async function AdvancedSettingEntry({
+export function AdvancedSettingEntry({
   groupId,
+  title,
+  description,
   currency,
-  memberId,
-  memberEmail,
-  memberName,
-  imageUrl,
+  disabled,
+  icon: Icon,
+  smallIcon,
+  action,
 }: IProps) {
+  const CurrencyIcon = useMemo(
+    () => (currency ? currencyIconMap[currency].icon : null),
+    [currency],
+  );
+
   return (
-    <li className="flex items-center gap-x-4">
-      <div className="flex h-14 w-14 items-center justify-center">
-        <Avatar variant="lg" userName={memberName} userImageUrl={imageUrl} />
+    <li
+      onClick={action}
+      className={cn(
+        "cursor-pointer px-4 pb-2 hover:bg-neutral-200",
+        !disabled && !description && "text-rose-700",
+      )}
+    >
+      <div className="flex items-center gap-x-4">
+        <div className="flex h-14 w-14 items-center justify-center">
+          {!!CurrencyIcon && <CurrencyIcon className="h-10 w-10" />}
+          {!!Icon && (
+            <Icon
+              className={cn(
+                "h-10 w-10",
+                disabled && "text-neutral-400",
+                smallIcon && "h-6 w-6",
+              )}
+            />
+          )}
+        </div>
+        <div className="flex-1 font-medium">
+          <h4 className={cn("line-clamp-1", disabled && "text-neutral-400")}>
+            {title}
+          </h4>
+        </div>
       </div>
-      <div className="flex-1 font-medium">
-        <h4 className="line-clamp-1 text-base">{memberName}</h4>
-        <p className="line-clamp-1 text-sm text-neutral-400">{memberEmail}</p>
-      </div>
-      <div className="flex flex-col items-end justify-center">
-        <p className="text-xs font-medium md:text-sm">gets back</p>
-        <div className="flex items-center font-semibold">amount</div>
-      </div>
+      {!!description && (
+        <p
+          className={cn(
+            "text-muted-foreground ml-[4.5rem] pr-4 text-sm font-medium",
+            disabled && "text-neutral-400",
+          )}
+        >
+          {description}
+        </p>
+      )}
     </li>
   );
 }
