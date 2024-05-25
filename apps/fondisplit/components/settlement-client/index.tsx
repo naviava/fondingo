@@ -155,7 +155,7 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex h-full flex-col items-center justify-center pb-24"
         >
-          <div className="flex items-center gap-x-4">
+          <div className="flex items-center">
             <SettlementMember
               groupId={groupId}
               drawerType="debtor"
@@ -163,8 +163,8 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
               selectedMember={selectedDebtor}
               isPending={isPending}
             />
-            <div className="flex items-center">
-              <div className="h-1.5 w-7 bg-neutral-700" />
+            <div className="-mt-9 flex items-center">
+              <div className="h-1.5 w-12 bg-neutral-700" />
               <div
                 style={{
                   width: 0,
@@ -183,9 +183,6 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
               isPending={isPending}
             />
           </div>
-          {!!selectedDebtor && !!selectedCreditor && (
-            <p className="mt-4 font-medium">{`${selectedDebtor?.name} paid ${selectedCreditor.name}`}</p>
-          )}
           <div className="mt-10 flex items-center gap-x-4">
             <div className="rounded-md border-2 border-neutral-300 p-1 shadow-md shadow-neutral-500">
               <CurrencyIcon size={36} />

@@ -32,7 +32,7 @@ function _SettlementMember({
           drawerType,
         });
       }}
-      className="select-none"
+      className="flex select-none flex-col items-center justify-center"
     >
       <Avatar
         key={selectedMember?.id}
@@ -40,6 +40,9 @@ function _SettlementMember({
         userName={selectedMember?.name || ""}
         userImageUrl={selectedMember?.image}
       />
+      <h4 className="mt-4 line-clamp-1 w-[8rem] text-center font-medium">
+        {selectedMember?.name}
+      </h4>
     </div>
   );
 }
