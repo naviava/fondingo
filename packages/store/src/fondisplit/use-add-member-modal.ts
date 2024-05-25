@@ -1,18 +1,17 @@
 import { create } from "zustand";
 
 type AddMemberStore = {
+  // isGroupManager: boolean;
   groupId: string;
-  isGroupManager: boolean;
   isOpen: boolean;
-  onOpen: (groupId: string, isGroupManager: boolean) => void;
+  onOpen: (groupId: string) => void;
   onClose: () => void;
 };
 
 export const useAddMemberModal = create<AddMemberStore>((set) => ({
+  // isGroupManager: false,
   groupId: "",
-  isGroupManager: false,
   isOpen: false,
-  onOpen: (groupId: string, isGroupManager: boolean) =>
-    set({ isOpen: true, groupId, isGroupManager }),
-  onClose: () => set({ isOpen: false, groupId: "", isGroupManager: false }),
+  onOpen: (groupId: string) => set({ isOpen: true, groupId }),
+  onClose: () => set({ isOpen: false, groupId: "" }),
 }));

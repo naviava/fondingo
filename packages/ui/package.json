@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./avatar": "./src/avatar.tsx",
     "./utils": "./src/lib/utils.ts",
     "./lucide": "./src/lib/lucide.ts",
     "./constants": "./src/constants/index.ts",
+    "./avatar": "./src/avatar.tsx",
+    "./rsc-wrapper": "./src/rsc-wrapper.tsx",
     "./confirm-modal": "./src/confirm-modal.tsx",
     "./refresh-button": "./src/refresh-button.tsx",
     "./form": "./src/shadcn/form.tsx",

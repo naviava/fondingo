@@ -25,7 +25,6 @@ function _GroupExpensesPanel({
   groupColor,
   hasMembers,
   hasExpenses,
-  isGroupManager = false,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
   const { topRef, bottomRef } = usePanelHeight((state) => state);
@@ -40,7 +39,7 @@ function _GroupExpensesPanel({
           <Button
             type="button"
             variant="splitCta"
-            onClick={() => onOpen(groupId, isGroupManager)}
+            onClick={() => onOpen(groupId)}
             className="h-14 w-64 text-lg shadow-md shadow-neutral-500"
           >
             <UserPlus className="mr-2" size={24} />

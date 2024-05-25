@@ -41,7 +41,7 @@ export function AddMemberModal() {
 
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [isAddingContact, setIsAddingContact] = useState(false);
-  const { groupId, isGroupManager, isOpen, onClose } = useAddMemberModal();
+  const { groupId, isOpen, onClose } = useAddMemberModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -116,7 +116,7 @@ export function AddMemberModal() {
               <Button
                 variant="splitGhost"
                 size="sm"
-                disabled={!isGroupManager || isPending}
+                disabled={isPending}
                 onClick={() => submitButtonRef.current?.click()}
                 className="min-w-[5rem]"
               >
@@ -130,7 +130,7 @@ export function AddMemberModal() {
               <Button
                 variant="splitGhost"
                 size="sm"
-                disabled={!isGroupManager || isPending}
+                disabled={isPending}
                 onClick={onClose}
                 className="min-w-[5rem]"
               >
@@ -138,98 +138,97 @@ export function AddMemberModal() {
               </Button>
             )}
           </div>
-          {!isGroupManager && (
+          {/* When group management feature is available */}
+          {/* {!isGroupManager && (
             <DialogDescription className="p-6 text-center">
               Only group managers can add members to the group.
             </DialogDescription>
-          )}
-          {isGroupManager && (
-            <div className="space-y-4">
-              {!isAddingContact && (
-                <div className="relative px-4">
-                  {/* TODO: Add search friends functionality */}
-                  <Input
-                    disabled={isPending}
-                    className="bg-neutral-200/90 pl-10 text-base font-medium"
-                  />
-                  <Search
-                    size={20}
-                    className="text-muted-foreground absolute left-6 top-1/2 -translate-y-1/2"
-                  />
-                </div>
-              )}
-              <Separator />
-              {!isAddingContact && (
-                <div
-                  role="button"
-                  onClick={() => setIsAddingContact(true)}
-                  className="flex select-none items-center px-4"
+          )} */}
+          <div className="space-y-4">
+            {!isAddingContact && (
+              <div className="relative px-4">
+                {/* TODO: Add search friends functionality */}
+                <Input
+                  disabled={isPending}
+                  className="bg-neutral-200/90 pl-10 text-base font-medium"
+                />
+                <Search
+                  size={20}
+                  className="text-muted-foreground absolute left-6 top-1/2 -translate-y-1/2"
+                />
+              </div>
+            )}
+            <Separator />
+            {!isAddingContact && (
+              <div
+                role="button"
+                onClick={() => setIsAddingContact(true)}
+                className="flex select-none items-center px-4"
+              >
+                <UserPlus className="mr-4" />
+                <span className="text-base font-medium">
+                  Add a new contact to Fondisplit
+                </span>
+              </div>
+            )}
+            {isAddingContact && (
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8 px-4"
                 >
-                  <UserPlus className="mr-4" />
-                  <span className="text-base font-medium">
-                    Add a new contact to Fondisplit
-                  </span>
-                </div>
-              )}
-              {isAddingContact && (
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-8 px-4"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="memberName"
-                      // @ts-ignore
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col items-start justify-center">
-                          <FormLabel className="text-start font-semibold">
-                            Name
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              autoComplete="off"
-                              disabled={isPending}
-                              {...field}
-                              className="form-input"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      // @ts-ignore
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col items-start justify-center">
-                          <FormLabel className="text-start font-semibold">
-                            Email address
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              autoComplete="off"
-                              disabled={isPending}
-                              {...field}
-                              className="form-input"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <button
-                      ref={submitButtonRef}
-                      type="submit"
-                      disabled={isPending}
-                      className="hidden"
-                    />
-                  </form>
-                </Form>
-              )}
-            </div>
-          )}
+                  <FormField
+                    control={form.control}
+                    name="memberName"
+                    // @ts-ignore
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col items-start justify-center">
+                        <FormLabel className="text-start font-semibold">
+                          Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            autoComplete="off"
+                            disabled={isPending}
+                            {...field}
+                            className="form-input"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    // @ts-ignore
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col items-start justify-center">
+                        <FormLabel className="text-start font-semibold">
+                          Email address
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            autoComplete="off"
+                            disabled={isPending}
+                            {...field}
+                            className="form-input"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <button
+                    ref={submitButtonRef}
+                    type="submit"
+                    disabled={isPending}
+                    className="hidden"
+                  />
+                </form>
+              </Form>
+            )}
+          </div>
         </DialogHeader>
       </DialogContent>
     </Dialog>

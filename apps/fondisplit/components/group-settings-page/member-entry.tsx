@@ -40,20 +40,26 @@ export async function MemberEntry({
         <h4 className="line-clamp-1 text-base">{memberName}</h4>
         <p className="line-clamp-1 text-sm text-neutral-400">{memberEmail}</p>
       </div>
-      <div
-        className={cn(
-          "flex flex-col items-end justify-center",
-          isInDebt ? "text-orange-600" : "text-cta",
-        )}
-      >
-        <p className="text-xs font-medium md:text-sm">
-          {isInDebt ? "owes" : "gets back"}
+      {grossBalance === 0 ? (
+        <p className="text-sm font-medium italic text-neutral-400">
+          all settled up
         </p>
-        <div className="flex items-center font-semibold">
-          <CurrencyIcon className="h-4 w-4" />
-          <span>{(displayAmount / 100).toFixed(2)}</span>
+      ) : (
+        <div
+          className={cn(
+            "flex flex-col items-end justify-center",
+            isInDebt ? "text-orange-600" : "text-cta",
+          )}
+        >
+          <p className="text-xs font-medium md:text-sm">
+            {isInDebt ? "owes" : "gets back"}
+          </p>
+          <div className="flex items-center font-semibold">
+            <CurrencyIcon className="h-4 w-4" />
+            <span>{(displayAmount / 100).toFixed(2)}</span>
+          </div>
         </div>
-      </div>
+      )}
     </li>
   );
 }

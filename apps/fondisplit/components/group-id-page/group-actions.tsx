@@ -36,8 +36,8 @@ function _GroupActions({
   const { setTopRef } = usePanelHeight((state) => state);
 
   const handleAddMember = useCallback(() => {
-    onOpen(groupId, isGroupManager);
-  }, [groupId, isGroupManager, onOpen]);
+    onOpen(groupId);
+  }, [groupId, onOpen]);
 
   const options = useMemo(
     () => [
