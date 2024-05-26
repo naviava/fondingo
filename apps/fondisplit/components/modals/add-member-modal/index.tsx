@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useDebounceValue } from "@fondingo/utils/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { trpc } from "~/lib/trpc/client";
@@ -13,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader } from "@fondingo/ui/dialog";
 import { Search, UserPlus } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
 import { useToast } from "@fondingo/ui/use-toast";
+import { SearchResults } from "./search-results";
 import { AddedMembers } from "./added-members";
 import { FriendsList } from "./friends-list";
 import { Input } from "@fondingo/ui/input";
@@ -36,9 +38,16 @@ export function AddMemberModal() {
   const { toast } = useToast();
 
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const [debouncedValue, setValue] = useDebounceValue("", 500);
   const { groupId, isOpen, onClose, clearAddedMembers } = useAddMemberModal();
+
   const [isAddingContact, setIsAddingContact] = useState(false);
   const [isPendingAddMultiple, setIsPendingAddMultiple] = useState(false);
+
+  const isSearching = useMemo(
+    () => debouncedValue.length > 0,
+    [debouncedValue],
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,8 +106,12 @@ export function AddMemberModal() {
               <div className="relative px-4">
                 {/* TODO: Add search friends functionality */}
                 <Input
+                  type="text"
+                  defaultValue={debouncedValue}
+                  onChange={(e) => setValue(e.target.value)}
                   disabled={isPendingAddSingle || isPendingAddMultiple}
-                  className="bg-neutral-200/90 pl-10 text-base font-medium"
+                  placeholder="Search by email or phone number"
+                  className="bg-neutral-200/90 pl-10 text-base font-medium placeholder:text-neutral-400/90"
                 />
                 <Search
                   size={20}
@@ -124,11 +137,14 @@ export function AddMemberModal() {
                 </span>
               </div>
             )}
-            {}
             {!isAddingContact ? (
-              <FriendsList
-                disabled={isPendingAddSingle || isPendingAddMultiple}
-              />
+              isSearching ? (
+                <SearchResults searchTerm={debouncedValue} />
+              ) : (
+                <FriendsList
+                  disabled={isPendingAddSingle || isPendingAddMultiple}
+                />
+              )
             ) : (
               <Form {...form}>
                 <form

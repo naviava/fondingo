@@ -10,6 +10,7 @@ import {
   getDebtWithFriend,
   findUsers,
   getFriendRequests,
+  findFriends,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -22,4 +23,5 @@ export const userRouter = router({
   getFriends,
   getDebtWithFriend,
   findUsers,
+  findFriends,
 });

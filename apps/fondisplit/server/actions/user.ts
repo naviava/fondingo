@@ -319,6 +319,54 @@ export const getFriends = privateProcedure.query(async ({ ctx }) => {
   };
 });
 
+export const findFriends = privateProcedure
+  .input(z.string().min(1, { message: "Search query cannot be empty" }))
+  .query(async ({ ctx, input: searchTerm }) => {
+    const { user } = ctx;
+    const friends = await splitdb.friend.findMany({
+      where: {
+        OR: [{ user1Id: user.id }, { user2Id: user.id }],
+      },
+      include: {
+        user1: true,
+        user2: true,
+      },
+    });
+    const formattedFriends = friends
+      .map((friend) =>
+        friend.user1Id === user.id ? friend.user2 : friend.user1,
+      )
+      .sort((a, b) => {
+        if (!!a.name && !!b.name) return a.name.localeCompare(b.name);
+        return 0;
+      });
+
+    const tempFriends = await splitdb.tempFriend.findMany({
+      where: { userId: user.id },
+      orderBy: { name: "asc" },
+    });
+
+    const friendsSearchResults = formattedFriends.filter(
+      (friend) =>
+        friend.name?.includes(searchTerm) ||
+        friend.email?.includes(searchTerm) ||
+        friend.phone?.includes(searchTerm),
+    );
+    const tempFriendsSearchResults = tempFriends.filter(
+      (friend) =>
+        friend.name?.includes(searchTerm) ||
+        friend.email?.includes(searchTerm) ||
+        friend.phone?.includes(searchTerm),
+    );
+
+    return {
+      friends: !!friendsSearchResults.length ? friendsSearchResults : [],
+      tempFriends: !!tempFriendsSearchResults.length
+        ? tempFriendsSearchResults
+        : [],
+    };
+  });
+
 /**
  * This function is an asynchronous operation that calculates and returns the gross balance of a user.
  * The gross balance is calculated as the difference between the total amount of credits and the total amount of debts of the user.

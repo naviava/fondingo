@@ -450,7 +450,6 @@ export const addMultipleMembers = privateProcedure
       });
       return Promise.all(promises);
     });
-    console.log(updates);
     if (!updates.length)
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
