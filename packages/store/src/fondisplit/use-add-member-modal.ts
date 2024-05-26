@@ -34,6 +34,7 @@ export const useAddMemberModal = create<AddMemberStore>((set) => ({
   // isGroupManager: false,
   userId: "",
   groupId: "",
+  isPending: false,
 
   addedMembers: {},
   toggleAddedMember: ({ id, name = "", email, imageUrl = "" }) =>

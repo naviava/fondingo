@@ -36,8 +36,9 @@ export function AddMemberModal() {
   const { toast } = useToast();
 
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const [isAddingContact, setIsAddingContact] = useState(false);
   const { groupId, isOpen, onClose } = useAddMemberModal();
+  const [isAddingContact, setIsAddingContact] = useState(false);
+  const [isPendingAddMultiple, setIsPendingAddMultiple] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,7 +49,7 @@ export function AddMemberModal() {
   });
 
   const utils = trpc.useUtils();
-  const { mutate: handleAddMember, isPending } =
+  const { mutate: handleAddMember, isPending: isPendingAddSingle } =
     trpc.group.addMember.useMutation({
       onError: ({ message }) =>
         toast({
@@ -84,17 +85,19 @@ export function AddMemberModal() {
         <DialogHeader>
           <Header
             form={form}
-            disabled={isPending}
+            groupId={groupId}
+            disabled={isPendingAddSingle || isPendingAddMultiple}
             isAddingContact={isAddingContact}
             submitButtonRef={submitButtonRef}
             setIsAddingContact={setIsAddingContact}
+            setIsPendingAddMultiple={setIsPendingAddMultiple}
           />
           <div className="space-y-4">
             {!isAddingContact && (
               <div className="relative px-4">
                 {/* TODO: Add search friends functionality */}
                 <Input
-                  disabled={isPending}
+                  disabled={isPendingAddSingle || isPendingAddMultiple}
                   className="bg-neutral-200/90 pl-10 text-base font-medium"
                 />
                 <Search
@@ -108,7 +111,10 @@ export function AddMemberModal() {
             {!isAddingContact && (
               <div
                 role="button"
-                onClick={() => setIsAddingContact(true)}
+                onClick={() => {
+                  if (isPendingAddSingle || isPendingAddMultiple) return;
+                  setIsAddingContact(true);
+                }}
                 className="flex select-none items-center px-4 py-3 hover:bg-neutral-200"
               >
                 <UserPlus className="mr-4" />
@@ -119,7 +125,9 @@ export function AddMemberModal() {
             )}
             {}
             {!isAddingContact ? (
-              <FriendsList />
+              <FriendsList
+                disabled={isPendingAddSingle || isPendingAddMultiple}
+              />
             ) : (
               <Form {...form}>
                 <form
@@ -138,7 +146,9 @@ export function AddMemberModal() {
                         <FormControl>
                           <Input
                             autoComplete="off"
-                            disabled={isPending}
+                            disabled={
+                              isPendingAddSingle || isPendingAddMultiple
+                            }
                             {...field}
                             className="form-input"
                           />
@@ -159,7 +169,9 @@ export function AddMemberModal() {
                         <FormControl>
                           <Input
                             autoComplete="off"
-                            disabled={isPending}
+                            disabled={
+                              isPendingAddSingle || isPendingAddMultiple
+                            }
                             {...field}
                             className="form-input"
                           />
@@ -171,7 +183,7 @@ export function AddMemberModal() {
                   <button
                     ref={submitButtonRef}
                     type="submit"
-                    disabled={isPending}
+                    disabled={isPendingAddSingle || isPendingAddMultiple}
                     className="hidden"
                   />
                 </form>

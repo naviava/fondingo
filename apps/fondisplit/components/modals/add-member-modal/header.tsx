@@ -1,19 +1,24 @@
 "use client";
 
-import { Dispatch, RefObject, SetStateAction, useMemo } from "react";
+import { Dispatch, RefObject, SetStateAction, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 import { useAddMemberModal } from "@fondingo/store/fondisplit";
 import { UseFormReturn } from "react-hook-form";
 
 import { DialogTitle } from "@fondingo/ui/dialog";
+import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Loader } from "@fondingo/ui/lucide";
+import { trpc } from "~/lib/trpc/client";
 
 interface IProps {
+  groupId: string;
   disabled?: boolean;
   isAddingContact: boolean;
   submitButtonRef: RefObject<HTMLButtonElement>;
   setIsAddingContact: Dispatch<SetStateAction<boolean>>;
+  setIsPendingAddMultiple: Dispatch<SetStateAction<boolean>>;
   form: UseFormReturn<
     {
       memberName: string;
@@ -26,20 +31,45 @@ interface IProps {
 
 export function Header({
   form,
+  groupId,
   isAddingContact,
   submitButtonRef,
   disabled = false,
   setIsAddingContact,
+  setIsPendingAddMultiple,
 }: IProps) {
+  const router = useRouter();
   const { addedMembers, onClose } = useAddMemberModal();
   const submissionData = useMemo(
     () =>
       Object.values(addedMembers).map((member) => ({
         id: member.id,
-        name: member.name,
+        name: member.name || "",
         email: member.email,
       })),
     [addedMembers],
+  );
+
+  const { mutate: handleAddMembers, isPending } =
+    trpc.group.addMultipleMembers.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        router.refresh();
+        onClose();
+      },
+    });
+
+  useEffect(
+    () => setIsPendingAddMultiple(isPending),
+    [isPending, setIsPendingAddMultiple],
   );
 
   return (
@@ -84,7 +114,12 @@ export function Header({
           variant="splitGhost"
           size="sm"
           disabled={disabled}
-          onClick={() => console.log(submissionData)}
+          onClick={() =>
+            handleAddMembers({
+              groupId,
+              newMembers: submissionData,
+            })
+          }
           className="min-w-[5rem]"
         >
           Done

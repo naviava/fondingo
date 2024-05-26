@@ -301,12 +301,16 @@ export const getFriends = privateProcedure.query(async ({ ctx }) => {
       user2: true,
     },
   });
-  const formattedFriends = friends.map((friend) =>
-    friend.user1Id === user.id ? friend.user2 : friend.user1,
-  );
+  const formattedFriends = friends
+    .map((friend) => (friend.user1Id === user.id ? friend.user2 : friend.user1))
+    .sort((a, b) => {
+      if (!!a.name && !!b.name) return a.name.localeCompare(b.name);
+      return 0;
+    });
 
   const tempFriends = await splitdb.tempFriend.findMany({
     where: { userId: user.id },
+    orderBy: { name: "asc" },
   });
 
   return {

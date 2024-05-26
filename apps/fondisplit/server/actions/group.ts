@@ -329,8 +329,8 @@ export const addMultipleMembers = privateProcedure
       groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
       newMembers: z.array(
         z.object({
-          userId: z.string().min(1, { message: "User ID cannot be empty" }),
-          memberName: z.string().min(1, { message: "Name cannot be empty" }),
+          id: z.string().min(1, { message: "User ID cannot be empty" }),
+          name: z.string().min(1, { message: "Name cannot be empty" }),
           email: z.string().email({ message: "Invalid email" }),
         }),
       ),
@@ -358,7 +358,7 @@ export const addMultipleMembers = privateProcedure
       where: {
         groupId,
         userId: {
-          in: [...newMembers.map((member) => member.userId), user.id],
+          in: newMembers.map((member) => member.id),
         },
       },
     });
@@ -369,7 +369,7 @@ export const addMultipleMembers = privateProcedure
       });
 
     const updates = await splitdb.$transaction(async (db) => {
-      return newMembers.map(async (member) => {
+      const promises = newMembers.map(async (member) => {
         // Check if the user exists in the database and is a friend.
         const existingUser = await db.user.findUnique({
           where: { email: member.email },
@@ -409,7 +409,7 @@ export const addMultipleMembers = privateProcedure
           const newGroupMember = await db.groupMember.create({
             data: {
               groupId,
-              name: member.memberName,
+              name: member.name,
               email: existingUser.email,
               userId: existingUser.id,
               role: "MEMBER",
@@ -423,7 +423,7 @@ export const addMultipleMembers = privateProcedure
         const newGroupMember = await db.groupMember.create({
           data: {
             groupId,
-            name: member.memberName,
+            name: member.name,
             email: member.email,
             role: "MEMBER",
           },
@@ -441,21 +441,23 @@ export const addMultipleMembers = privateProcedure
 
         await db.tempFriend.create({
           data: {
-            name: member.memberName,
+            name: member.name,
             email: member.email,
             userId: user.id,
           },
         });
         return newGroupMember;
       });
+      return Promise.all(promises);
     });
+    console.log(updates);
     if (!updates.length)
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to add members to the group",
       });
     return {
-      toastTitle: `${updates.length} members added to the group.`,
+      toastTitle: `${updates.length} new ${updates.length === 1 ? "member" : "members"} added to the group.`,
       toastDescription: "You can now split expenses with them.",
     };
   });

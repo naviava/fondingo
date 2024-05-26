@@ -4,14 +4,16 @@ import { useMemo } from "react";
 import { trpc } from "~/lib/trpc/client";
 import { FriendEntry } from "./friend-entry";
 
-interface IProps {}
+interface IProps {
+  disabled?: boolean;
+}
 
-export function FriendsList({}: IProps) {
+export function FriendsList({ disabled }: IProps) {
   const { data: fetchedfriends } = trpc.user.getFriends.useQuery();
   const friends = useMemo(() => fetchedfriends?.friends, [fetchedfriends]);
 
   return (
-    <section>
+    <section className="select-none">
       <h4 className="mb-2 px-4 text-base font-semibold">
         Friends on Fondisplit
       </h4>
@@ -24,6 +26,7 @@ export function FriendsList({}: IProps) {
             imageUrl={friend.image}
             friendName={friend.name}
             friendEmail={friend.email}
+            disabled={disabled}
           />
         ))}
     </section>
