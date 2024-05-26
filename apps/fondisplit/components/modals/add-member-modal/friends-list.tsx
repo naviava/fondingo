@@ -15,7 +15,7 @@ export function FriendsList({ disabled }: IProps) {
 
   return (
     <section className="select-none">
-      <h4 className="mb-2 px-4 text-base font-semibold">
+      <h4 className="mb-3 px-4 text-left text-base font-semibold">
         Friends on Fondisplit
       </h4>
       <ScrollArea className="h-[40vh]">

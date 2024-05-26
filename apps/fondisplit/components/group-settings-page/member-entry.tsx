@@ -56,7 +56,7 @@ export async function MemberEntry({
           </p>
           <div className="flex items-center font-semibold">
             <CurrencyIcon className="h-4 w-4" />
-            <span>{(displayAmount / 100).toFixed(2)}</span>
+            <span>{(displayAmount / 100).toLocaleString()}</span>
           </div>
         </div>
       )}

@@ -185,10 +185,10 @@ export function ExpenseSplitsDrawer() {
                       "font-bold",
                       sum === expenseAmount && "text-cta",
                     )}
-                  >{`${sum.toFixed(2)} of ${expenseAmount.toFixed(2)} assigned`}</p>
+                  >{`${sum.toLocaleString()} of ${expenseAmount.toLocaleString()} assigned`}</p>
                 </div>
                 {expenseAmount - sum !== 0 && (
-                  <p className="font-medium text-rose-500">{`${(expenseAmount - sum).toFixed(2)} left`}</p>
+                  <p className="font-medium text-rose-500">{`${(expenseAmount - sum).toLocaleString()} left`}</p>
                 )}
               </>
             )}

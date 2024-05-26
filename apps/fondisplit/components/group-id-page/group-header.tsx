@@ -50,7 +50,7 @@ export function GroupHeader({
               <div className="text-cta ml-0.5 flex items-center">
                 <CurrencyIcon className="h-3 w-3" />
                 <span className="font-semibold">
-                  {(credit.amount / 100).toFixed(2)}
+                  {(credit.amount / 100).toLocaleString()}
                 </span>
               </div>
             </li>
@@ -66,7 +66,7 @@ export function GroupHeader({
               <div className="ml-0.5 flex items-center text-orange-600">
                 <CurrencyIcon className="h-3 w-3" />
                 <span className="font-semibold">
-                  {(debt.amount / 100).toFixed(2)}
+                  {(debt.amount / 100).toLocaleString()}
                 </span>
               </div>
             </li>

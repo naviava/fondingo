@@ -56,7 +56,7 @@ function _DebtEntry({
             )}
           >
             <CurrencyIcon className="h-3 w-3" />
-            <span>{(amount / 100).toFixed(2)}</span>
+            <span>{(amount / 100).toLocaleString()}</span>
           </div>
           <span> to {to.name}</span>
         </div>

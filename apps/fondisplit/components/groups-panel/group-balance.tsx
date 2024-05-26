@@ -43,7 +43,7 @@ export function GroupBalance({ userId, currency, data }: IProps) {
           {(isInDebt
             ? (grossBalanceAmount / 100) * -1
             : grossBalanceAmount / 100
-          ).toFixed(2)}
+          ).toLocaleString()}
         </span>
       </div>
     </div>

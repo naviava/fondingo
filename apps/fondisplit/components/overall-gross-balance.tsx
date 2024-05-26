@@ -15,8 +15,8 @@ export async function OverallGrossBalance() {
   const isInDebt = grossBalance < 0;
 
   const displayAmount = isInDebt
-    ? ((grossBalance / 100) * -1).toFixed(2)
-    : (grossBalance / 100).toFixed(2);
+    ? ((grossBalance / 100) * -1).toLocaleString()
+    : (grossBalance / 100).toLocaleString();
 
   return (
     <div className="flex items-center justify-between px-4">

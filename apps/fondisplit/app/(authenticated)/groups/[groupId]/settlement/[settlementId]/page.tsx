@@ -52,7 +52,7 @@ export default async function SettlementIdPage({ params }: IProps) {
         <h2 className="text-xl font-medium">{`${creditorName} paid ${debtorName}`}</h2>
         <h1 className="flex items-center text-4xl font-bold">
           <CurrencyIcon className="h-7 w-7" />
-          {(settlement.amount / 100).toFixed(2)}
+          {(settlement.amount / 100).toLocaleString()}
         </h1>
         <div className="space-y-1 text-center text-sm font-medium text-neutral-400">
           <p>

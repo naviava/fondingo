@@ -35,7 +35,7 @@ export function SettlementEntry({
         </p>
         <div className="flex items-center">
           <CurrencyIcon className="ml-1 h-3 w-3" />
-          <p>{(amount / 100).toFixed(2)}</p>
+          <p>{(amount / 100).toLocaleString()}</p>
         </div>
       </div>
     </div>

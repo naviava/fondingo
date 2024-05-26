@@ -110,7 +110,7 @@ export default function ExpenseForm({
       groupId,
       expenseName: expense?.name || "",
       expenseAmount:
-        (expense?.amount && (expense?.amount / 100).toFixed(2)) || "",
+        (expense?.amount && (expense?.amount / 100).toLocaleString()) || "",
       payments: defaultPayments,
       splits: defaultSplits,
     },

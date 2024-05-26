@@ -518,7 +518,7 @@ export const deleteExpenseById = privateProcedure
 
     return {
       toastTitle: `${deletedExpense.name} deleted`,
-      toastDescription: `The expense of ${(deletedExpense.amount / 100).toFixed(2)} has been deleted successfully.`,
+      toastDescription: `The expense of ${(deletedExpense.amount / 100).toLocaleString()} has been deleted successfully.`,
     };
   });
 
@@ -662,6 +662,6 @@ export const deleteSettlementById = privateProcedure
 
     return {
       toastTitle: `Payment deleted`,
-      toastDescription: `The payment of ${(deletedSettlement.amount / 100).toFixed(2)} has been deleted successfully.`,
+      toastDescription: `The payment of ${(deletedSettlement.amount / 100).toLocaleString()} has been deleted successfully.`,
     };
   });

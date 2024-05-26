@@ -40,7 +40,7 @@ export function PaymentSplitEntry({
         <CurrencyIcon
           className={cn("ml-1 h-4 w-4", avatarSize === "sm" && "h-3 w-3")}
         />
-        <span>{(amount / 100).toFixed(2)}</span>
+        <span>{(amount / 100).toLocaleString()}</span>
       </div>
     </li>
   );

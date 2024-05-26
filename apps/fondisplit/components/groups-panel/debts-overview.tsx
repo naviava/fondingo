@@ -28,7 +28,7 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
           <div className="text-cta ml-1 flex items-center">
             <CurrencyIcon size={11} />
             <span className="font-semibold">
-              {(credit.amount / 100).toFixed(2)}
+              {(credit.amount / 100).toLocaleString()}
             </span>
           </div>
         </li>
@@ -42,7 +42,7 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
           <div className="ml-1 flex items-center text-orange-600">
             <CurrencyIcon size={11} />
             <span className="font-semibold">
-              {(debt.amount / 100).toFixed(2)}
+              {(debt.amount / 100).toLocaleString()}
             </span>
           </div>
         </li>

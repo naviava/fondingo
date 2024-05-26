@@ -439,8 +439,8 @@ export const getDebtWithFriend = privateProcedure
       const isInDebt = debtAmount > creditAmount;
       const displayAmountText =
         balanceAmount > 0
-          ? (balanceAmount / 100).toFixed(2)
-          : ((balanceAmount / 100) * -1).toFixed(2);
+          ? (balanceAmount / 100).toLocaleString()
+          : ((balanceAmount / 100) * -1).toLocaleString();
 
       return {
         isInDebt,

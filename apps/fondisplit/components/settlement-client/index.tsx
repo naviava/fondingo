@@ -103,7 +103,7 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
       if (debtor && creditor) {
         setSelectedDebtor(debtor);
         setSelectedCreditor(creditor);
-        form.setValue("amount", amount?.toFixed(2) || "");
+        form.setValue("amount", amount?.toLocaleString() || "");
         setFlag(true);
       }
     }

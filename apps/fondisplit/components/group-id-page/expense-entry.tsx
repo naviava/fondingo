@@ -47,8 +47,8 @@ export async function ExpenseEntry({
     className: isInDebt ? "text-orange-600" : "text-cta",
     label: isInDebt ? "you borrowed" : "you lent",
     amount: isInDebt
-      ? `${((grossBalance / 100) * -1).toFixed(2)}`
-      : `${(grossBalance / 100).toFixed(2)}`,
+      ? `${((grossBalance / 100) * -1).toLocaleString()}`
+      : `${(grossBalance / 100).toLocaleString()}`,
   };
 
   return (
@@ -73,7 +73,7 @@ export async function ExpenseEntry({
               paid{" "}
               <div className="flex items-center">
                 <CurrencyIcon className="ml-1 h-3 w-3" />
-                <span>{(payment.amount / 100).toFixed(2)}</span>
+                <span>{(payment.amount / 100).toLocaleString()}</span>
                 {idx === 1 && expense.payments.length > 2 && (
                   <span className="ml-1">{`and ${expense.payments.length - 2} more`}</span>
                 )}

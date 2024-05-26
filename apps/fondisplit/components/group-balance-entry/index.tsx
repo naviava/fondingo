@@ -93,7 +93,7 @@ export function GroupBalanceEntry({ groupId, memberId, currency }: IProps) {
                   )}
                 >
                   <CurrencyIcon className="h-3 w-3" />
-                  <span>{(displayAmount / 100).toFixed(2)}</span>
+                  <span>{(displayAmount / 100).toLocaleString()}</span>
                 </div>
                 <span>in total</span>
               </div>

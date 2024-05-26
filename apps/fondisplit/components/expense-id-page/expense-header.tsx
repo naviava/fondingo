@@ -30,7 +30,7 @@ export function ExpenseHeader({
         <p className="text-lg font-medium">{expenseName}</p>
         <h1 className="flex items-center text-3xl font-bold">
           <CurrencyIcon className="h-7 w-7" />
-          {(expenseAmount / 100).toFixed(2)}
+          {(expenseAmount / 100).toLocaleString()}
         </h1>
         <div className="text-muted-foreground text-sm font-medium">
           <p className="">{`Added by ${expenseCreator} on ${createdAt}`}</p>
