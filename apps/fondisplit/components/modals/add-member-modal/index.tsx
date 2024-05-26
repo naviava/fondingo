@@ -36,7 +36,7 @@ export function AddMemberModal() {
   const { toast } = useToast();
 
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const { groupId, isOpen, onClose } = useAddMemberModal();
+  const { groupId, isOpen, onClose, clearAddedMembers } = useAddMemberModal();
   const [isAddingContact, setIsAddingContact] = useState(false);
   const [isPendingAddMultiple, setIsPendingAddMultiple] = useState(false);
 
@@ -113,6 +113,7 @@ export function AddMemberModal() {
                 role="button"
                 onClick={() => {
                   if (isPendingAddSingle || isPendingAddMultiple) return;
+                  clearAddedMembers();
                   setIsAddingContact(true);
                 }}
                 className="flex select-none items-center px-4 py-3 hover:bg-neutral-200"

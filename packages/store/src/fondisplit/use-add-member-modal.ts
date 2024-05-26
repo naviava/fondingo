@@ -13,6 +13,7 @@ type AddMemberStore = {
   groupId: string;
 
   addedMembers: Record<string, AddedMember>;
+  clearAddedMembers: () => void;
   toggleAddedMember: ({
     id,
     name,
@@ -37,6 +38,7 @@ export const useAddMemberModal = create<AddMemberStore>((set) => ({
   isPending: false,
 
   addedMembers: {},
+  clearAddedMembers: () => set((state) => ({ ...state, addedMembers: {} })),
   toggleAddedMember: ({ id, name = "", email, imageUrl = "" }) =>
     set((state) => {
       if (!!state.addedMembers[id]) {

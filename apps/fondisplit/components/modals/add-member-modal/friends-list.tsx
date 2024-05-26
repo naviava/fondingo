@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { trpc } from "~/lib/trpc/client";
 import { FriendEntry } from "./friend-entry";
+import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 interface IProps {
   disabled?: boolean;
@@ -17,18 +18,20 @@ export function FriendsList({ disabled }: IProps) {
       <h4 className="mb-2 px-4 text-base font-semibold">
         Friends on Fondisplit
       </h4>
-      {!!friends &&
-        !!friends.length &&
-        friends.map((friend) => (
-          <FriendEntry
-            key={friend.id}
-            friendId={friend.id}
-            imageUrl={friend.image}
-            friendName={friend.name}
-            friendEmail={friend.email}
-            disabled={disabled}
-          />
-        ))}
+      <ScrollArea className="h-[40vh]">
+        {!!friends &&
+          !!friends.length &&
+          friends.map((friend) => (
+            <FriendEntry
+              key={friend.id}
+              friendId={friend.id}
+              imageUrl={friend.image}
+              friendName={friend.name}
+              friendEmail={friend.email}
+              disabled={disabled}
+            />
+          ))}
+      </ScrollArea>
     </section>
   );
 }
