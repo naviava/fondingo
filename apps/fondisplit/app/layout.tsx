@@ -1,4 +1,4 @@
-import { Montserrat } from "next/font/google";
+import { Roboto } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -13,7 +13,11 @@ import SessionProvider from "~/components/providers/session-provider";
 import { Providers } from "~/components/providers";
 import { Toaster } from "@fondingo/ui/toaster";
 
-const font = Montserrat({ subsets: ["latin"] });
+const font = Roboto({
+  // weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["100", "300", "400", "500", "700", "900"],
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Fondisplit",
