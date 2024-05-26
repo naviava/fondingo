@@ -27,8 +27,8 @@ export function FriendEntry({
   const { addedMembers, toggleAddedMember } = useAddMemberModal();
 
   const isInGroup = useMemo(
-    () => group?.members.map((member) => member.userId).includes(friendId),
-    [friendId, group?.members],
+    () => group?.members.map((member) => member.email).includes(friendEmail),
+    [friendEmail, group?.members],
   );
   const isAdded = useMemo(
     () => !!addedMembers[friendId],
@@ -51,6 +51,7 @@ export function FriendEntry({
         className={cn(
           "flex items-center justify-between gap-x-4 px-4 py-1",
           !disabled && !isInGroup && "hover:bg-neutral-200",
+          (disabled || isInGroup) && "cursor-not-allowed",
         )}
       >
         <div className="flex h-14 w-14 items-center justify-center">

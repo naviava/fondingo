@@ -17,6 +17,7 @@ interface IProps {
   disabled?: boolean;
   isAddingContact: boolean;
   submitButtonRef: RefObject<HTMLButtonElement>;
+  setSearchTerm: (value: string) => void;
   setIsAddingContact: Dispatch<SetStateAction<boolean>>;
   setIsPendingAddMultiple: Dispatch<SetStateAction<boolean>>;
   form: UseFormReturn<
@@ -35,11 +36,12 @@ export function Header({
   isAddingContact,
   submitButtonRef,
   disabled = false,
+  setSearchTerm,
   setIsAddingContact,
   setIsPendingAddMultiple,
 }: IProps) {
   const router = useRouter();
-  const { addedMembers, onClose } = useAddMemberModal();
+  const { addedMembers, clearAddedMembers, onClose } = useAddMemberModal();
   const submissionData = useMemo(
     () =>
       Object.values(addedMembers).map((member) => ({
@@ -50,6 +52,7 @@ export function Header({
     [addedMembers],
   );
 
+  const utils = trpc.useUtils();
   const { mutate: handleAddMembers, isPending } =
     trpc.group.addMultipleMembers.useMutation({
       onError: ({ message }) =>
@@ -62,8 +65,15 @@ export function Header({
           title: toastTitle,
           description: toastDescription,
         });
-        router.refresh();
+        utils.group.getGroupById.invalidate();
+        utils.group.getMembers.invalidate();
+        utils.group.getGroups.invalidate();
+        setIsAddingContact(false);
+        clearAddedMembers();
+        setSearchTerm("");
+        form.reset();
         onClose();
+        router.refresh();
       },
     });
 

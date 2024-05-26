@@ -75,7 +75,9 @@ export function AddMemberModal() {
         utils.group.getMembers.invalidate();
         utils.group.getGroups.invalidate();
         setIsAddingContact(false);
+        clearAddedMembers();
         form.reset();
+        setValue("");
         onClose();
         router.refresh();
       },
@@ -89,7 +91,15 @@ export function AddMemberModal() {
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        setIsAddingContact(false);
+        clearAddedMembers();
+        setValue("");
+        onClose();
+      }}
+    >
       <DialogContent hideDefaultCloseButton className="px-0 py-4">
         <DialogHeader>
           <Header
@@ -98,6 +108,7 @@ export function AddMemberModal() {
             disabled={isPendingAddSingle || isPendingAddMultiple}
             isAddingContact={isAddingContact}
             submitButtonRef={submitButtonRef}
+            setSearchTerm={setValue}
             setIsAddingContact={setIsAddingContact}
             setIsPendingAddMultiple={setIsPendingAddMultiple}
           />
