@@ -1,4 +1,4 @@
-import { SettlementClient } from "~/components/settlement-client";
+import { SettlementForm } from "~/components/settlement-form";
 import { serverClient } from "~/lib/trpc/server-client";
 import { redirect } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default async function SettleUpPage({ params }: IProps) {
   }));
 
   return (
-    <SettlementClient
+    <SettlementForm
       groupId={params.groupId}
       members={members}
       currency={group.currency}

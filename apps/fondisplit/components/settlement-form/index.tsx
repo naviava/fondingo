@@ -30,8 +30,8 @@ interface IProps {
   members: GroupMemberClient[];
 }
 
-export const SettlementClient = memo(_SettlementClient);
-function _SettlementClient({ groupId, currency, members }: IProps) {
+export const SettlementForm = memo(_SettlementForm);
+function _SettlementForm({ groupId, currency, members }: IProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
@@ -103,7 +103,7 @@ function _SettlementClient({ groupId, currency, members }: IProps) {
       if (debtor && creditor) {
         setSelectedDebtor(debtor);
         setSelectedCreditor(creditor);
-        form.setValue("amount", amount?.toLocaleString() || "");
+        form.setValue("amount", amount?.toFixed(2) || "");
         setFlag(true);
       }
     }

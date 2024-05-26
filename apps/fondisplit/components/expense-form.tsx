@@ -110,7 +110,7 @@ export default function ExpenseForm({
       groupId,
       expenseName: expense?.name || "",
       expenseAmount:
-        (expense?.amount && (expense?.amount / 100).toLocaleString()) || "",
+        (expense?.amount && (expense?.amount / 100).toFixed(2)) || "",
       payments: defaultPayments,
       splits: defaultSplits,
     },
@@ -141,41 +141,69 @@ export default function ExpenseForm({
   ]);
 
   const utils = trpc.useUtils();
-  const { mutate: handleAddExpense, isPending } =
+  const runInvalidationsAndRoute = useCallback(
+    ({
+      toastTitle,
+      toastDescription,
+    }: {
+      toastTitle: string;
+      toastDescription: string;
+    }) => {
+      toast({ title: toastTitle, description: toastDescription });
+      utils.expense.getExpenseById.invalidate();
+      utils.expense.getExpenseIds.invalidate();
+      utils.group.getGroupById.invalidate();
+      utils.group.getGroups.invalidate();
+      utils.group.getDebts.invalidate();
+      form.reset();
+      clearExpenseDetails();
+      router.push(`/groups/${groupId}`);
+      router.refresh();
+    },
+    [clearExpenseDetails, form, groupId, router, toast, utils],
+  );
+  const { mutate: handleAddExpense, isPending: isPendingAdd } =
     trpc.expense.addExpense.useMutation({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
-        toast({ title: toastTitle, description: toastDescription });
-        utils.expense.getExpenseById.invalidate();
-        utils.expense.getExpenseIds.invalidate();
-        utils.group.getGroupById.invalidate();
-        utils.group.getGroups.invalidate();
-        utils.group.getDebts.invalidate();
-        form.reset();
-        clearExpenseDetails();
-        router.push(`/groups/${groupId}`);
-        router.refresh();
+        runInvalidationsAndRoute({ toastTitle, toastDescription });
+      },
+    });
+  const { mutate: handleEditExpense, isPending: isPendingEdit } =
+    trpc.expense.updateExpense.useMutation({
+      onError: ({ message }) =>
+        toast({ title: "Something went wrong", description: message }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        runInvalidationsAndRoute({ toastTitle, toastDescription });
       },
     });
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
       if (isEditing)
-        console.log({ ...values, expenseAmount: Number(values.expenseAmount) });
+        handleEditExpense({
+          ...values,
+          expenseId: expenseId ?? "",
+          expenseAmount: Number(values.expenseAmount),
+        });
       else
         handleAddExpense({
           ...values,
           expenseAmount: Number(values.expenseAmount),
         });
     },
-    [handleAddExpense, isEditing],
+    [handleAddExpense, handleEditExpense, expenseId, isEditing],
   );
 
   return (
     <>
       <div className="flex items-center justify-between px-2 pt-4">
-        <Button asChild variant="splitGhost" disabled={isPending}>
+        <Button
+          asChild
+          variant="splitGhost"
+          disabled={isPendingAdd || isPendingEdit}
+        >
           <Link
             href={
               isEditing
@@ -192,7 +220,7 @@ export default function ExpenseForm({
         <Button
           type="button"
           variant="splitGhost"
-          disabled={isPending}
+          disabled={isPendingAdd || isPendingEdit}
           onClick={() => {
             submitButtonRef.current?.click();
           }}
@@ -235,7 +263,7 @@ export default function ExpenseForm({
                     <Input
                       placeholder="Enter a description"
                       autoComplete="off"
-                      disabled={isPending}
+                      disabled={isPendingAdd || isPendingEdit}
                       {...field}
                       value={expenseName}
                       onChange={(e) => {
@@ -268,7 +296,7 @@ export default function ExpenseForm({
                       autoComplete="off"
                       type="number"
                       step={0.1}
-                      disabled={isPending}
+                      disabled={isPendingAdd || isPendingEdit}
                       {...field}
                       value={expenseAmount === 0 ? "" : expenseAmount}
                       onChange={(e) => {
@@ -291,7 +319,7 @@ export default function ExpenseForm({
               type="button"
               variant="splitGhost"
               size="sm"
-              disabled={isPending}
+              disabled={isPendingAdd || isPendingEdit}
               onClick={() => {
                 if (Number(form.getValues("expenseAmount")) > 0) {
                   onPaymentsDrawerOpen(groupId);
@@ -314,7 +342,7 @@ export default function ExpenseForm({
               type="button"
               variant="splitGhost"
               size="sm"
-              disabled={isPending}
+              disabled={isPendingAdd || isPendingEdit}
               onClick={() => {
                 if (Number(form.getValues("expenseAmount")) > 0) {
                   clearSplits();
