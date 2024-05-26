@@ -357,8 +357,8 @@ export const addMultipleMembers = privateProcedure
     const existingMembers = await splitdb.groupMember.findMany({
       where: {
         groupId,
-        userId: {
-          in: newMembers.map((member) => member.id),
+        email: {
+          in: newMembers.map((member) => member.email),
         },
       },
     });

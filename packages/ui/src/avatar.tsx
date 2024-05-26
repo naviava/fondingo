@@ -25,7 +25,7 @@ const textSizeMap = {
   default: "text-base",
   sm: "text-sm",
   lg: "text-3xl font-semibold",
-  xl: "text-6xl font-semibold",
+  xl: "text-4xl font-semibold",
 };
 
 export const Avatar = memo(_Avatar);

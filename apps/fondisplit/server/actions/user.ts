@@ -321,8 +321,10 @@ export const getFriends = privateProcedure.query(async ({ ctx }) => {
 
 export const findFriends = privateProcedure
   .input(z.string().min(1, { message: "Search query cannot be empty" }))
-  .query(async ({ ctx, input: searchTerm }) => {
+  .query(async ({ ctx, input }) => {
     const { user } = ctx;
+    const searchTerm = input.toLowerCase();
+
     const friends = await splitdb.friend.findMany({
       where: {
         OR: [{ user1Id: user.id }, { user2Id: user.id }],
@@ -348,14 +350,14 @@ export const findFriends = privateProcedure
 
     const friendsSearchResults = formattedFriends.filter(
       (friend) =>
-        friend.name?.includes(searchTerm) ||
-        friend.email?.includes(searchTerm) ||
+        friend.name?.toLowerCase().includes(searchTerm) ||
+        friend.email?.toLowerCase().includes(searchTerm) ||
         friend.phone?.includes(searchTerm),
     );
     const tempFriendsSearchResults = tempFriends.filter(
       (friend) =>
-        friend.name?.includes(searchTerm) ||
-        friend.email?.includes(searchTerm) ||
+        friend.name?.toLowerCase().includes(searchTerm) ||
+        friend.email?.toLowerCase().includes(searchTerm) ||
         friend.phone?.includes(searchTerm),
     );
 
