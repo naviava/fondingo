@@ -34,9 +34,10 @@ export function AdvancedSettingEntry({
 
   return (
     <li
-      onClick={action}
+      onClick={disabled ? () => {} : action}
       className={cn(
-        "cursor-pointer px-4 pb-2 hover:bg-neutral-200",
+        "select-none px-4 pb-2",
+        !disabled && "cursor-pointer hover:bg-neutral-200",
         !disabled && !description && "text-rose-700",
       )}
     >

@@ -46,8 +46,8 @@ export function AdvancedSettings({ userId, group }: IProps) {
           description: toastDescription,
         });
         invalidateAll();
-        router.refresh();
         router.push("/groups");
+        router.refresh();
       },
     });
 

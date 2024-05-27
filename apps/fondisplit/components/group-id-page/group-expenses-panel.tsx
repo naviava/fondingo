@@ -29,7 +29,7 @@ function _GroupExpensesPanel({
   hasExpenses,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
-  const { topRef, bottomRef } = usePanelHeight((state) => state);
+  const { panelHeight, topRef, bottomRef } = usePanelHeight((state) => state);
 
   if (!hasMembers) {
     return (
@@ -82,8 +82,7 @@ function _GroupExpensesPanel({
     // <ScrollArea className="h-[55vh] md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
     <ScrollArea
       style={{
-        height:
-          topRef && bottomRef ? `${bottomRef - topRef - 16}px` : "default",
+        height: topRef && bottomRef ? `${panelHeight - 16}px` : "default",
       }}
     >
       {children}

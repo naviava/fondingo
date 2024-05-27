@@ -34,7 +34,7 @@ function _GroupActions({
   const searchParams = useSearchParams();
   const topDivRef = useRef<HTMLDivElement>(null);
 
-  const { onOpen } = useAddMemberModal();
+  const { onOpen } = useAddMemberModal((state) => state);
   const { setTopRef } = usePanelHeight((state) => state);
 
   const handleAddMember = useCallback(() => {

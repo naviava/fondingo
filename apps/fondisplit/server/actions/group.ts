@@ -110,7 +110,7 @@ export const getGroups = privateProcedure.query(async ({ ctx }) => {
   const groups = await splitdb.group.findMany({
     where: {
       members: {
-        some: { userId: user.id },
+        some: { userId: user.id, isDeleted: false },
       },
     },
     include: {
@@ -171,6 +171,11 @@ export const getGroupById = privateProcedure
         code: "NOT_FOUND",
         message: "Group not found",
       });
+
+    const filteredGroupMembers = group.members.filter(
+      (member) => !member.isDeleted,
+    );
+    group.members = filteredGroupMembers;
     return group;
   });
 
@@ -513,7 +518,10 @@ export const getMembers = privateProcedure
       });
 
     const groupMembers = splitdb.groupMember.findMany({
-      where: { groupId },
+      where: {
+        groupId,
+        isDeleted: false,
+      },
       include: { user: true },
     });
     return groupMembers;
@@ -583,7 +591,7 @@ export const removeMemberFromGroup = privateProcedure
           (m) => m.userId === user.id,
         );
         if (
-          member.email !== user.email ||
+          member.email !== user.email &&
           currentUserInGroup?.role !== "MANAGER"
         )
           throw new TRPCError({
@@ -607,9 +615,9 @@ export const removeMemberFromGroup = privateProcedure
         const updatedMember = await db.groupMember.update({
           where: { id: member.id },
           data: {
-            name: "(deleted user)",
+            name: "(deleted)",
             isDeleted: true,
-            userId: "",
+            userId: null,
           },
         });
         if (!updatedMember)
@@ -711,6 +719,7 @@ export const getDebtsByMemberId = privateProcedure
       where: {
         groupId,
         id: memberId,
+        isDeleted: false,
       },
       include: {
         user: {
@@ -871,9 +880,11 @@ export const addSettlement = privateProcedure
       });
 
     const isDebtorInGroup = group.members.some(
-      (member) => member.id === fromId,
+      (member) => member.id === fromId && !member.isDeleted,
     );
-    const isCreditInGroup = group.members.some((member) => member.id === toId);
+    const isCreditInGroup = group.members.some(
+      (member) => member.id === toId && !member.isDeleted,
+    );
     if (!isDebtorInGroup || !isCreditInGroup)
       throw new TRPCError({
         code: "BAD_REQUEST",

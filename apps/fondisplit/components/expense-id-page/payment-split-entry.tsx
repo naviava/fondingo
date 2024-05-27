@@ -1,5 +1,9 @@
+"use client";
+
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { CurrencyCode } from "@fondingo/db-split";
+import { useMemo } from "react";
+
 import { Avatar } from "@fondingo/ui/avatar";
 import { cn } from "@fondingo/ui/utils";
 
@@ -26,7 +30,10 @@ export function PaymentSplitEntry({
   imageUrl = "",
   avatarSize = "default",
 }: IProps) {
-  const CurrencyIcon = currencyIconMap[currency].icon;
+  const CurrencyIcon = useMemo(
+    () => currencyIconMap[currency].icon,
+    [currency],
+  );
 
   return (
     <li className="flex items-center gap-x-3 py-1 font-medium">

@@ -67,7 +67,7 @@ export const addExpense = privateProcedure
         where: {
           id: groupId,
           members: {
-            some: { userId: user.id },
+            some: { userId: user.id, isDeleted: false },
           },
         },
       });
@@ -102,7 +102,10 @@ export const addExpense = privateProcedure
         });
 
       const groupMembers = await splitdb.groupMember.findMany({
-        where: { groupId },
+        where: {
+          groupId,
+          isDeleted: false,
+        },
       });
       const groupMemberIds = groupMembers.map((member) => member.id);
 
@@ -247,7 +250,10 @@ export const updateExpense = privateProcedure
           groupId,
           group: {
             members: {
-              some: { userId: user.id },
+              some: {
+                userId: user.id,
+                isDeleted: false,
+              },
             },
           },
         },
@@ -283,7 +289,10 @@ export const updateExpense = privateProcedure
         });
 
       const groupMembers = await splitdb.groupMember.findMany({
-        where: { groupId },
+        where: {
+          groupId,
+          isDeleted: false,
+        },
       });
       const groupMemberIds = groupMembers.map((member) => member.id);
 
@@ -489,7 +498,9 @@ export const deleteExpenseById = privateProcedure
         groupId,
         group: {
           members: {
-            some: { userId: user.id },
+            some: {
+              userId: user.id,
+            },
           },
         },
       },
@@ -573,7 +584,9 @@ export const getSettlementById = privateProcedure
         groupId,
         group: {
           members: {
-            some: { userId: user.id },
+            some: {
+              userId: user.id,
+            },
           },
         },
       },
@@ -633,7 +646,9 @@ export const deleteSettlementById = privateProcedure
         groupId,
         group: {
           members: {
-            some: { userId: user.id },
+            some: {
+              userId: user.id,
+            },
           },
         },
       },
