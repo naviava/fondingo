@@ -457,6 +457,7 @@ export const getExpenseById = privateProcedure
       },
       include: {
         createdBy: true,
+        lastModifiedBy: true,
         payments: {
           include: {
             groupMember: {
@@ -707,6 +708,7 @@ export const getSettlementById = privateProcedure
       },
       include: {
         createdBy: true,
+        lastModifiedBy: true,
         from: {
           include: {
             user: {

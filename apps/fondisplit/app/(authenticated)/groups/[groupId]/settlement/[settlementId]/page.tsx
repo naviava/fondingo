@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { SettlementActions } from "~/components/settlement-actions";
 import { DisplayAmount } from "~/components/display-amount";
-import { currencyIconMap } from "@fondingo/ui/constants";
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { FcMoneyTransfer } from "react-icons/fc";
 import { Button } from "@fondingo/ui/button";
@@ -32,7 +31,6 @@ export default async function SettlementIdPage({ params }: IProps) {
     settlement.createdById,
   );
 
-  const CurrencyIcon = currencyIconMap[group.currency].icon;
   const creditorName = isSettlementCreatorInGroup
     ? settlement.from.userId === user?.id
       ? "You"
@@ -47,6 +45,11 @@ export default async function SettlementIdPage({ params }: IProps) {
     ? settlement.createdById === user?.id
       ? "you"
       : settlement.createdBy.name
+    : "(deleted)";
+  const lastUpdatedByName = isSettlementCreatorInGroup
+    ? settlement.lastModifiedById === user?.id
+      ? "you"
+      : settlement.lastModifiedBy.name
     : "(deleted)";
 
   return (
@@ -78,7 +81,7 @@ export default async function SettlementIdPage({ params }: IProps) {
             {format(new Date(settlement.createdAt), "LLL d yyyy")}
           </p>
           <p>
-            Last updated on{" "}
+            Last updated by {lastUpdatedByName} on{" "}
             {format(new Date(settlement.updatedAt), "LLL d yyyy")}
           </p>
         </div>
