@@ -649,6 +649,97 @@ export const addSettlement = privateProcedure
     };
   });
 
+export const updateSettlement = privateProcedure
+  .input(
+    z.object({
+      settlementId: z
+        .string()
+        .min(1, { message: "Settlement ID cannot be empty" }),
+      groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
+      fromId: z.string().min(1, { message: "Debtor ID cannot be empty" }),
+      toId: z.string().min(1, { message: "Creditor ID cannot be empty" }),
+      amount: z.number(),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { settlementId, groupId, fromId, toId, amount } = input;
+
+    if (fromId === toId)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Debtor and creditor cannot be the same",
+      });
+    if (amount <= 0)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Amount should be greater than 0",
+      });
+
+    const existingSettlement = await splitdb.settlement.findUnique({
+      where: {
+        id: settlementId,
+        groupId,
+      },
+      include: {
+        group: {
+          include: { members: true },
+        },
+      },
+    });
+    if (!existingSettlement)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Settlement not found",
+      });
+
+    const isDebtorInGroup = existingSettlement.group.members.some(
+      (member) => member.id === fromId && !member.isDeleted,
+    );
+    const isCreditInGroup = existingSettlement.group.members.some(
+      (member) => member.id === toId && !member.isDeleted,
+    );
+    if (!isDebtorInGroup || !isCreditInGroup)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Both debtor and creditor should be in the group",
+      });
+
+    const updatedSettlement = await splitdb.settlement.update({
+      where: {
+        id: existingSettlement.id,
+      },
+      data: {
+        fromId,
+        toId,
+        lastModifiedById: user.id,
+        amount: Math.floor(amount * 100),
+      },
+      include: {
+        from: true,
+        to: true,
+      },
+    });
+    if (!updatedSettlement)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to update settlement",
+      });
+
+    const res = await calculateDebts(groupId);
+    if (!("success" in res) || !res.success) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to calculate debts",
+      });
+    }
+
+    return {
+      toastTitle: "Settlement updated",
+      toastDescription: `${updatedSettlement.from.name} paid ${updatedSettlement.to.name} $${updatedSettlement.amount / 100}`,
+    };
+  });
+
 export const getSettlements = privateProcedure
   .input(z.string().min(1, { message: "Group ID cannot be empty" }))
   .query(async ({ ctx, input: groupId }) => {

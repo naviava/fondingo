@@ -7,6 +7,7 @@ import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 import { Pencil, Trash2 } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 import { toast } from "@fondingo/ui/use-toast";
+import { useUtils } from "~/hooks/use-utils";
 
 interface IProps {
   groupId: string;
@@ -15,10 +16,31 @@ interface IProps {
 
 export function SettlementActions({ groupId, settlementId }: IProps) {
   const router = useRouter();
+  const { invalidateAll } = useUtils();
   const { onOpen, onClose } = useConfirmModal();
 
   const utils = trpc.useUtils();
-  const { mutate: handleDeleteSettlement, isPending } =
+  const { mutate: handleUpdateSettlement, isPending: isPendingUpdate } =
+    trpc.expense.updateSettlement.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        utils.group.getGroupTotals.invalidate();
+        invalidateAll();
+        onClose();
+        router.push(`/groups/${groupId}`);
+        router.refresh();
+      },
+    });
+
+  const { mutate: handleDeleteSettlement, isPending: isPendingDelete } =
     trpc.expense.deleteSettlementById.useMutation({
       onError: ({ message }) =>
         toast({
@@ -30,14 +52,11 @@ export function SettlementActions({ groupId, settlementId }: IProps) {
           title: toastTitle,
           description: toastDescription,
         });
-        utils.group.getGroupById.invalidate(groupId);
-        utils.expense.getSettlements.invalidate();
-        utils.user.getDebtWithFriend.invalidate();
-        utils.user.getGrossBalance.invalidate();
-        utils.group.getDebts.invalidate();
+        utils.group.getGroupTotals.invalidate();
+        invalidateAll();
+        onClose();
         router.push(`/groups/${groupId}`);
         router.refresh();
-        onClose();
       },
     });
 
@@ -46,7 +65,7 @@ export function SettlementActions({ groupId, settlementId }: IProps) {
       <Button
         size="sm"
         variant="ghost"
-        disabled={isPending}
+        disabled={isPendingDelete || isPendingUpdate}
         onClick={() =>
           onOpen({
             title: "Delete payment?",
@@ -63,10 +82,10 @@ export function SettlementActions({ groupId, settlementId }: IProps) {
       <Button
         size="sm"
         variant="ghost"
-        disabled={isPending}
-        onClick={() => {
-          // TODO: Handle edit settlement
-        }}
+        disabled={isPendingDelete || isPendingUpdate}
+        onClick={() =>
+          router.push(`/groups/${groupId}/settlement/${settlementId}/edit`)
+        }
       >
         <Pencil />
       </Button>

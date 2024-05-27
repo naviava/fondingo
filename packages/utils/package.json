@@ -2,6 +2,7 @@
   "name": "@fondingo/utils",
   "version": "0.0.0",
   "exports": {
+    ".": "./src/index.ts",
     "./date-fns": "./src/date-fns.ts",
     "./hooks": "./src/hooks.ts",
     "./uuid": "./src/uuid.ts",

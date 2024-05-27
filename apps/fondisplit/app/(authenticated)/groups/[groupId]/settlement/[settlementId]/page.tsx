@@ -26,17 +26,24 @@ export default async function SettlementIdPage({ params }: IProps) {
   });
   if (!settlement) return redirect(`/groups/${params.groupId}`);
 
+  const groupMemberIds = group.members.map((member) => member.id);
+  const isCreditorInGroup = groupMemberIds.includes(settlement.from.id);
+  const isDebtorInGroup = groupMemberIds.includes(settlement.to.id);
+
   const groupMemberUserIds = group.members.map((member) => member.user?.id);
   const isSettlementCreatorInGroup = groupMemberUserIds.includes(
     settlement.createdById,
   );
+  const isSettlementLastModifiedByInGroup = groupMemberUserIds.includes(
+    settlement.lastModifiedById,
+  );
 
-  const creditorName = isSettlementCreatorInGroup
+  const creditorName = isCreditorInGroup
     ? settlement.from.userId === user?.id
       ? "You"
       : settlement.from.name
     : "(deleted)";
-  const debtorName = isSettlementCreatorInGroup
+  const debtorName = isDebtorInGroup
     ? settlement.to.userId === user?.id
       ? "you"
       : settlement.to.name
@@ -46,7 +53,7 @@ export default async function SettlementIdPage({ params }: IProps) {
       ? "you"
       : settlement.createdBy.name
     : "(deleted)";
-  const lastUpdatedByName = isSettlementCreatorInGroup
+  const lastUpdatedByName = isSettlementLastModifiedByInGroup
     ? settlement.lastModifiedById === user?.id
       ? "you"
       : settlement.lastModifiedBy.name

@@ -875,7 +875,6 @@ export const getGroupTotals = privateProcedure
   .query(async ({ ctx, input: groupId }) => {
     const { user } = ctx;
 
-    // try {
     const group = await splitdb.group.findUnique({
       where: {
         id: groupId,
@@ -976,13 +975,6 @@ export const getGroupTotals = privateProcedure
       totalChangeInBalance,
       currency: group.currency,
     };
-    // } catch (err) {
-    //   console.error(err);
-    //   throw new TRPCError({
-    //     code: "INTERNAL_SERVER_ERROR",
-    //     message: "Failed to get group totals",
-    //   });
-    // }
   });
 
 /**
