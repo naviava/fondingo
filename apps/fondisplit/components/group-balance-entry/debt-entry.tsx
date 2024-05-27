@@ -39,11 +39,6 @@ function _DebtEntry({
 }: IProps) {
   const router = useRouter();
 
-  const CurrencyIcon = useMemo(
-    () => currencyIconMap[currency].icon,
-    [currency],
-  );
-
   return (
     <li>
       <div className="flex items-center gap-x-2">

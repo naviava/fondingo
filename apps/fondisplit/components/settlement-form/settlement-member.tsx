@@ -1,23 +1,27 @@
 import { useSettlementDrawer } from "@fondingo/store/fondisplit";
 import { Avatar } from "@fondingo/ui/avatar";
 import { GroupMemberClient } from "~/types";
-import { memo } from "react";
+import { Dispatch, memo, SetStateAction } from "react";
 
 interface IProps {
+  flag: boolean;
   groupId: string;
+  disabled: boolean;
+  members: GroupMemberClient[];
   drawerType: "debtor" | "creditor";
   selectedMember: GroupMemberClient | null;
-  members: GroupMemberClient[];
-  isPending: boolean;
+  setFlag: Dispatch<SetStateAction<boolean>>;
 }
 
 export const SettlementMember = memo(_SettlementMember);
 function _SettlementMember({
   groupId,
-  drawerType,
   members,
+  drawerType,
+  flag = false,
   selectedMember,
-  isPending = false,
+  disabled = false,
+  setFlag,
 }: IProps) {
   const { onDrawerOpen } = useSettlementDrawer();
 
@@ -25,7 +29,8 @@ function _SettlementMember({
     <div
       role="button"
       onClick={() => {
-        if (isPending) return;
+        if (disabled) return;
+        if (!flag) setFlag(true);
         onDrawerOpen({
           groupId,
           members,

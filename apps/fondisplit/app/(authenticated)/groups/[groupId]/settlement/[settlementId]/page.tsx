@@ -67,10 +67,7 @@ export default async function SettlementIdPage({ params }: IProps) {
             <ChevronLeft />
           </Link>
         </Button>
-        <SettlementActions
-          groupId={params.groupId}
-          settlementId={params.settlementId}
-        />
+        <SettlementActions groupId={params.groupId} settlement={settlement} />
       </div>
       <div className="mt-16 flex flex-col items-center justify-center gap-y-4">
         <FcMoneyTransfer size={80} />

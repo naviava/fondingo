@@ -23,6 +23,7 @@ import { trpc } from "~/lib/trpc/client";
 
 const formSchema = z.object({
   amount: z.string().min(1, { message: "Amount must be greater than 0" }),
+  settlementId: z.string().optional(),
 });
 
 interface IProps {
@@ -56,12 +57,13 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: "",
+      settlementId: "",
     },
   });
 
   const utils = trpc.useUtils();
   const { invalidateAll } = useUtils();
-  const { mutate: handleAddSettlement, isPending } =
+  const { mutate: handleAddSettlement, isPending: isPendingAdd } =
     trpc.expense.addSettlement.useMutation({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
@@ -74,9 +76,41 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
         router.refresh();
       },
     });
+  const { mutate: handleEditSettlement, isPending: isPendingEdit } =
+    trpc.expense.updateSettlement.useMutation({
+      onError: ({ message }) =>
+        toast({ title: "Something went wrong", description: message }),
+      onSuccess: () => {
+        utils.group.getGroupTotals.invalidate();
+        invalidateAll();
+        resetDrawer();
+        form.reset();
+        router.push(`/groups/${groupId}/settlement/${settlementId}`);
+        router.refresh();
+      },
+    });
+
+  const amount = useMemo(
+    () => Number(searchParams.get("amount")) / 100,
+    [searchParams],
+  );
+  const settlementId = useMemo(
+    () => searchParams.get("settlementId"),
+    [searchParams],
+  );
+  const fromId = useMemo(() => searchParams.get("from"), [searchParams]);
+  const toId = useMemo(() => searchParams.get("to"), [searchParams]);
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
+      if (!!values.settlementId)
+        return handleEditSettlement({
+          groupId,
+          settlementId: values.settlementId,
+          fromId: selectedDebtor?.id || "",
+          toId: selectedCreditor?.id || "",
+          amount: Number(values.amount),
+        });
       handleAddSettlement({
         groupId,
         fromId: selectedDebtor?.id || "",
@@ -84,25 +118,24 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
         amount: Number(values.amount),
       });
     },
-    [groupId, selectedDebtor, selectedCreditor, handleAddSettlement],
+    [
+      groupId,
+      selectedDebtor,
+      selectedCreditor,
+      handleAddSettlement,
+      handleEditSettlement,
+    ],
   );
-
-  const amount = useMemo(
-    () => Number(searchParams.get("amount")) / 100,
-    [searchParams],
-  );
-  const fromId = useMemo(() => searchParams.get("from"), [searchParams]);
-  const toId = useMemo(() => searchParams.get("to"), [searchParams]);
 
   useEffect(() => {
+    if (!!settlementId) form.setValue("settlementId", settlementId);
     if (!flag && !!fromId && !!toId) {
       const debtor = members.find((member) => member.id === fromId);
       const creditor = members.find((member) => member.id === toId);
-      if (debtor && creditor) {
+      if (!!debtor && !!creditor) {
         setSelectedDebtor(debtor);
         setSelectedCreditor(creditor);
         form.setValue("amount", amount?.toFixed(2) || "");
-        setFlag(true);
       }
     }
     if (!selectedDebtor && !!members[0]) {
@@ -118,6 +151,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
     fromId,
     amount,
     members,
+    settlementId,
     selectedDebtor,
     selectedCreditor,
     setSelectedDebtor,
@@ -128,18 +162,18 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
     <>
       <div className="flex items-center justify-between px-2 pt-4">
         <Button
-          variant="ghost"
           size="sm"
-          disabled={isPending}
+          variant="ghost"
+          disabled={isPendingAdd || isPendingEdit}
           onClick={() => router.back()}
         >
           <ChevronLeft />
         </Button>
         <h1 className="text-lg font-semibold">Record a payment</h1>
         <Button
-          variant="splitGhost"
           size="sm"
-          disabled={isPending}
+          variant="splitGhost"
+          disabled={isPendingAdd || isPendingEdit}
           onClick={() => {
             submitButtonRef.current?.click();
           }}
@@ -154,11 +188,13 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
         >
           <div className="flex items-center">
             <SettlementMember
+              flag={flag}
               groupId={groupId}
-              drawerType="debtor"
               members={members}
+              setFlag={setFlag}
+              drawerType="debtor"
+              disabled={isPendingAdd || isPendingEdit}
               selectedMember={selectedDebtor}
-              isPending={isPending}
             />
             <div className="-mt-9 flex items-center">
               <div className="h-1.5 w-12 bg-neutral-700" />
@@ -173,11 +209,13 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
               />
             </div>
             <SettlementMember
+              flag={flag}
               groupId={groupId}
-              drawerType="creditor"
               members={members}
+              setFlag={setFlag}
+              drawerType="creditor"
+              disabled={isPendingAdd || isPendingEdit}
               selectedMember={selectedCreditor}
-              isPending={isPending}
             />
           </div>
           <div className="mt-10 flex items-center gap-x-4">
@@ -192,12 +230,12 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
                 <FormItem className="h-12 w-full">
                   <FormControl>
                     <Input
-                      placeholder="0.00"
-                      autoComplete="off"
-                      type="number"
                       min={0.01}
                       step={0.01}
-                      disabled={isPending}
+                      type="number"
+                      placeholder="0.00"
+                      autoComplete="off"
+                      disabled={isPendingAdd || isPendingEdit}
                       {...field}
                       className="form-input h-full max-w-[10rem] text-4xl font-semibold placeholder:text-4xl placeholder:text-neutral-400"
                     />
@@ -209,7 +247,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
           <button
             ref={submitButtonRef}
             type="submit"
-            disabled={isPending}
+            disabled={isPendingAdd || isPendingEdit}
             className="hidden"
           />
         </form>

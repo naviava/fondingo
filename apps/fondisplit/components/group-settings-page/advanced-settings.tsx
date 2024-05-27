@@ -14,6 +14,7 @@ import { serverClient } from "~/lib/trpc/server-client";
 import { trpc } from "~/lib/trpc/client";
 import { useUtils } from "~/hooks/use-utils";
 import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
+import { calculateDebts } from "~/server/actions/group";
 
 interface IProps {
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;
@@ -135,7 +136,11 @@ export function AdvancedSettings({ userId, group }: IProps) {
           title="Calculate debts"
           description="Automatically combines debts to reduce the total number of repayments between group members."
           disabled={isPendingRemove || isPendingDelete}
-          action={() => {}}
+          action={async () => {
+            await calculateDebts(group.id);
+            invalidateAll();
+            router.refresh();
+          }}
         />
         <AdvancedSettingEntry
           groupId={group.id}

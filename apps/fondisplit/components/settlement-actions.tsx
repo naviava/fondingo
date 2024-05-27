@@ -1,20 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+
+import { serverClient } from "~/lib/trpc/server-client";
+import { useUtils } from "~/hooks/use-utils";
 import { trpc } from "~/lib/trpc/client";
 
 import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 import { Pencil, Trash2 } from "@fondingo/ui/lucide";
-import { Button } from "@fondingo/ui/button";
 import { toast } from "@fondingo/ui/use-toast";
-import { useUtils } from "~/hooks/use-utils";
+import { Button } from "@fondingo/ui/button";
 
 interface IProps {
   groupId: string;
-  settlementId: string;
+  settlement: Awaited<
+    ReturnType<typeof serverClient.expense.getSettlementById>
+  >;
 }
 
-export function SettlementActions({ groupId, settlementId }: IProps) {
+export function SettlementActions({ groupId, settlement }: IProps) {
   const router = useRouter();
   const { invalidateAll } = useUtils();
   const { onOpen, onClose } = useConfirmModal();
@@ -72,7 +76,7 @@ export function SettlementActions({ groupId, settlementId }: IProps) {
             description:
               "Are you sure you want to delete this payment? This will remove the payment for ALL people involved, not just you. This action cannot be undone.",
             confirmAction: () =>
-              handleDeleteSettlement({ groupId, settlementId }),
+              handleDeleteSettlement({ groupId, settlementId: settlement.id }),
             cancelAction: onClose,
           })
         }
@@ -84,7 +88,9 @@ export function SettlementActions({ groupId, settlementId }: IProps) {
         variant="ghost"
         disabled={isPendingDelete || isPendingUpdate}
         onClick={() =>
-          router.push(`/groups/${groupId}/settlement/${settlementId}/edit`)
+          router.push(
+            `/groups/${groupId}/settlement?settlementId=${settlement.id}&from=${settlement.fromId}&to=${settlement.toId}&amount=${settlement.amount}`,
+          )
         }
       >
         <Pencil />
