@@ -1071,7 +1071,6 @@ export async function calculateDebts(
         Object.keys(balances).length > 0 &&
         Object.keys(balances).length > 1
       ) {
-        console.log(balances);
         const maxOwed = Object.keys(balances).reduce((a, b) =>
           balances[a]! > balances[b]! ? a : b,
         );

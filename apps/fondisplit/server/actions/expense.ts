@@ -286,9 +286,6 @@ export const updateExpense = privateProcedure
       (acc, split) => acc + Math.floor(split.amount * 100),
       0,
     );
-    console.log("\n\nTotal Payments Amount: ", totalPaymentsAmount);
-    console.log("Total Splits Amount: ", totalSplitsAmount);
-    console.log("Expense Amount: ", expenseAmount);
     if (
       totalPaymentsAmount !== expenseAmount ||
       totalSplitsAmount !== expenseAmount

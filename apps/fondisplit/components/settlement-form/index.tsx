@@ -109,13 +109,13 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
           settlementId: values.settlementId,
           fromId: selectedDebtor?.id || "",
           toId: selectedCreditor?.id || "",
-          amount: Number(values.amount),
+          amount: Math.floor(Number(values.amount) * 100) / 100,
         });
       handleAddSettlement({
         groupId,
         fromId: selectedDebtor?.id || "",
         toId: selectedCreditor?.id || "",
-        amount: Number(values.amount),
+        amount: Math.floor(Number(values.amount) * 100) / 100,
       });
     },
     [
@@ -230,9 +230,9 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
                 <FormItem className="h-12 w-full">
                   <FormControl>
                     <Input
+                      type="number"
                       min={0.01}
                       step={0.01}
-                      type="number"
                       placeholder="0.00"
                       autoComplete="off"
                       disabled={isPendingAdd || isPendingEdit}
