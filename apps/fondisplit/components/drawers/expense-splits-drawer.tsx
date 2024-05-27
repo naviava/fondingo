@@ -2,8 +2,10 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { CheckCircle, TriangleAlert } from "@fondingo/ui/lucide";
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
 import { ExpenseSplitsMember } from "./expense-splits-member";
+import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";
 import {
@@ -15,7 +17,6 @@ import {
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
-import { CheckCircle, TriangleAlert } from "@fondingo/ui/lucide";
 
 const textMap = {
   equally: {
@@ -158,17 +159,21 @@ export function ExpenseSplitsDrawer() {
             1.23
           </Button>
         </div>
-        <ul className="space-y-4 px-8 py-4">
-          {members?.map((member) => (
-            <ExpenseSplitsMember
-              key={member.id}
-              userId={member.id}
-              userName={member.name}
-              userImageUrl={member.user?.image}
-              setSplitsState={setSplitsState}
-            />
-          ))}
-        </ul>
+        <ScrollArea
+          className={cn(!!members && members.length > 5 && "h-[40vh]")}
+        >
+          <ul className="space-y-4 px-8 py-4">
+            {members?.map((member) => (
+              <ExpenseSplitsMember
+                key={member.id}
+                userId={member.id}
+                userName={member.name}
+                userImageUrl={member.user?.image}
+                setSplitsState={setSplitsState}
+              />
+            ))}
+          </ul>
+        </ScrollArea>
         {splitType === "custom" && (
           <div className="mb-4 flex flex-col items-center justify-center text-sm">
             {hasNegativeAmount ? (

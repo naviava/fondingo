@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { ExpensePaymentsMember } from "./expense-payments-member";
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";
 import {
@@ -114,7 +115,7 @@ export function ExpensePaymentsDrawer() {
           </DrawerTitle>
           <Separator />
         </DrawerHeader>
-        <ul className="space-y-4 px-8 py-4">
+        <div className="space-y-4 px-8 py-4">
           {isMultiple && (
             <div className="flex flex-col items-center justify-center text-sm">
               {hasNegativeAmount ? (
@@ -142,43 +143,49 @@ export function ExpensePaymentsDrawer() {
               )}
             </div>
           )}
-          {members?.map((member) => (
-            <ExpensePaymentsMember
-              key={member.id}
-              userId={member.id}
-              userName={member.name}
-              userImageUrl={member.user?.image}
-              isMultiple={isMultiple}
-              setPaymentsState={setPaymentsState}
-            />
-          ))}
-          {isMultiple ? (
-            <li
-              onClick={() => {
-                clearPayments();
-                setIsMultiple(false);
-              }}
-              className="flex cursor-pointer items-center justify-between border-b pb-2"
-            >
-              <span className="text-muted-foreground text-sm font-medium">
-                Single payer
-              </span>
-              <ChevronLeft className="text-muted-foreground" />
-            </li>
-          ) : (
-            <li
-              onClick={() => {
-                setIsMultiple(true);
-              }}
-              className="flex cursor-pointer items-center justify-between border-b pb-2"
-            >
-              <span className="text-muted-foreground text-sm font-medium">
-                Multiple people
-              </span>
-              <ChevronRight className="text-muted-foreground" />
-            </li>
-          )}
-        </ul>
+          <ScrollArea
+            className={cn(!!members && members.length > 5 && "h-[40vh]")}
+          >
+            <ul className="space-y-4">
+              {members?.map((member) => (
+                <ExpensePaymentsMember
+                  key={member.id}
+                  userId={member.id}
+                  userName={member.name}
+                  userImageUrl={member.user?.image}
+                  isMultiple={isMultiple}
+                  setPaymentsState={setPaymentsState}
+                />
+              ))}
+              {isMultiple ? (
+                <li
+                  onClick={() => {
+                    clearPayments();
+                    setIsMultiple(false);
+                  }}
+                  className="flex cursor-pointer items-center justify-between border-b pb-2"
+                >
+                  <span className="text-muted-foreground text-sm font-medium">
+                    Single payer
+                  </span>
+                  <ChevronLeft className="text-muted-foreground" />
+                </li>
+              ) : (
+                <li
+                  onClick={() => {
+                    setIsMultiple(true);
+                  }}
+                  className="flex cursor-pointer items-center justify-between border-b pb-2"
+                >
+                  <span className="text-muted-foreground text-sm font-medium">
+                    Multiple people
+                  </span>
+                  <ChevronRight className="text-muted-foreground" />
+                </li>
+              )}
+            </ul>
+          </ScrollArea>
+        </div>
       </DrawerContent>
     </Drawer>
   );
