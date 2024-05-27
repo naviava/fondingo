@@ -123,7 +123,7 @@ export function Header({
         <Button
           variant="splitGhost"
           size="sm"
-          disabled={disabled}
+          disabled={disabled || !Object.keys(addedMembers).length}
           onClick={() =>
             handleAddMembers({
               groupId,

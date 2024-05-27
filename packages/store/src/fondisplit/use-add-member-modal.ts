@@ -51,9 +51,9 @@ export const useAddMemberModal = create<AddMemberStore>((set) => ({
           ...state.addedMembers,
           [id]: {
             id,
-            imageUrl,
             name,
             email,
+            imageUrl,
           },
         },
       };
