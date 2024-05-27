@@ -32,13 +32,19 @@ export default async function ExpenseIdPage({ params }: IProps) {
     expense.createdById,
   );
 
+  const createdAt = format(new Date(expense.createdAt), "d MMMM yyyy");
   const expenseCreator = isExpenseCreatorInGroup
     ? expense.createdById === user?.id
       ? "you"
       : expense.createdBy.name
     : "(deleted)";
-  const createdAt = format(new Date(expense.createdAt), "d MMMM yyyy");
+
   const updatedAt = format(new Date(expense.updatedAt), "d MMMM yyyy");
+  const expenseUpdatedBy = isExpenseCreatorInGroup
+    ? expense.lastModifiedById === user?.id
+      ? "you"
+      : expense.createdBy.name
+    : "(deleted)";
 
   return (
     <div className="pb-24">
@@ -57,10 +63,11 @@ export default async function ExpenseIdPage({ params }: IProps) {
         groupColor={group.color}
         currency={group.currency}
         expenseName={expense.name}
-        expenseCreator={expenseCreator || "Unknown"}
         expenseAmount={expense.amount}
         createdAt={createdAt}
         updatedAt={updatedAt}
+        expenseCreator={expenseCreator || "Unknown"}
+        expenseUpdatedBy={expenseUpdatedBy || "Unknown"}
       />
       <ExpenseDetails user={user} group={group} expense={expense} />
     </div>

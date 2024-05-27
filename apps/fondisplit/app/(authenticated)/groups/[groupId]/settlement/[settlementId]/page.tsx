@@ -26,13 +26,27 @@ export default async function SettlementIdPage({ params }: IProps) {
   });
   if (!settlement) return redirect(`/groups/${params.groupId}`);
 
+  const groupMemberUserIds = group.members.map((member) => member.user?.id);
+  const isSettlementCreatorInGroup = groupMemberUserIds.includes(
+    settlement.createdById,
+  );
+
   const CurrencyIcon = currencyIconMap[group.currency].icon;
-  const creditorName =
-    settlement.from.userId === user?.id ? "You" : settlement.from.name;
-  const debtorName =
-    settlement.to.userId === user?.id ? "you" : settlement.to.name;
-  const creatorName =
-    settlement.createdById === user?.id ? "you" : settlement.createdBy.name;
+  const creditorName = isSettlementCreatorInGroup
+    ? settlement.from.userId === user?.id
+      ? "You"
+      : settlement.from.name
+    : "(deleted)";
+  const debtorName = isSettlementCreatorInGroup
+    ? settlement.to.userId === user?.id
+      ? "you"
+      : settlement.to.name
+    : "(deleted)";
+  const creatorName = isSettlementCreatorInGroup
+    ? settlement.createdById === user?.id
+      ? "you"
+      : settlement.createdBy.name
+    : "(deleted)";
 
   return (
     <div className="h-full pb-24">

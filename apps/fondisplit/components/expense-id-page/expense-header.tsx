@@ -6,20 +6,22 @@ interface IProps {
   groupColor: string;
   currency: CurrencyCode;
   expenseName: string;
-  expenseCreator: string;
   expenseAmount: number;
   createdAt: string;
   updatedAt: string;
+  expenseCreator: string;
+  expenseUpdatedBy: string;
 }
 
 export function ExpenseHeader({
   groupColor,
   currency,
   expenseName,
-  expenseCreator,
   expenseAmount,
   createdAt,
   updatedAt,
+  expenseCreator,
+  expenseUpdatedBy,
 }: IProps) {
   const CurrencyIcon = currencyIconMap[currency].icon;
 
@@ -34,7 +36,7 @@ export function ExpenseHeader({
         </h1>
         <div className="text-muted-foreground text-sm font-medium">
           <p className="">{`Added by ${expenseCreator} on ${createdAt}`}</p>
-          <p className="">{`Last updated on ${updatedAt}`}</p>
+          <p className="">{`Last updated ${expenseUpdatedBy} on ${updatedAt}`}</p>
         </div>
       </div>
     </div>

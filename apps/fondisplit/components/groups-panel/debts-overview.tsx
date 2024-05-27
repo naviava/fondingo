@@ -26,7 +26,7 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
         >
           {credit.from.name} owes you{" "}
           <div className="text-cta ml-1 flex items-center">
-            <CurrencyIcon size={11} />
+            <CurrencyIcon className="h-3.5 w-3.5" />
             <span className="font-semibold">
               {(credit.amount / 100).toLocaleString()}
             </span>
@@ -40,7 +40,7 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
         >
           You owe {debt.to.name}
           <div className="ml-1 flex items-center text-orange-600">
-            <CurrencyIcon size={11} />
+            <CurrencyIcon className="h-3.5 w-3.5" />
             <span className="font-semibold">
               {(debt.amount / 100).toLocaleString()}
             </span>
