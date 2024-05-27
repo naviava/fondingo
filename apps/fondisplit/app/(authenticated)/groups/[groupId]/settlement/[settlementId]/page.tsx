@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { SettlementActions } from "~/components/settlement-actions";
+import { DisplayAmount } from "~/components/display-amount";
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { FcMoneyTransfer } from "react-icons/fc";
@@ -64,9 +65,12 @@ export default async function SettlementIdPage({ params }: IProps) {
       <div className="mt-16 flex flex-col items-center justify-center gap-y-4">
         <FcMoneyTransfer size={80} />
         <h2 className="text-xl font-medium">{`${creditorName} paid ${debtorName}`}</h2>
-        <h1 className="flex items-center text-4xl font-bold">
-          <CurrencyIcon className="h-7 w-7" />
-          {(settlement.amount / 100).toLocaleString()}
+        <h1 className="flex items-center font-bold">
+          <DisplayAmount
+            variant="xl"
+            amount={settlement.amount}
+            currency={group.currency}
+          />
         </h1>
         <div className="space-y-1 text-center text-sm font-medium text-neutral-400">
           <p>

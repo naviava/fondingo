@@ -1,4 +1,4 @@
-import { currencyIconMap } from "@fondingo/ui/constants";
+import { DisplayAmount } from "~/components/display-amount";
 import { CurrencyCode } from "@fondingo/db-split";
 import { FcMoneyTransfer } from "react-icons/fc";
 import { EntryDate } from "./entry-date";
@@ -18,8 +18,6 @@ export function SettlementEntry({
   fromName = "Unknown",
   toName = "Unknown",
 }: IProps) {
-  const CurrencyIcon = currencyIconMap[currency].icon;
-
   return (
     <div
       role="button"
@@ -33,10 +31,12 @@ export function SettlementEntry({
         <p>
           {fromName} paid {toName}
         </p>
-        <div className="flex items-center">
-          <CurrencyIcon className="ml-1 h-3 w-3" />
-          <p>{(amount / 100).toLocaleString()}</p>
-        </div>
+        <DisplayAmount
+          variant="sm"
+          amount={amount}
+          currency={currency}
+          className="ml-1"
+        />
       </div>
     </div>
   );

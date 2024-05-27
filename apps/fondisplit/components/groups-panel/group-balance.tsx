@@ -1,3 +1,4 @@
+import { DisplayAmount } from "~/components/display-amount";
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { CurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
@@ -37,15 +38,11 @@ export function GroupBalance({ userId, currency, data }: IProps) {
       <span className="text-xs font-medium md:text-sm">
         {isInDebt ? "you owe" : "you are owed"}
       </span>
-      <div className="flex items-center">
-        <CurrencyIcon className="h-4 w-4" />
-        <span className="font-semibold">
-          {(isInDebt
-            ? (grossBalanceAmount / 100) * -1
-            : grossBalanceAmount / 100
-          ).toLocaleString()}
-        </span>
-      </div>
+      <DisplayAmount
+        amount={grossBalanceAmount}
+        currency={currency}
+        className="font-semibold"
+      />
     </div>
   );
 }

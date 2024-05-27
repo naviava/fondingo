@@ -1,10 +1,10 @@
-import { currencyIconMap } from "@fondingo/ui/constants";
-import { ExpenseAvatar } from "../expense-avatar";
-import { CurrencyCode } from "@fondingo/db-split";
-
 import { serverClient } from "~/lib/trpc/server-client";
-import { EntryDate } from "./entry-date";
+import { CurrencyCode } from "@fondingo/db-split";
 import { cn } from "@fondingo/ui/utils";
+
+import { ExpenseAvatar } from "~/components/expense-avatar";
+import { DisplayAmount } from "~/components/display-amount";
+import { EntryDate } from "./entry-date";
 
 interface IProps {
   userId: string | undefined;
@@ -21,7 +21,6 @@ export async function ExpenseEntry({
   groupColor,
   currency,
 }: IProps) {
-  const CurrencyIcon = currencyIconMap[currency].icon;
   const expense = await serverClient.expense.getExpenseById({
     groupId,
     expenseId,
@@ -72,8 +71,12 @@ export async function ExpenseEntry({
                 : payment.groupMember.name}{" "}
               paid{" "}
               <div className="flex items-center">
-                <CurrencyIcon className="ml-1 h-3 w-3" />
-                <span>{(payment.amount / 100).toLocaleString()}</span>
+                <DisplayAmount
+                  variant="sm"
+                  amount={payment.amount}
+                  currency={currency}
+                  className="ml-1"
+                />
                 {idx === 1 && expense.payments.length > 2 && (
                   <span className="ml-1">{`and ${expense.payments.length - 2} more`}</span>
                 )}
@@ -90,10 +93,7 @@ export async function ExpenseEntry({
           )}
         >
           <p className="text-xs font-medium md:text-sm">{displayText.label}</p>
-          <div className="flex items-center">
-            <CurrencyIcon className="h-4 w-4" />
-            <span className="font-semibold">{displayText.amount}</span>
-          </div>
+          <DisplayAmount amount={grossBalance} currency={currency} />
         </div>
       ) : (
         <span className="text-xs font-medium italic text-neutral-400">

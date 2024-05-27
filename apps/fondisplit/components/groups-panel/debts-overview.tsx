@@ -1,4 +1,4 @@
-import { currencyIconMap } from "@fondingo/ui/constants";
+import { DisplayAmount } from "~/components/display-amount";
 import { serverClient } from "~/lib/trpc/server-client";
 import { CurrencyCode } from "@fondingo/db-split";
 
@@ -11,7 +11,6 @@ interface IProps {
 export async function DebtsOverview({ userId, groupId, currency }: IProps) {
   const allMyBalances = await serverClient.group.getDebts(groupId);
 
-  const CurrencyIcon = currencyIconMap[currency].icon;
   const myCredits = allMyBalances.filter(
     (credit) => credit.to.user?.id === userId,
   );
@@ -25,12 +24,12 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
           className="text-muted-foreground flex items-center text-sm font-medium"
         >
           {credit.from.name} owes you{" "}
-          <div className="text-cta ml-1 flex items-center">
-            <CurrencyIcon className="h-3.5 w-3.5" />
-            <span className="font-semibold">
-              {(credit.amount / 100).toLocaleString()}
-            </span>
-          </div>
+          <DisplayAmount
+            variant="sm"
+            amount={credit.amount}
+            currency={currency}
+            className="text-cta ml-1 font-semibold"
+          />
         </li>
       ))}
       {myDebts.map((debt) => (
@@ -39,12 +38,12 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
           className="text-muted-foreground flex items-center text-sm font-medium"
         >
           You owe {debt.to.name}
-          <div className="ml-1 flex items-center text-orange-600">
-            <CurrencyIcon className="h-3.5 w-3.5" />
-            <span className="font-semibold">
-              {(debt.amount / 100).toLocaleString()}
-            </span>
-          </div>
+          <DisplayAmount
+            variant="sm"
+            amount={debt.amount}
+            currency={currency}
+            className="ml-1 font-semibold text-orange-600"
+          />
         </li>
       ))}
     </ul>

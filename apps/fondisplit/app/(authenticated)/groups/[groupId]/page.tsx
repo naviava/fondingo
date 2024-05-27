@@ -4,6 +4,7 @@ import { GroupActions } from "~/components/group-id-page/group-actions";
 import { GroupHeader } from "~/components/group-id-page/group-header";
 import { GroupBalanceEntry } from "~/components/group-balance-entry";
 import { GroupLog } from "~/components/group-id-page/group-log";
+import { GroupTotals } from "~/components/group-totals";
 import { GroupAvatar } from "~/components/group-avatar";
 
 import { serverClient } from "~/lib/trpc/server-client";
@@ -72,7 +73,7 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
           hasMembers={group.members.length > 1}
           hasExpenses={!!group.expenses.length}
         >
-          {searchParams.showBalances && (
+          {searchParams.showBalances && !searchParams.showTotals && (
             <ul>
               {groupMemberIds.map((id) => (
                 <GroupBalanceEntry
@@ -84,8 +85,11 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
               ))}
             </ul>
           )}
-          {searchParams.showTotals && <div>Totals section</div>}
-          {!searchParams.showBalances && !searchParams.showTotals && (
+          {searchParams.showTotals && !searchParams.showBalances && (
+            <GroupTotals userId={currentUser?.id} groupId={group.id} />
+          )}
+          {((!searchParams.showBalances && !searchParams.showTotals) ||
+            (searchParams.showBalances && searchParams.showTotals)) && (
             <GroupLog
               userId={currentUser?.id}
               groupId={group.id}

@@ -9,6 +9,7 @@ import { cn } from "@fondingo/ui/utils";
 
 import { Button } from "@fondingo/ui/button";
 import { Avatar } from "@fondingo/ui/avatar";
+import { DisplayAmount } from "../display-amount";
 
 interface IProps {
   groupId: string;
@@ -55,8 +56,7 @@ function _DebtEntry({
               isDebt ? "text-orange-600" : "text-cta",
             )}
           >
-            <CurrencyIcon className="h-3 w-3" />
-            <span>{(amount / 100).toLocaleString()}</span>
+            <DisplayAmount variant="sm" amount={amount} currency={currency} />
           </div>
           <span> to {to.name}</span>
         </div>

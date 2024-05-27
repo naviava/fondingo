@@ -5,6 +5,7 @@ import { cn } from "@fondingo/ui/utils";
 
 import { MdAdminPanelSettings } from "react-icons/md";
 import { Avatar } from "@fondingo/ui/avatar";
+import { DisplayAmount } from "../display-amount";
 
 interface IProps {
   groupId: string;
@@ -30,9 +31,6 @@ export async function MemberEntry({
       groupId,
       memberId,
     });
-
-  const displayAmount = isInDebt ? -grossBalance : grossBalance;
-  const CurrencyIcon = currencyIconMap[currency].icon;
 
   // TODO: Handle rendering when member is all settled up.
   return (
@@ -63,10 +61,11 @@ export async function MemberEntry({
           <p className="text-xs font-medium md:text-sm">
             {isInDebt ? "owes" : "gets back"}
           </p>
-          <div className="flex items-center font-semibold">
-            <CurrencyIcon className="h-4 w-4" />
-            <span>{(displayAmount / 100).toLocaleString()}</span>
-          </div>
+          <DisplayAmount
+            amount={grossBalance}
+            currency={currency}
+            className="font-semibold"
+          />
         </div>
       )}
     </li>

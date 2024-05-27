@@ -1,11 +1,9 @@
 "use client";
 
-import { currencyIconMap } from "@fondingo/ui/constants";
 import { CurrencyCode } from "@fondingo/db-split";
-import { useMemo } from "react";
 
+import { DisplayAmount } from "~/components/display-amount";
 import { Avatar } from "@fondingo/ui/avatar";
-import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   type: "payment" | "split";
@@ -30,11 +28,6 @@ export function PaymentSplitEntry({
   imageUrl = "",
   avatarSize = "default",
 }: IProps) {
-  const CurrencyIcon = useMemo(
-    () => currencyIconMap[currency].icon,
-    [currency],
-  );
-
   return (
     <li className="flex items-center gap-x-3 py-1 font-medium">
       <Avatar
@@ -44,10 +37,12 @@ export function PaymentSplitEntry({
       />
       <div className="flex items-center">
         {`${type === "payment" ? (didIPay ? "You paid" : creditorName + " paid") : doIOwe ? "You owe" : debtorName + " owes"}`}
-        <CurrencyIcon
-          className={cn("ml-1 h-4 w-4", avatarSize === "sm" && "h-3 w-3")}
+        <DisplayAmount
+          amount={amount}
+          currency={currency}
+          variant={avatarSize === "sm" ? "sm" : "default"}
+          className="ml-1"
         />
-        <span>{(amount / 100).toLocaleString()}</span>
       </div>
     </li>
   );

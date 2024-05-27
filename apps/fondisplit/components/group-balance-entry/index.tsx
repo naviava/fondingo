@@ -16,6 +16,7 @@ import {
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
+import { DisplayAmount } from "../display-amount";
 
 interface IProps {
   groupId: string;
@@ -92,8 +93,11 @@ export function GroupBalanceEntry({ groupId, memberId, currency }: IProps) {
                     isInDebt ? "text-orange-600" : "text-cta",
                   )}
                 >
-                  <CurrencyIcon className="h-3 w-3" />
-                  <span>{(displayAmount / 100).toLocaleString()}</span>
+                  <DisplayAmount
+                    variant="sm"
+                    amount={displayAmount}
+                    currency={currency}
+                  />
                 </div>
                 <span>in total</span>
               </div>
