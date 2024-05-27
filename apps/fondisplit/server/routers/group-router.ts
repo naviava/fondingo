@@ -11,6 +11,7 @@ import {
   getGroupById,
   getGroups,
   getMembers,
+  removeMemberFromGroup,
 } from "../actions/group";
 
 export const groupRouter = router({
@@ -21,6 +22,7 @@ export const groupRouter = router({
   addMember,
   addMultipleMembers,
   getMembers,
+  removeMemberFromGroup,
   addSettlement,
   getDebts,
   getDebtsByMemberId,

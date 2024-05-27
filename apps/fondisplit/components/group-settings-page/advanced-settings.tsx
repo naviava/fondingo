@@ -1,13 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
-import { AdvancedSettingEntry } from "./advanced-setting-entry";
-import { serverClient } from "~/lib/trpc/server-client";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FcCalculator } from "react-icons/fc";
 import { GiExitDoor } from "react-icons/gi";
+
+import { AdvancedSettingEntry } from "./advanced-setting-entry";
+import { toast } from "@fondingo/ui/use-toast";
+
+import { serverClient } from "~/lib/trpc/server-client";
+import { trpc } from "~/lib/trpc/client";
+import { useUtils } from "~/hooks/use-utils";
+import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 
 interface IProps {
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;
@@ -16,6 +22,9 @@ interface IProps {
 
 export function AdvancedSettings({ userId, group }: IProps) {
   const router = useRouter();
+  const { onOpen, onClose } = useConfirmModal();
+  const { invalidateAll } = useUtils();
+
   const hasBalances = useMemo(
     () =>
       group.simplifiedDebts.filter(
@@ -23,6 +32,69 @@ export function AdvancedSettings({ userId, group }: IProps) {
       ).length > 0,
     [group.simplifiedDebts, userId],
   );
+
+  const { mutate: handleRemoveMember } =
+    trpc.group.removeMemberFromGroup.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        invalidateAll();
+        router.refresh();
+        router.push("/groups");
+      },
+    });
+
+  const handleLeaveGroup = useCallback(() => {
+    const isLastMember = group.members.length === 1;
+    if (isLastMember) {
+      return onOpen({
+        title: "Delete group",
+        description:
+          "Are you sure you want to delete this group? This action CANNOT be undone.",
+        confirmAction: () => {},
+        cancelAction: onClose,
+      });
+    }
+
+    const currentMember = group.members.find((m) => m.userId === userId);
+    const noOfManagers = group.members.filter(
+      (m) => m.role === "MANAGER",
+    ).length;
+    if (currentMember?.role === "MANAGER" && noOfManagers === 1)
+      return toast({
+        title: "Can't leave group",
+        description:
+          "You are the only manager in this group. Assign someone else first.",
+      });
+
+    onOpen({
+      title: "Leave group",
+      description: "Are you sure you want to leave this group?",
+      confirmAction: () =>
+        handleRemoveMember({
+          groupId: group.id,
+          memberId: currentMember?.id ?? "",
+        }),
+      cancelAction: onClose,
+    });
+  }, [handleRemoveMember, onOpen, onClose, group.id, group.members, userId]);
+
+  const handleDeleteGroup = useCallback(() => {
+    onOpen({
+      title: "Delete group",
+      description:
+        "Are you sure you want to delete this group? This action CANNOT be undone.",
+      confirmAction: () => {},
+      cancelAction: onClose,
+    });
+  }, [onOpen, onClose]);
 
   return (
     <section className="space-y-6">
@@ -56,13 +128,13 @@ export function AdvancedSettings({ userId, group }: IProps) {
               : ""
           }
           disabled={hasBalances}
-          action={() => {}}
+          action={handleLeaveGroup}
         />
         <AdvancedSettingEntry
           groupId={group.id}
           icon={RiDeleteBin6Line}
           title="Delete group"
-          action={() => {}}
+          action={handleDeleteGroup}
           smallIcon
         />
       </ul>
