@@ -1,3 +1,5 @@
+import { randomInteger } from "@fondingo/utils";
+
 export function formatPrice(price: number): string {
   return (price / 100).toLocaleString();
 }
@@ -29,12 +31,15 @@ export function adjustMinorAmount(
   }));
 
   const totalAmount = splits.reduce((acc, split) => acc + split.amount, 0);
-  const diff = Math.floor(expenseAmount * 100) - totalAmount;
+  let diff = Math.floor(expenseAmount * 100) - totalAmount;
   if (diff === 0) return originalSplits;
 
-  const randomIndex = Math.floor(Math.random() * splits.length);
-  if (!!splits[randomIndex]) {
-    splits[randomIndex].amount += diff;
+  while (!!diff) {
+    const randomIndex = randomInteger(0, splits.length - 1);
+    if (!!splits[randomIndex]) {
+      splits[randomIndex].amount += diff;
+      diff = 0;
+    }
   }
 
   const newSplits = splits.map((split) => ({

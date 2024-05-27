@@ -93,6 +93,8 @@ export function ExpenseSplitsMember({
           <CurrencyIcon className="text-muted-foreground mr-2 h-4 w-4" />
           <Input
             type="number"
+            min={0.01}
+            step={0.01}
             defaultValue={
               splits.length > 1
                 ? splits.find((split) => split.userId === userId)?.amount === 0
@@ -108,7 +110,7 @@ export function ExpenseSplitsMember({
                     {
                       userId,
                       userName,
-                      amount: Number(e.target.value),
+                      amount: Math.floor(Number(e.target.value) * 100) / 100,
                     },
                   ]),
               );

@@ -30,14 +30,14 @@ const textMap = {
 
 export function ExpenseSplitsDrawer() {
   const {
-    isSplitsDrawerOpen,
-    onSplitsDrawerClose,
-    groupId,
-    expenseAmount,
     splits,
-    setSplits,
+    groupId,
     splitType,
+    expenseAmount,
+    isSplitsDrawerOpen,
+    setSplits,
     setSplitType,
+    onSplitsDrawerClose,
   } = useExpenseDetails();
 
   const { data: members } = trpc.group.getMembers.useQuery(groupId);
@@ -53,7 +53,7 @@ export function ExpenseSplitsDrawer() {
   const sum = useMemo(
     () =>
       splitsState.reduce((total, payment) => {
-        total += payment.amount;
+        total += Math.floor(payment.amount * 100) / 100;
         return total;
       }, 0),
     [splitsState],
@@ -71,7 +71,9 @@ export function ExpenseSplitsDrawer() {
     if (sum !== expenseAmount) {
       return;
     }
-    setSplits(splitsState.filter((payment) => payment.amount > 0));
+    setSplits(
+      splitsState.filter((payment) => Math.floor(payment.amount * 100) > 0),
+    );
     return onSplitsDrawerClose();
   }, [
     expenseAmount,

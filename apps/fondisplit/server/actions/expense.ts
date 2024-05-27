@@ -60,7 +60,14 @@ export const addExpense = privateProcedure
   )
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { groupId, expenseName, expenseAmount, payments, splits } = input;
+    const {
+      splits,
+      groupId,
+      payments,
+      expenseName,
+      expenseAmount: unformmatedExpenseAmount,
+    } = input;
+    const expenseAmount = Math.floor(unformmatedExpenseAmount * 100);
 
     try {
       const group = await splitdb.group.findUnique({
@@ -78,11 +85,11 @@ export const addExpense = privateProcedure
         });
 
       const totalPaymentsAmount = payments.reduce(
-        (acc, payment) => acc + payment.amount,
+        (acc, payment) => acc + Math.floor(payment.amount * 100),
         0,
       );
       const totalSplitsAmount = splits.reduce(
-        (acc, split) => acc + split.amount,
+        (acc, split) => acc + Math.floor(split.amount * 100),
         0,
       );
       if (
@@ -154,7 +161,7 @@ export const addExpense = privateProcedure
           data: {
             groupId,
             name: expenseName,
-            amount: Math.floor(expenseAmount * 100),
+            amount: expenseAmount,
             createdById: user.id,
             lastModifiedById: user.id,
           },
@@ -240,175 +247,185 @@ export const updateExpense = privateProcedure
   )
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { groupId, expenseId, expenseName, expenseAmount, payments, splits } =
-      input;
+    const {
+      splits,
+      groupId,
+      payments,
+      expenseId,
+      expenseName,
+      expenseAmount: unformatedExpenseAmount,
+    } = input;
+    const expenseAmount = Math.floor(unformatedExpenseAmount * 100);
 
-    try {
-      const existingExpense = await splitdb.expense.findUnique({
-        where: {
-          id: expenseId,
-          groupId,
-          group: {
-            members: {
-              some: {
-                userId: user.id,
-                isDeleted: false,
-              },
+    // try {
+    const existingExpense = await splitdb.expense.findUnique({
+      where: {
+        id: expenseId,
+        groupId,
+        group: {
+          members: {
+            some: {
+              userId: user.id,
+              isDeleted: false,
             },
           },
         },
-      });
-      if (!existingExpense)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Expense not found",
-        });
-
-      const totalPaymentsAmount = payments.reduce(
-        (acc, payment) => acc + payment.amount,
-        0,
-      );
-      const totalSplitsAmount = splits.reduce(
-        (acc, split) => acc + split.amount,
-        0,
-      );
-      if (
-        totalPaymentsAmount !== expenseAmount ||
-        totalSplitsAmount !== expenseAmount
-      ) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Total payments and splits should match the expense amount",
-        });
-      }
-
-      if (expenseAmount <= 0)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Expense amount should be greater than 0",
-        });
-
-      const groupMembers = await splitdb.groupMember.findMany({
-        where: {
-          groupId,
-          isDeleted: false,
-        },
-      });
-      const groupMemberIds = groupMembers.map((member) => member.id);
-
-      const paymentUserIds = payments.map((payment) => payment.userId);
-      if (hasDuplicates(paymentUserIds)) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Duplicate users in payments",
-        });
-      }
-      payments.forEach((payment) => {
-        if (payment.amount <= 0)
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Payment amount should be greater than 0",
-          });
-        if (!groupMemberIds.includes(payment.userId))
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Payment user not in group",
-          });
-      });
-
-      const splitUserIds = splits.map((split) => split.userId);
-      if (hasDuplicates(splitUserIds)) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Duplicate users in splits",
-        });
-      }
-      splits.forEach((split) => {
-        if (split.amount <= 0)
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Split amount should be greater than 0",
-          });
-        if (!groupMemberIds.includes(split.userId))
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Split user not in group",
-          });
-      });
-
-      const updatedExpense = await splitdb.$transaction(async (db) => {
-        await db.expensePayment.deleteMany({
-          where: { expenseId: existingExpense.id },
-        });
-        await db.expenseSplit.deleteMany({
-          where: { expenseId: existingExpense.id },
-        });
-
-        const updatedExpense = await db.expense.update({
-          where: { id: existingExpense.id },
-          data: {
-            name: expenseName,
-            amount: Math.floor(expenseAmount * 100),
-            lastModifiedById: user.id,
-            groupId,
-          },
-        });
-        if (!updatedExpense)
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to update expense",
-          });
-
-        for (const payment of payments) {
-          const expensePayment = await db.expensePayment.create({
-            data: {
-              amount: Math.floor(payment.amount * 100),
-              groupMemberId: payment.userId,
-              expenseId: updatedExpense.id,
-            },
-          });
-          if (!expensePayment)
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to create payment",
-            });
-        }
-
-        for (const split of splits) {
-          const expenseSplit = await db.expenseSplit.create({
-            data: {
-              amount: Math.floor(split.amount * 100),
-              groupMemberId: split.userId,
-              expenseId: updatedExpense.id,
-            },
-          });
-          if (!expenseSplit)
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to create split",
-            });
-        }
-        return updatedExpense;
-      });
-
-      const res = await calculateDebts(groupId);
-      if (!("success" in res) || !res.success) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to calculate debts",
-        });
-      }
-      return {
-        toastTitle: `${updatedExpense.name} added`,
-        toastDescription: `Expense of ${updatedExpense.amount / 100} added to the group`,
-      };
-    } catch (err) {
-      console.error("\n\nError adding expense:\n\n", err);
+      },
+    });
+    if (!existingExpense)
       throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Something went wrong. Try again later.",
+        code: "NOT_FOUND",
+        message: "Expense not found",
+      });
+
+    const totalPaymentsAmount = payments.reduce(
+      (acc, payment) => acc + Math.floor(payment.amount * 100),
+      0,
+    );
+    const totalSplitsAmount = splits.reduce(
+      (acc, split) => acc + Math.floor(split.amount * 100),
+      0,
+    );
+    console.log("\n\nTotal Payments Amount: ", totalPaymentsAmount);
+    console.log("Total Splits Amount: ", totalSplitsAmount);
+    console.log("Expense Amount: ", expenseAmount);
+    if (
+      totalPaymentsAmount !== expenseAmount ||
+      totalSplitsAmount !== expenseAmount
+    ) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Total payments and splits should match the expense amount",
       });
     }
+
+    if (expenseAmount <= 0)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Expense amount should be greater than 0",
+      });
+
+    const groupMembers = await splitdb.groupMember.findMany({
+      where: {
+        groupId,
+        isDeleted: false,
+      },
+    });
+    const groupMemberIds = groupMembers.map((member) => member.id);
+
+    const paymentUserIds = payments.map((payment) => payment.userId);
+    if (hasDuplicates(paymentUserIds)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Duplicate users in payments",
+      });
+    }
+    payments.forEach((payment) => {
+      if (payment.amount <= 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Payment amount should be greater than 0",
+        });
+      if (!groupMemberIds.includes(payment.userId))
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Payment user not in group",
+        });
+    });
+
+    const splitUserIds = splits.map((split) => split.userId);
+    if (hasDuplicates(splitUserIds)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Duplicate users in splits",
+      });
+    }
+    splits.forEach((split) => {
+      if (split.amount <= 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Split amount should be greater than 0",
+        });
+      if (!groupMemberIds.includes(split.userId))
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Split user not in group",
+        });
+    });
+
+    const updatedExpense = await splitdb.$transaction(async (db) => {
+      await db.expensePayment.deleteMany({
+        where: { expenseId: existingExpense.id },
+      });
+      await db.expenseSplit.deleteMany({
+        where: { expenseId: existingExpense.id },
+      });
+
+      const updatedExpense = await db.expense.update({
+        where: { id: existingExpense.id },
+        data: {
+          name: expenseName,
+          amount: expenseAmount,
+          lastModifiedById: user.id,
+          groupId,
+        },
+      });
+      if (!updatedExpense)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update expense",
+        });
+
+      for (const payment of payments) {
+        const expensePayment = await db.expensePayment.create({
+          data: {
+            amount: Math.floor(payment.amount * 100),
+            groupMemberId: payment.userId,
+            expenseId: updatedExpense.id,
+          },
+        });
+        if (!expensePayment)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create payment",
+          });
+      }
+
+      for (const split of splits) {
+        const expenseSplit = await db.expenseSplit.create({
+          data: {
+            amount: Math.floor(split.amount * 100),
+            groupMemberId: split.userId,
+            expenseId: updatedExpense.id,
+          },
+        });
+        if (!expenseSplit)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create split",
+          });
+      }
+      return updatedExpense;
+    });
+
+    const res = await calculateDebts(groupId);
+    if (!("success" in res) || !res.success) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to calculate debts",
+      });
+    }
+    return {
+      toastTitle: `${updatedExpense.name} added`,
+      toastDescription: `Expense of ${updatedExpense.amount / 100} added to the group`,
+    };
+    // } catch (err) {
+    //   console.error("\n\nError adding expense:\n\n", err);
+    //   throw new TRPCError({
+    //     code: "INTERNAL_SERVER_ERROR",
+    //     message: "Something went wrong. Try again later.",
+    //   });
+    // }
   });
 
 export const getExpenseIds = privateProcedure

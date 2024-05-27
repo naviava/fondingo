@@ -68,7 +68,10 @@ export const useExpenseDetails = create<ExpenseDetails>((set) => ({
 
   expenseAmount: 0,
   setExpenseAmount: (expenseAmount) =>
-    set((state) => ({ ...state, expenseAmount: Number(expenseAmount) })),
+    set((state) => ({
+      ...state,
+      expenseAmount: Math.floor(Number(expenseAmount) * 100) / 100,
+    })),
 
   payments: [],
   setPayments: (payments) => set((state) => ({ ...state, payments })),

@@ -2,13 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { ExpensePaymentsMember } from "./expense-payments-member";
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
-import {
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-  TriangleAlert,
-} from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";
 import {
@@ -17,9 +12,14 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@fondingo/ui/drawer";
+import {
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  TriangleAlert,
+} from "@fondingo/ui/lucide";
 
 import { trpc } from "~/lib/trpc/client";
-import { ExpensePaymentsMember } from "./expense-payments-member";
 import { cn } from "@fondingo/ui/utils";
 
 export function ExpensePaymentsDrawer() {
@@ -45,12 +45,13 @@ export function ExpensePaymentsDrawer() {
 
   const sum = useMemo(() => {
     return paymentsState.reduce((total, payment) => {
-      return total + payment.amount;
+      return total + Math.floor(payment.amount * 100) / 100;
     }, 0);
   }, [paymentsState]);
 
   const hasNegativeAmount = useMemo(
-    () => !!paymentsState.find((payment) => payment.amount < 0),
+    () =>
+      !!paymentsState.find((payment) => Math.floor(payment.amount * 100) < 0),
     [paymentsState],
   );
 
@@ -58,7 +59,9 @@ export function ExpensePaymentsDrawer() {
     if (sum !== expenseAmount || hasNegativeAmount) {
       return;
     } else {
-      setPayments(paymentsState.filter((payment) => payment.amount > 0));
+      setPayments(
+        paymentsState.filter((payment) => Math.floor(payment.amount * 100) > 0),
+      );
       onPaymentsDrawerClose();
     }
   }, [

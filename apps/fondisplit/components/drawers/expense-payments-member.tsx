@@ -3,8 +3,8 @@
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
-import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
+import { Check } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 
 import { currencyIconMap } from "@fondingo/ui/constants";
@@ -112,7 +112,7 @@ export function ExpensePaymentsMember({
                     {
                       userId,
                       userName,
-                      amount: Number(e.target.value),
+                      amount: Math.floor(Number(e.target.value) * 100) / 100,
                     },
                   ]),
               );

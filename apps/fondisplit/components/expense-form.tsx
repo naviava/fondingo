@@ -184,12 +184,12 @@ export default function ExpenseForm({
         handleEditExpense({
           ...values,
           expenseId: expenseId ?? "",
-          expenseAmount: Number(values.expenseAmount),
+          expenseAmount: Math.floor(Number(values.expenseAmount) * 100) / 100,
         });
       else
         handleAddExpense({
           ...values,
-          expenseAmount: Number(values.expenseAmount),
+          expenseAmount: Math.floor(Number(values.expenseAmount) * 100) / 100,
         });
     },
     [handleAddExpense, handleEditExpense, expenseId, isEditing],
