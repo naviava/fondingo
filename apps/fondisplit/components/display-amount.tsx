@@ -10,6 +10,7 @@ interface IProps {
   amount: number;
   currency: CurrencyCode;
   className?: string;
+  showNegative?: boolean;
   variant?: "default" | "sm" | "lg" | "xl";
 }
 
@@ -18,6 +19,7 @@ function _DisplayAmount({
   amount,
   currency,
   className,
+  showNegative = false,
   variant = "default",
 }: IProps) {
   const CurrencyIcon = useMemo(
@@ -25,10 +27,10 @@ function _DisplayAmount({
     [currency],
   );
 
-  const displayAmount = useMemo(
-    () => (amount < 0 ? -amount : amount),
-    [amount],
-  );
+  const displayAmount = useMemo(() => {
+    if (showNegative) return amount;
+    return amount < 0 ? -amount : amount;
+  }, [amount, showNegative]);
 
   return (
     <div className={cn("flex items-center", className)}>

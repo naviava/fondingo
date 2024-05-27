@@ -1,16 +1,13 @@
 import Link from "next/link";
 
-import { PaymentSplitEntry } from "~/components/expense-id-page/payment-split-entry";
+import { ExpenseDetails } from "~/components/expense-id-page/expense-details";
 import { ExpenseActions } from "~/components/expense-id-page/expense-actions";
 import { ExpenseHeader } from "~/components/expense-id-page/expense-header";
-import { Separator } from "@fondingo/ui/separator";
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { format } from "@fondingo/utils/date-fns";
-import { ScrollArea } from "@fondingo/ui/scroll-area";
-import { ExpenseDetails } from "~/components/expense-id-page/expense-details";
 
 interface IProps {
   params: {
