@@ -35,7 +35,7 @@ export function GroupHeader({
         <p className="text-base">All debts settled.</p>
       )}
       <ul className="mt-2 space-y-1">
-        {isEven ? (
+        {hasExpenses && isEven ? (
           <p className="text-muted-foreground flex items-center text-sm">
             You're all settled up.
           </p>

@@ -175,29 +175,6 @@ export const getGroupById = privateProcedure
   });
 
 // TODO: Consolidate these 2 functions into one.
-/**
- * This function is used to add a member to a group. It takes an input object with the following properties:
- * - groupId: A string representing the ID of the group to which the member is to be added. It cannot be empty.
- * - memberName: A string representing the name of the member to be added. It cannot be empty.
- * - email: A string representing the email of the member to be added. It must be a valid email format.
- *
- * The function performs the following checks:
- * - It checks if the user is trying to add themselves to the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message stating "You cannot add yourself to the group."
- * - It checks if the user is already in the group. If so, it throws a TRPCError with a "BAD_REQUEST" code and a message stating "User is already in this group."
- * - It checks if the user exists in the database and is a friend. If the user exists but is not a friend, it throws a TRPCError with a "BAD_REQUEST" code and a message stating "You can add an existing account only if they are your friend."
- *
- * If the user exists and is a friend, the function adds them to the group and returns an object with a toastTitle and toastDescription.
- *
- * If the user does not exist, the function adds them to the group, adds them as a temp friend, and returns an object with a toastTitle and toastDescription. It also has a TODO to send an invitation email to the user.
- *
- * @function addMember
- * @param {Object} input - The input object containing the groupId, memberName, and email.
- * @param {string} input.groupId - The ID of the group to which the member is to be added.
- * @param {string} input.memberName - The name of the member to be added.
- * @param {string} input.email - The email of the member to be added.
- * @returns {Promise<Object>} Returns a promise that resolves to an object with a toastTitle and toastDescription.
- * @throws {TRPCError} Throws a TRPCError if the user is trying to add themselves to the group, if the user is already in the group, or if the user exists but is not a friend.
- */
 export const addMember = privateProcedure
   .input(
     z.object({
@@ -210,6 +187,20 @@ export const addMember = privateProcedure
     const { user } = ctx;
     const { groupId, memberName, email } = input;
 
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
     // Check if the user is trying to add themselves to the group.
     if (user.email === email)
       throw new TRPCError({
@@ -218,7 +209,7 @@ export const addMember = privateProcedure
       });
 
     // Check if the user is already in the group.
-    const existingUserInGroup = await splitdb.groupMember.findUnique({
+    const existingMemberInGroup = await splitdb.groupMember.findUnique({
       where: {
         groupId_email: {
           groupId,
@@ -226,16 +217,30 @@ export const addMember = privateProcedure
         },
       },
     });
-    if (!!existingUserInGroup)
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "User is already in this group.",
-      });
-
     // Check if the user exists in the database and is a friend.
     const existingUser = await splitdb.user.findUnique({
       where: { email },
     });
+
+    if (!!existingMemberInGroup && existingMemberInGroup.isDeleted) {
+      const addedUser = await splitdb.groupMember.update({
+        where: { id: existingMemberInGroup.id },
+        data: {
+          name: memberName,
+          isDeleted: false,
+          userId: !!existingUser?.id ? existingUser?.id : "",
+        },
+      });
+      return {
+        toastTitle: `${addedUser.name} added to the group.`,
+        toastDescription: "You can now split expenses with them.",
+      };
+    }
+    if (!!existingMemberInGroup && !existingMemberInGroup.isDeleted)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User is already in this group.",
+      });
 
     let isFriend = false;
     if (!!existingUser) {
@@ -354,26 +359,38 @@ export const addMultipleMembers = privateProcedure
         message: "Group not found",
       });
 
-    const existingMembers = await splitdb.groupMember.findMany({
-      where: {
-        groupId,
-        email: {
-          in: newMembers.map((member) => member.email),
-        },
-      },
-    });
-    if (!!existingMembers.length)
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Some members are already in the group",
-      });
-
     const updates = await splitdb.$transaction(async (db) => {
       const promises = newMembers.map(async (member) => {
+        // Check if the user is already in the group.
+        const existingMemberInGroup = await splitdb.groupMember.findUnique({
+          where: {
+            groupId_email: {
+              groupId,
+              email: member.email,
+            },
+          },
+        });
         // Check if the user exists in the database and is a friend.
-        const existingUser = await db.user.findUnique({
+        const existingUser = await splitdb.user.findUnique({
           where: { email: member.email },
         });
+
+        if (!!existingMemberInGroup && existingMemberInGroup.isDeleted) {
+          const addedUser = await splitdb.groupMember.update({
+            where: { id: existingMemberInGroup.id },
+            data: {
+              name: member.name,
+              isDeleted: false,
+              userId: !!existingUser?.id ? existingUser?.id : "",
+            },
+          });
+          return addedUser;
+        }
+        if (!!existingMemberInGroup && !existingMemberInGroup.isDeleted)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User is already in this group.",
+          });
 
         let isFriend = false;
         if (!!existingUser) {
@@ -500,6 +517,120 @@ export const getMembers = privateProcedure
       include: { user: true },
     });
     return groupMembers;
+  });
+
+export const removeMemberFromGroup = privateProcedure
+  .input(
+    z.object({
+      groupId: z.string().min(1, { message: "Group ID cannot be empty" }),
+      memberId: z.string().min(1, { message: "Member ID cannot be empty" }),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { groupId, memberId } = input;
+
+    try {
+      return splitdb.$transaction(async (db) => {
+        const group = await db.group.findUnique({
+          where: {
+            id: groupId,
+            members: {
+              some: { userId: user.id },
+            },
+          },
+          include: { members: true },
+        });
+        if (!group)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Group not found",
+          });
+        if (group.members.length === 1)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Cannot remove the last member from the group",
+          });
+
+        const member = await db.groupMember.findUnique({
+          where: {
+            groupId,
+            id: memberId,
+          },
+        });
+        if (!member)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Member not found",
+          });
+        if (member.isDeleted)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Member not found",
+          });
+
+        const noOfManagers = group.members.filter(
+          (m) => m.role === "MANAGER" && !m.isDeleted,
+        ).length;
+        if (noOfManagers === 1 && member.role === "MANAGER")
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Assign someone else as Manager before removing this member",
+          });
+
+        const currentUserInGroup = group.members.find(
+          (m) => m.userId === user.id,
+        );
+        if (
+          member.email !== user.email ||
+          currentUserInGroup?.role !== "MANAGER"
+        )
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You are not authorized to remove this member",
+          });
+
+        const isSelf = user.email === member.email;
+        const hasPendingDebts = await db.simplifiedDebt.findFirst({
+          where: {
+            groupId,
+            OR: [{ fromId: memberId }, { toId: memberId }],
+          },
+        });
+        if (!!hasPendingDebts)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `${isSelf ? "You have" : member.name + " has"} pending debts in the group`,
+          });
+
+        const updatedMember = await db.groupMember.update({
+          where: { id: member.id },
+          data: {
+            name: "(deleted user)",
+            isDeleted: true,
+            userId: "",
+          },
+        });
+        if (!updatedMember)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to remove member from group",
+          });
+        return {
+          toastTitle: isSelf ? "You left" : "Member removed",
+          toastDescription: isSelf
+            ? `You are no longer part of ${group.name}`
+            : `${updatedMember.name} has been removed from the group`,
+        };
+      });
+    } catch (err) {
+      console.error(err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to remove member from group",
+      });
+    }
   });
 
 /**

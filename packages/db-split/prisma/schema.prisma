@@ -142,6 +142,7 @@ model GroupMember {
   name               String
   email              String
   role               GroupRole        @default(MEMBER)
+  isDeleted          Boolean          @default(false)
   groupId            String
   group              Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   userId             String?
