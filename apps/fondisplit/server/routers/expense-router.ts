@@ -9,6 +9,7 @@ import {
   getSettlements,
   getSettlementById,
   deleteSettlementById,
+  addSettlement,
 } from "../actions/expense";
 
 export const expenseRouter = router({
@@ -17,6 +18,7 @@ export const expenseRouter = router({
   getExpenseIds,
   getExpenseById,
   deleteExpenseById,
+  addSettlement,
   getSettlements,
   getSettlementById,
   deleteSettlementById,

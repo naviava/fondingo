@@ -60,7 +60,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
 
   const utils = trpc.useUtils();
   const { mutate: handleAddSettlement, isPending } =
-    trpc.group.addSettlement.useMutation({
+    trpc.expense.addSettlement.useMutation({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: () => {

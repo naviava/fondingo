@@ -3,7 +3,6 @@ import { router } from "~/server/trpc";
 import {
   addMember,
   addMultipleMembers,
-  addSettlement,
   createGroup,
   deleteGroupById,
   editGroup,
@@ -25,7 +24,6 @@ export const groupRouter = router({
   addMultipleMembers,
   getMembers,
   removeMemberFromGroup,
-  addSettlement,
   getDebts,
   getDebtsByMemberId,
 });
