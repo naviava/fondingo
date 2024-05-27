@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { useExpenseDetails } from "@fondingo/store/fondisplit";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUtils } from "~/hooks/use-utils";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
 
@@ -141,33 +142,22 @@ export default function ExpenseForm({
   ]);
 
   const utils = trpc.useUtils();
-  const runInvalidationsAndRoute = useCallback(
-    ({
-      toastTitle,
-      toastDescription,
-    }: {
-      toastTitle: string;
-      toastDescription: string;
-    }) => {
-      toast({ title: toastTitle, description: toastDescription });
-      utils.expense.getExpenseById.invalidate();
-      utils.expense.getExpenseIds.invalidate();
-      utils.group.getGroupById.invalidate();
-      utils.group.getGroups.invalidate();
-      utils.group.getDebts.invalidate();
-      form.reset();
-      clearExpenseDetails();
-      router.push(`/groups/${groupId}`);
-      router.refresh();
-    },
-    [clearExpenseDetails, form, groupId, router, toast, utils],
-  );
+  const { invalidateAll } = useUtils();
   const { mutate: handleAddExpense, isPending: isPendingAdd } =
     trpc.expense.addExpense.useMutation({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
-        runInvalidationsAndRoute({ toastTitle, toastDescription });
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        utils.group.getGroupTotals.invalidate();
+        clearExpenseDetails();
+        invalidateAll();
+        form.reset();
+        router.push(`/groups/${groupId}`);
+        router.refresh();
       },
     });
   const { mutate: handleEditExpense, isPending: isPendingEdit } =
@@ -175,7 +165,16 @@ export default function ExpenseForm({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
-        runInvalidationsAndRoute({ toastTitle, toastDescription });
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        utils.group.getGroupTotals.invalidate();
+        clearExpenseDetails();
+        invalidateAll();
+        form.reset();
+        router.push(`/groups/${groupId}`);
+        router.refresh();
       },
     });
 

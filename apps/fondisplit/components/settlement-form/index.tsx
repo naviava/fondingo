@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { useSettlementDrawer } from "@fondingo/store/fondisplit";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUtils } from "~/hooks/use-utils";
 import { GroupMemberClient } from "~/types";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
@@ -59,21 +60,18 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
   });
 
   const utils = trpc.useUtils();
+  const { invalidateAll } = useUtils();
   const { mutate: handleAddSettlement, isPending } =
     trpc.expense.addSettlement.useMutation({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: () => {
-        utils.expense.getSettlements.invalidate();
-        utils.expense.getExpenseById.invalidate();
-        utils.expense.getExpenseIds.invalidate();
-        utils.group.getGroupById.invalidate();
-        utils.group.getGroups.invalidate();
-        utils.group.getDebts.invalidate();
-        router.push(`/groups/${groupId}`);
-        router.refresh();
+        utils.group.getGroupTotals.invalidate();
+        invalidateAll();
         resetDrawer();
         form.reset();
+        router.push(`/groups/${groupId}`);
+        router.refresh();
       },
     });
 

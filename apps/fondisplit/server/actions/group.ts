@@ -870,6 +870,121 @@ export const getDebtsByMemberId = privateProcedure
     };
   });
 
+export const getGroupTotals = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .query(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+
+    // try {
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const member = await splitdb.groupMember.findFirst({
+      where: {
+        groupId,
+        userId: user.id,
+        isDeleted: false,
+      },
+    });
+    if (!member)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Member not found",
+      });
+
+    const expenses = await splitdb.expense.findMany({
+      where: { groupId },
+      include: {
+        payments: {
+          include: {
+            groupMember: {
+              include: { user: true },
+            },
+          },
+        },
+        splits: {
+          include: {
+            groupMember: {
+              include: { user: true },
+            },
+          },
+        },
+      },
+    });
+    const settlements = await splitdb.settlement.findMany({
+      where: { groupId },
+      include: {
+        from: {
+          include: { user: true },
+        },
+        to: {
+          include: { user: true },
+        },
+      },
+    });
+
+    const payments = expenses.flatMap((expense) => expense.payments);
+    const splits = expenses.flatMap((expense) => expense.splits);
+    const myPayments = payments.filter(
+      (payment) => payment.groupMember.userId === user.id,
+    );
+    const mySplits = splits.filter(
+      (split) => split.groupMember.userId === user.id,
+    );
+
+    const totalGroupSpending = expenses.reduce(
+      (acc, expense) => acc + expense.amount,
+      0,
+    );
+    const totalYouPaidFor = myPayments.reduce(
+      (acc, payment) => acc + payment.amount,
+      0,
+    );
+    const yourTotalShare = mySplits.reduce(
+      (acc, split) => acc + split.amount,
+      0,
+    );
+    const paymentsMade = settlements.reduce((acc, settlement) => {
+      if (settlement.from.userId === user.id) return acc + settlement.amount;
+      return acc;
+    }, 0);
+    const paymentsReceived = settlements.reduce((acc, settlement) => {
+      if (settlement.to.userId === user.id) return acc + settlement.amount;
+      return acc;
+    }, 0);
+
+    const totalChangeInBalance =
+      totalYouPaidFor - yourTotalShare - paymentsReceived + paymentsMade;
+
+    return {
+      paymentsMade,
+      yourTotalShare,
+      totalYouPaidFor,
+      paymentsReceived,
+      totalGroupSpending,
+      totalChangeInBalance,
+      currency: group.currency,
+    };
+    // } catch (err) {
+    //   console.error(err);
+    //   throw new TRPCError({
+    //     code: "INTERNAL_SERVER_ERROR",
+    //     message: "Failed to get group totals",
+    //   });
+    // }
+  });
+
 /**
  * This function is used to calculate and store the simplified debts for a group. It takes a string input representing the group ID.
  *

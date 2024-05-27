@@ -86,7 +86,7 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
             </ul>
           )}
           {searchParams.showTotals && !searchParams.showBalances && (
-            <GroupTotals userId={currentUser?.id} groupId={group.id} />
+            <GroupTotals groupId={group.id} />
           )}
           {((!searchParams.showBalances && !searchParams.showTotals) ||
             (searchParams.showBalances && searchParams.showTotals)) && (

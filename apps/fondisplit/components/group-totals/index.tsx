@@ -1,19 +1,56 @@
+import { serverClient } from "~/lib/trpc/server-client";
+import { TotalsEntry } from "./totals-entry";
+
 interface IProps {
-  userId: string | null | undefined;
   groupId: string;
 }
 
-export function GroupTotals({ userId = "", groupId }: IProps) {
+export async function GroupTotals({ groupId }: IProps) {
+  const {
+    currency,
+    paymentsMade,
+    yourTotalShare,
+    totalYouPaidFor,
+    paymentsReceived,
+    totalGroupSpending,
+    totalChangeInBalance,
+  } = await serverClient.group.getGroupTotals(groupId);
+
   return (
-    <>
-      <h3 className="mb-6 px-4 text-lg font-semibold">
-        Group spending summary
-      </h3>
+    <section className="px-4">
+      <h3 className="mb-6 text-lg font-semibold">Group spending summary</h3>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h5>Total group spending</h5>
-        </div>
+        <TotalsEntry
+          currency={currency}
+          title="Total group spending"
+          amount={totalGroupSpending}
+        />
+        <TotalsEntry
+          currency={currency}
+          amount={totalYouPaidFor}
+          title="Total you paid for"
+        />
+        <TotalsEntry
+          currency={currency}
+          amount={yourTotalShare}
+          title="Your total share"
+        />
+        <TotalsEntry
+          currency={currency}
+          amount={paymentsMade}
+          title="Payments made"
+        />
+        <TotalsEntry
+          currency={currency}
+          amount={paymentsReceived}
+          title="Payments received"
+        />
+        <TotalsEntry
+          currency={currency}
+          amount={totalChangeInBalance}
+          title="Total change in balance"
+        />
       </div>
-    </>
+    </section>
   );
 }
