@@ -1,13 +1,16 @@
+import { CurrencyCode, TGroupRole } from "@fondingo/db-split";
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { serverClient } from "~/lib/trpc/server-client";
-import { Avatar } from "@fondingo/ui/avatar";
-import { CurrencyCode } from "@fondingo/db-split";
 import { cn } from "@fondingo/ui/utils";
+
+import { MdAdminPanelSettings } from "react-icons/md";
+import { Avatar } from "@fondingo/ui/avatar";
 
 interface IProps {
   groupId: string;
   memberId: string;
   memberName: string;
+  memberRole: TGroupRole;
   memberEmail: string;
   currency: CurrencyCode;
   imageUrl: string | null | undefined;
@@ -18,6 +21,7 @@ export async function MemberEntry({
   currency,
   memberId,
   memberEmail,
+  memberRole,
   memberName,
   imageUrl,
 }: IProps) {
@@ -37,7 +41,12 @@ export async function MemberEntry({
         <Avatar variant="lg" userName={memberName} userImageUrl={imageUrl} />
       </div>
       <div className="flex-1 font-medium">
-        <h4 className="line-clamp-1 text-base">{memberName}</h4>
+        <div className="flex items-center">
+          <h4 className="line-clamp-1 text-base">{memberName}</h4>
+          {memberRole === "MANAGER" && (
+            <MdAdminPanelSettings className="text-cta ml-2 h-5 w-5" />
+          )}
+        </div>
         <p className="line-clamp-1 text-sm text-neutral-400">{memberEmail}</p>
       </div>
       {grossBalance === 0 ? (

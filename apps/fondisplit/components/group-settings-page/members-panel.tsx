@@ -17,10 +17,11 @@ export function MembersPanel({ userId = "", group }: IProps) {
           <MemberEntry
             key={member.email}
             groupId={group.id}
-            currency={group.currency}
             memberId={member.id}
             memberName={member.name}
+            memberRole={member.role}
             memberEmail={member.email}
+            currency={group.currency}
             imageUrl={member.user?.image}
           />
         ))}
