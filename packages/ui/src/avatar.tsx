@@ -11,7 +11,7 @@ import {
 interface IProps {
   userName: string | null | undefined;
   userImageUrl: string | null | undefined;
-  variant?: "default" | "sm" | "lg" | "xl";
+  variant?: "default" | "sm" | "lg" | "xl" | "2xl";
 }
 
 const variantMap = {
@@ -19,6 +19,7 @@ const variantMap = {
   sm: "h-6 w-6",
   lg: "h-12 w-12",
   xl: "h-16 w-16",
+  "2xl": "h-20 w-20",
 };
 
 const textSizeMap = {
@@ -26,6 +27,7 @@ const textSizeMap = {
   sm: "text-sm",
   lg: "text-3xl font-semibold",
   xl: "text-4xl font-semibold",
+  "2xl": "text-5xl font-semibold",
 };
 
 export const Avatar = memo(_Avatar);
