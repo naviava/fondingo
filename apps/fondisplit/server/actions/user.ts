@@ -508,16 +508,22 @@ export const getDebtWithFriend = privateProcedure
 
 export const findUsers = privateProcedure
   .input(z.string().min(1, { message: "Search query cannot be empty" }))
-  .query(async ({ ctx, input: searchTerm }) => {
+  .query(async ({ ctx, input }) => {
     const { user } = ctx;
+    const searchTerm = input.toLowerCase();
 
     const users = await splitdb.user.findMany({
       where: {
         id: { not: user.id },
         OR: [
-          { email: { contains: searchTerm } },
-          { name: { contains: searchTerm } },
-          { phone: { contains: searchTerm } },
+          {
+            email: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          { name: { contains: searchTerm, mode: "insensitive" } },
+          { phone: { contains: searchTerm, mode: "insensitive" } },
         ],
       },
       orderBy: { name: "asc" },
