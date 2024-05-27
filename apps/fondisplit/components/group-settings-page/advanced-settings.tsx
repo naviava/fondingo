@@ -25,6 +25,10 @@ export function AdvancedSettings({ userId, group }: IProps) {
   const { onOpen, onClose } = useConfirmModal();
   const { invalidateAll } = useUtils();
 
+  const isManager = useMemo(() => {
+    const currentMember = group.members.find((m) => m.userId === userId);
+    return currentMember?.role === "MANAGER";
+  }, [userId, group.members]);
   const hasBalances = useMemo(
     () =>
       group.simplifiedDebts.filter(
@@ -33,8 +37,25 @@ export function AdvancedSettings({ userId, group }: IProps) {
     [group.simplifiedDebts, userId],
   );
 
-  const { mutate: handleRemoveMember } =
+  const { mutate: handleRemoveMember, isPending: isPendingRemove } =
     trpc.group.removeMemberFromGroup.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        invalidateAll();
+        router.push("/groups");
+        router.refresh();
+      },
+    });
+  const { mutate: handleDeleteGroupById, isPending: isPendingDelete } =
+    trpc.group.deleteGroupById.useMutation({
       onError: ({ message }) =>
         toast({
           title: "Something went wrong",
@@ -55,9 +76,9 @@ export function AdvancedSettings({ userId, group }: IProps) {
     const isLastMember = group.members.length === 1;
     if (isLastMember) {
       return onOpen({
-        title: "Delete group",
+        title: "Delete group?",
         description:
-          "Are you sure you want to delete this group? This action CANNOT be undone.",
+          "Are you sure you want to delete this group? This will delete all expenses, payments and members within the group. This action is irreversible.",
         confirmAction: () => {},
         cancelAction: onClose,
       });
@@ -67,7 +88,7 @@ export function AdvancedSettings({ userId, group }: IProps) {
     const noOfManagers = group.members.filter(
       (m) => m.role === "MANAGER",
     ).length;
-    if (currentMember?.role === "MANAGER" && noOfManagers === 1)
+    if (isManager && noOfManagers === 1)
       return toast({
         title: "Can't leave group",
         description:
@@ -84,17 +105,25 @@ export function AdvancedSettings({ userId, group }: IProps) {
         }),
       cancelAction: onClose,
     });
-  }, [handleRemoveMember, onOpen, onClose, group.id, group.members, userId]);
+  }, [
+    handleRemoveMember,
+    onOpen,
+    onClose,
+    group.id,
+    group.members,
+    userId,
+    isManager,
+  ]);
 
   const handleDeleteGroup = useCallback(() => {
     onOpen({
-      title: "Delete group",
+      title: "Delete group?",
       description:
-        "Are you sure you want to delete this group? This action CANNOT be undone.",
-      confirmAction: () => {},
+        "Are you sure you want to delete this group? This will delete all expenses, payments and members within the group. This action is irreversible.",
+      confirmAction: () => handleDeleteGroupById(group.id),
       cancelAction: onClose,
     });
-  }, [onOpen, onClose]);
+  }, [group.id, onOpen, onClose, handleDeleteGroupById]);
 
   return (
     <section className="space-y-6">
@@ -105,6 +134,7 @@ export function AdvancedSettings({ userId, group }: IProps) {
           icon={FcCalculator}
           title="Calculate debts"
           description="Automatically combines debts to reduce the total number of repayments between group members."
+          disabled={isPendingRemove || isPendingDelete}
           action={() => {}}
         />
         <AdvancedSettingEntry
@@ -112,6 +142,7 @@ export function AdvancedSettings({ userId, group }: IProps) {
           title="Change currency"
           currency={group.currency}
           description="Change the currency used in this group."
+          disabled={isPendingRemove || isPendingDelete}
           action={() =>
             router.push(
               `/groups/${group.id}/edit?groupName=${group.name}&color=${group.color.slice(1)}&type=${group.type}&currency=${group.currency}`,
@@ -127,13 +158,17 @@ export function AdvancedSettings({ userId, group }: IProps) {
               ? "You can't leave this group because you have outstanding debts with other group members."
               : ""
           }
-          disabled={hasBalances}
+          disabled={hasBalances || isPendingRemove || isPendingDelete}
           action={handleLeaveGroup}
         />
         <AdvancedSettingEntry
           groupId={group.id}
           icon={RiDeleteBin6Line}
           title="Delete group"
+          description={
+            isManager ? "" : "Only group managers can delete a group."
+          }
+          disabled={!isManager || isPendingRemove || isPendingDelete}
           action={handleDeleteGroup}
           smallIcon
         />

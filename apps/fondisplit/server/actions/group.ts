@@ -97,6 +97,65 @@ export const editGroup = privateProcedure
     };
   });
 
+export const deleteGroupById = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .mutation(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+
+    const existingGroup = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+      include: { members: true },
+    });
+    if (!existingGroup)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const currentMember = await splitdb.groupMember.findUnique({
+      where: {
+        groupId_email: {
+          groupId,
+          email: user.email,
+        },
+        isDeleted: false,
+        role: "MANAGER",
+      },
+    });
+    if (!currentMember)
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to delete this group",
+      });
+
+    return splitdb.$transaction(async (db) => {
+      await db.simplifiedDebt.deleteMany({
+        where: { groupId: existingGroup.id },
+      });
+      await db.expense.deleteMany({
+        where: { groupId: existingGroup.id },
+      });
+      await db.settlement.deleteMany({
+        where: { groupId: existingGroup.id },
+      });
+      await db.groupMember.deleteMany({
+        where: { groupId: existingGroup.id },
+      });
+      const deletedGroup = await db.group.delete({
+        where: { id: existingGroup.id },
+      });
+      return {
+        toastTitle: `${deletedGroup.name} deleted.`,
+        toastDescription: "Group has been deleted.",
+      };
+    });
+  });
+
 /**
  * Retrieves all groups that the current user is a member of.
  *
@@ -617,6 +676,7 @@ export const removeMemberFromGroup = privateProcedure
           data: {
             name: "(deleted)",
             isDeleted: true,
+            role: "MEMBER",
             userId: null,
           },
         });
