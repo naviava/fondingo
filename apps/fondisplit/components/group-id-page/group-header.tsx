@@ -22,6 +22,7 @@ export function GroupHeader({
 }: IProps) {
   const myCredits = groupDebts.filter((credit) => credit.to.userId === userId);
   const myDebts = groupDebts.filter((credit) => credit.from.userId === userId);
+  const totalLength = myCredits.length + myDebts.length;
   const isEven = !myCredits.length && !myDebts.length;
 
   return (
@@ -38,43 +39,82 @@ export function GroupHeader({
       {hasExpenses && !groupDebts.length && (
         <p className="text-base">All debts settled.</p>
       )}
-      <ul className="mt-2 space-y-1">
+      <ul className="mt-2 w-fit space-y-1">
         {hasExpenses && isEven ? (
           <p className="text-muted-foreground flex items-center text-xs">
             You're all settled up.
           </p>
         ) : (
           !!myCredits.length &&
-          myCredits.map((credit, idx) => (
-            <li
-              key={credit.id}
-              className="text-muted-foreground flex items-center text-xs"
-            >
-              {credit.from.name} owes you{" "}
-              <DisplayAmount
-                variant="xs"
-                amount={credit.amount}
-                currency={currency}
-                className="text-cta ml-0.5 font-semibold"
-              />
-            </li>
-          ))
+          myCredits.map((credit, idx) => {
+            if (idx > 2) return null;
+            if (idx === 2)
+              return (
+                <p className="text-muted-foreground flex items-center justify-end text-xs">
+                  ...and {totalLength - 2} more
+                </p>
+              );
+            return (
+              <li
+                key={credit.id}
+                className="text-muted-foreground flex items-center text-xs"
+              >
+                {credit.from.name} owes you{" "}
+                <DisplayAmount
+                  variant="xs"
+                  amount={credit.amount}
+                  currency={currency}
+                  className="text-cta ml-0.5 font-semibold"
+                />
+              </li>
+            );
+          })
         )}
         {!!myDebts.length &&
-          myDebts.map((debt) => (
-            <li
-              key={debt.id}
-              className="text-muted-foreground flex items-center text-sm"
-            >
-              You owe {debt.to.name}{" "}
-              <DisplayAmount
-                variant="sm"
-                amount={debt.amount}
-                currency={currency}
-                className="ml-0.5 font-semibold text-orange-600"
-              />
-            </li>
-          ))}
+          myDebts.map((debt, idx) => {
+            if (idx > 2) return null;
+            if (myCredits.length > 2) return null;
+            if (myCredits.length === 2 && idx > 0) return null;
+            if (myCredits.length === 1 && idx > 1) return null;
+
+            if (
+              (myCredits.length === 0 && idx === 2) ||
+              (myCredits.length === 1 && idx === 1) ||
+              (myCredits.length === 2 && idx === 0)
+            )
+              return (
+                <p className="text-muted-foreground flex items-center justify-end text-xs">
+                  ...and {totalLength - 2} more
+                </p>
+              );
+
+            // if (myCredits.length === 0 && idx === 2)
+            //   return (
+            //     <p className="text-muted-foreground flex items-center justify-end text-xs">
+            //       ...and {totalLength - 2} more
+            //     </p>
+            //   );
+            // if (myCredits.length === 2 && idx === 0)
+            //   return (
+            //     <p className="text-muted-foreground flex items-center justify-end text-xs">
+            //       ...and {totalLength - 2} more
+            //     </p>
+            //   );
+            return (
+              <li
+                key={debt.id}
+                className="text-muted-foreground flex items-center text-sm"
+              >
+                You owe {debt.to.name}{" "}
+                <DisplayAmount
+                  variant="sm"
+                  amount={debt.amount}
+                  currency={currency}
+                  className="ml-0.5 font-semibold text-orange-600"
+                />
+              </li>
+            );
+          })}
       </ul>
     </div>
   );
