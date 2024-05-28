@@ -8,6 +8,8 @@ import { Button } from "@fondingo/ui/button";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { format } from "@fondingo/utils/date-fns";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 interface IProps {
   params: {
@@ -51,7 +53,12 @@ export default async function ExpenseIdPage({ params }: IProps) {
             <ChevronLeft />
           </Link>
         </Button>
-        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-semibold">
+        <h2
+          className={cn(
+            "absolute left-1/2 -translate-x-1/2 text-lg font-semibold",
+            hfont.className,
+          )}
+        >
           Details
         </h2>
         <ExpenseActions groupId={group.id} expenseId={expense.id} />

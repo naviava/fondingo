@@ -5,6 +5,7 @@ import { cn } from "@fondingo/ui/utils";
 
 import { IconType } from "react-icons";
 import { TGroupType } from "~/types";
+import { hfont } from "~/lib/utils";
 
 interface IProps {
   label: string;
@@ -35,7 +36,14 @@ function _GroupTypeOptions({
       )}
     >
       <Icon size={25} className={cn("mr-2", customClasses)} />
-      <span className="select-none font-semibold tracking-wide">{label}</span>
+      <span
+        className={cn(
+          "select-none font-semibold tracking-wide",
+          hfont.className,
+        )}
+      >
+        {label}
+      </span>
     </li>
   );
 }

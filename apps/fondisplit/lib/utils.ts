@@ -1,4 +1,10 @@
-import { randomInteger } from "@fondingo/utils";
+import { Montserrat } from "next/font/google";
+
+export const hfont = Montserrat({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  // weight: ["100", "300", "400", "500", "700", "900"],
+  subsets: ["latin"],
+});
 
 export function formatPrice(price: number): string {
   return (price / 100).toLocaleString();

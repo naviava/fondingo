@@ -2,6 +2,8 @@ import { RefreshButton } from "@fondingo/ui/refresh-button";
 import { DisplayAmount } from "~/components/display-amount";
 import { CurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 interface IProps {
   userId: string | undefined;
@@ -25,28 +27,32 @@ export function GroupHeader({
   return (
     <div className="ml-[5.3rem]">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{groupName}</h1>
+        <h1
+          className={cn("line-clamp-1 text-xl font-semibold", hfont.className)}
+        >
+          {groupName}
+        </h1>
         <RefreshButton />
       </div>
-      {!hasExpenses && <p className="text-base">No expenses here yet.</p>}
+      {!hasExpenses && <p className="text-sm">No expenses here yet.</p>}
       {hasExpenses && !groupDebts.length && (
         <p className="text-base">All debts settled.</p>
       )}
       <ul className="mt-2 space-y-1">
         {hasExpenses && isEven ? (
-          <p className="text-muted-foreground flex items-center text-sm">
+          <p className="text-muted-foreground flex items-center text-xs">
             You're all settled up.
           </p>
         ) : (
           !!myCredits.length &&
-          myCredits.map((credit) => (
+          myCredits.map((credit, idx) => (
             <li
               key={credit.id}
-              className="text-muted-foreground flex items-center text-sm"
+              className="text-muted-foreground flex items-center text-xs"
             >
               {credit.from.name} owes you{" "}
               <DisplayAmount
-                variant="sm"
+                variant="xs"
                 amount={credit.amount}
                 currency={currency}
                 className="text-cta ml-0.5 font-semibold"

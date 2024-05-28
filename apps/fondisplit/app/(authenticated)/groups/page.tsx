@@ -10,6 +10,8 @@ import { GroupAvatar } from "~/components/group-avatar";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 import { serverClient } from "~/lib/trpc/server-client";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 export default async function GroupsPage() {
   const user = await serverClient.user.getAuthProfile();
@@ -42,7 +44,12 @@ export default async function GroupsPage() {
                     groupColor={group.color}
                     className="hover:text-neutral-200"
                   />
-                  <h2 className="mx-2 line-clamp-1 flex-1 font-medium">
+                  <h2
+                    className={cn(
+                      "mx-2 line-clamp-1 flex-1 text-sm font-semibold",
+                      hfont.className,
+                    )}
+                  >
                     {group.name}
                   </h2>
                   <GroupBalance

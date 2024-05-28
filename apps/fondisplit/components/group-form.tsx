@@ -43,6 +43,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@fondingo/ui/form";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 const formSchema = z.object({
   groupName: z
@@ -198,6 +200,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
         <Button
           variant="splitGhost"
           disabled={isPendingCreate || isPendingEdit}
+          className={hfont.className}
         >
           <Link
             href={
@@ -207,14 +210,14 @@ function _GroupForm({ isEditing, initialData }: IProps) {
             Cancel
           </Link>
         </Button>
-        <h1 className="text-lg font-semibold">
+        <h1 className={cn("text-lg font-semibold", hfont.className)}>
           {isEditing ? "Customize group" : "Create a group"}
         </h1>
         <Button
           type="button"
           variant="splitGhost"
           disabled={isPendingCreate || isPendingEdit}
-          className="w-20"
+          className={cn("w-20", hfont.className)}
           onClick={() => {
             if (submitButtonRef.current) {
               submitButtonRef.current.click();
@@ -238,7 +241,9 @@ function _GroupForm({ isEditing, initialData }: IProps) {
               // @ts-ignore
               render={({ field }) => (
                 <FormItem className="w-full px-2">
-                  <FormLabel className="font-bold">Group name</FormLabel>
+                  <FormLabel className={cn("font-bold", hfont.className)}>
+                    Group name
+                  </FormLabel>
                   <FormControl>
                     <Input
                       autoComplete="off"
@@ -266,7 +271,9 @@ function _GroupForm({ isEditing, initialData }: IProps) {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
           <div className="mt-6 flex flex-col items-center justify-center space-y-8">
-            <Label className="text-base font-bold">Currency</Label>
+            <Label className={cn("text-base font-bold", hfont.className)}>
+              Currency
+            </Label>
             <div className="border-2 border-dashed border-neutral-300 p-3">
               <CurrencyIcon className="h-16 w-16" />
             </div>

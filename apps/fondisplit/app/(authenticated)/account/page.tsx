@@ -5,6 +5,8 @@ import { Preferences } from "~/components/account-page/preferences";
 import { Feedback } from "~/components/account-page/feedback";
 import { Header } from "~/components/account-page/header";
 import { Logout } from "~/components/account-page/logout";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 export default async function AccountPage() {
   const user = await serverClient.user.getAuthProfile();
@@ -12,7 +14,14 @@ export default async function AccountPage() {
 
   return (
     <div className="h-full pb-24">
-      <h1 className="pt-4 text-center text-xl font-semibold">Account</h1>
+      <h1
+        className={cn(
+          "pt-4 text-center text-xl font-semibold",
+          hfont.className,
+        )}
+      >
+        Account
+      </h1>
       <Header
         email={user.email}
         userName={user.name || ""}

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useAddFriendModal } from "@fondingo/store/fondisplit";
 import { SearchBar } from "~/components/search-bar";
 import { Button } from "@fondingo/ui/button";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 export function SocialHeader() {
   const pathname = usePathname();
@@ -19,7 +21,10 @@ export function SocialHeader() {
           <Button
             variant="ghost"
             onClick={onOpen}
-            className="text-cta hover:text-cta text-base font-semibold md:text-lg"
+            className={cn(
+              "text-cta hover:text-cta text-base font-semibold md:text-lg",
+              hfont.className,
+            )}
           >
             Add friend
           </Button>
@@ -28,7 +33,10 @@ export function SocialHeader() {
           <Button
             asChild
             variant="ghost"
-            className="text-cta hover:text-cta text-base font-semibold md:text-lg"
+            className={cn(
+              "text-cta hover:text-cta text-base font-semibold md:text-lg",
+              hfont.className,
+            )}
           >
             <Link href="/create-group">Create group</Link>
           </Button>

@@ -58,9 +58,8 @@ export async function ExpenseEntry({
       <EntryDate createdAt={expense.createdAt} />
       <ExpenseAvatar groupColor={groupColor} />
       <div className="flex-1">
-        <h5 className="line-clamp-1 font-semibold">{expense.name}</h5>
-        {expense.payments.map((payment, idx) => {
-          if (idx > 0) return;
+        <h5 className="line-clamp-1 font-medium">{expense.name}</h5>
+        {expense.payments.map((payment) => {
           return (
             <div
               key={payment.id}
@@ -72,7 +71,7 @@ export async function ExpenseEntry({
               paid{" "}
               <div className="flex items-center">
                 <DisplayAmount
-                  variant="sm"
+                  variant="xs"
                   amount={payment.amount}
                   currency={currency}
                   className="ml-1"
@@ -94,6 +93,7 @@ export async function ExpenseEntry({
         >
           <p className="text-xs font-medium md:text-sm">{displayText.label}</p>
           <DisplayAmount
+            variant="sm"
             amount={grossBalance}
             currency={currency}
             className="font-semibold"

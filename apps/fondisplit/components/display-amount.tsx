@@ -11,7 +11,7 @@ interface IProps {
   currency: CurrencyCode;
   className?: string;
   showNegative?: boolean;
-  variant?: "default" | "sm" | "lg" | "xl";
+  variant?: "default" | "xs" | "sm" | "lg" | "xl";
 }
 
 export const DisplayAmount = memo(_DisplayAmount);
@@ -37,6 +37,7 @@ function _DisplayAmount({
       <CurrencyIcon
         className={cn(
           "h-4 w-4",
+          variant === "xs" && "h-3 w-3 md:h-3.5 md:w-3.5",
           variant === "sm" && "h-3.5 w-3.5",
           variant === "lg" && "h-5 w-5",
           variant === "xl" && "h-7 w-7",
@@ -44,6 +45,7 @@ function _DisplayAmount({
       />
       <span
         className={cn(
+          variant === "xs" && "text-xs md:text-sm",
           variant === "sm" && "text-sm",
           variant === "lg" && "text-2xl",
           variant === "xl" && "text-4xl",
