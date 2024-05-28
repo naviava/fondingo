@@ -1,16 +1,29 @@
 "use client";
 
+import { useEditUserModal } from "@fondingo/store/fondisplit";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Button } from "@fondingo/ui/button";
 import { BiSolidEdit } from "react-icons/bi";
 
 interface IProps {
+  email: string;
   userName: string;
   imageUrl: string;
-  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
 }
 
-export function Header({ userName, imageUrl, email }: IProps) {
+export function Header({
+  email,
+  userName,
+  imageUrl,
+  firstName,
+  lastName,
+  phone,
+}: IProps) {
+  const { onOpen } = useEditUserModal((state) => state);
+
   return (
     <div className="flex flex-col items-center">
       <div className="mx-auto my-10 w-fit">
@@ -22,7 +35,14 @@ export function Header({ userName, imageUrl, email }: IProps) {
           <Button
             size="sm"
             variant="splitGhost"
-            onClick={() => {}}
+            onClick={() =>
+              onOpen({
+                displayName: userName,
+                firstName,
+                lastName,
+                phone,
+              })
+            }
             className="h-auto p-2"
           >
             <BiSolidEdit className="h-6 w-6" />

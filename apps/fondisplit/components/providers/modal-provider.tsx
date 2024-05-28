@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { AddFriendModal } from "../modals/add-friend-modal";
 import { AddMemberModal } from "../modals/add-member-modal";
+import { EditUserModal } from "../modals/edit-user-modal";
 import { ConfirmModal } from "@fondingo/ui/confirm-modal";
 
 export function ModalProvider() {
@@ -13,9 +14,10 @@ export function ModalProvider() {
 
   return (
     <>
-      <AddMemberModal />
       <ConfirmModal />
+      <AddMemberModal />
       <AddFriendModal />
+      <EditUserModal />
     </>
   );
 }

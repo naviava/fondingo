@@ -1,4 +1,5 @@
-import { ChevronRight } from "@fondingo/ui/lucide";
+"use client";
+
 import { Option } from "./option";
 
 interface IProps {}

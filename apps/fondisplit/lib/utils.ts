@@ -34,12 +34,8 @@ export function adjustMinorAmount(
   let diff = Math.floor(expenseAmount * 100) - totalAmount;
   if (diff === 0) return originalSplits;
 
-  while (!!diff) {
-    const randomIndex = randomInteger(0, splits.length - 1);
-    if (!!splits[randomIndex]) {
-      splits[randomIndex].amount += diff;
-      diff = 0;
-    }
+  if (!!splits[0]) {
+    splits[0].amount += diff;
   }
 
   const newSplits = splits.map((split) => ({
