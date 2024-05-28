@@ -485,6 +485,7 @@ export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
       (acc, credit) => acc + credit.amount,
       0,
     );
+    console.log(creditAmount - debtAmount);
     return creditAmount - debtAmount;
   } catch (err) {
     console.error(err);

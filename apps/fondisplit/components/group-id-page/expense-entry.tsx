@@ -60,7 +60,7 @@ export async function ExpenseEntry({
       <div className="flex-1">
         <h5 className="line-clamp-1 font-semibold">{expense.name}</h5>
         {expense.payments.map((payment, idx) => {
-          if (idx > 1) return;
+          if (idx > 0) return;
           return (
             <div
               key={payment.id}
@@ -77,8 +77,8 @@ export async function ExpenseEntry({
                   currency={currency}
                   className="ml-1"
                 />
-                {idx === 1 && expense.payments.length > 2 && (
-                  <span className="ml-1">{`and ${expense.payments.length - 2} more`}</span>
+                {expense.payments.length > 1 && (
+                  <span className="ml-1 line-clamp-1">{`and ${expense.payments.length - 1} more`}</span>
                 )}
               </div>
             </div>

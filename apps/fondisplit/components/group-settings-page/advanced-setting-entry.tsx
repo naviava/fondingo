@@ -8,14 +8,16 @@ import { cn } from "@fondingo/ui/utils";
 
 import { Loader } from "@fondingo/ui/lucide";
 import { IconType } from "react-icons";
+import { format } from "@fondingo/utils/date-fns";
 
 interface IProps {
   title: string;
-  groupId: string;
   isCalc?: boolean;
+  currentTime?: Date;
   disabled?: boolean;
   smallIcon?: boolean;
   description?: string;
+  timeRemaining?: number;
   currency?: CurrencyCode;
   icon?: IconType;
   action: () => void;
@@ -28,6 +30,7 @@ export function AdvancedSettingEntry({
   disabled,
   smallIcon,
   description,
+  timeRemaining,
   action,
   icon: Icon,
 }: IProps) {
@@ -59,12 +62,22 @@ export function AdvancedSettingEntry({
           )}
         </div>
         <div
-          className={cn("flex-1 font-medium", isCalc && "flex items-center")}
+          className={cn("flex flex-1 items-center justify-between font-medium")}
         >
-          <h4 className={cn("line-clamp-1", disabled && "text-neutral-400")}>
-            {title}
-          </h4>
-          {isCalc && <Loader className="ml-2 h-5 w-5 animate-spin" />}
+          <div className="flex items-center">
+            <h4
+              className={cn(
+                "line-clamp-1",
+                disabled && "text-neutral-400",
+                !!timeRemaining && "text-sm",
+              )}
+            >
+              {!timeRemaining
+                ? title
+                : `Calculate debts again in ${Math.floor(timeRemaining / 60)}:${timeRemaining % 60 < 10 ? `0${timeRemaining % 60}` : timeRemaining % 60}`}
+            </h4>
+            {isCalc && <Loader className="ml-2 h-5 w-5 animate-spin" />}
+          </div>
         </div>
       </div>
       {!!description && (

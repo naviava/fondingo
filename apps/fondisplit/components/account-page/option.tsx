@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronRight } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
 

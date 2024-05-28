@@ -2,6 +2,7 @@ import { RefreshButton } from "@fondingo/ui/refresh-button";
 import { serverClient } from "~/lib/trpc/server-client";
 import { IndianRupee } from "@fondingo/ui/lucide";
 import { cn } from "@fondingo/ui/utils";
+import { DisplayAmount } from "./display-amount";
 
 const panelTextMap = {
   positive: "you are owed",
@@ -15,8 +16,8 @@ export async function OverallGrossBalance() {
   const isInDebt = grossBalance < 0;
 
   const displayAmount = isInDebt
-    ? ((grossBalance / 100) * -1).toLocaleString()
-    : (grossBalance / 100).toLocaleString();
+    ? Number((Math.floor(grossBalance * 100) / 100) * -1)
+    : Number(Math.floor(grossBalance * 100) / 100);
 
   return (
     <div className="flex items-center justify-between px-4">
@@ -28,15 +29,11 @@ export async function OverallGrossBalance() {
             ? panelTextMap["negative"]
             : panelTextMap["positive"]}
         {grossBalance !== 0 && (
-          <div
-            className={cn(
-              "flex items-center",
-              isInDebt ? "text-orange-600" : "text-cta",
-            )}
-          >
-            <IndianRupee className="h-4 w-4" />
-            <span>{displayAmount}</span>
-          </div>
+          <DisplayAmount
+            currency="INR"
+            amount={displayAmount}
+            className={cn("ml-1", isInDebt ? "text-orange-600" : "text-cta")}
+          />
         )}
       </h1>
       <RefreshButton />

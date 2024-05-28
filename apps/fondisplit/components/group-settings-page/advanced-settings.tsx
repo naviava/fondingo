@@ -1,20 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
+import { differenceInSeconds } from "@fondingo/utils/date-fns";
+import { useUtils } from "~/hooks/use-utils";
+
+import { AdvancedSettingEntry } from "./advanced-setting-entry";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { toast } from "@fondingo/ui/use-toast";
 import { FcCalculator } from "react-icons/fc";
 import { GiExitDoor } from "react-icons/gi";
 
-import { AdvancedSettingEntry } from "./advanced-setting-entry";
-import { toast } from "@fondingo/ui/use-toast";
-
 import { serverClient } from "~/lib/trpc/server-client";
 import { trpc } from "~/lib/trpc/client";
-import { useUtils } from "~/hooks/use-utils";
-import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
-import { calculateDebts } from "~/server/actions/group";
+import { useIsMounted } from "~/hooks/use-is-mounted";
 
 interface IProps {
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;
@@ -23,8 +24,19 @@ interface IProps {
 
 export function AdvancedSettings({ userId, group }: IProps) {
   const router = useRouter();
-  const { onOpen, onClose } = useConfirmModal();
   const { invalidateAll } = useUtils();
+  const { onOpen, onClose } = useConfirmModal();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  const timeRemaining = useMemo(() => {
+    if (!group.lastCacluatedDebtsAt) return 0;
+    const diff = differenceInSeconds(
+      currentTime,
+      new Date(group.lastCacluatedDebtsAt),
+    );
+    const returnValue = 300 - diff;
+    return returnValue > 0 ? returnValue : 0;
+  }, [currentTime, group.lastCacluatedDebtsAt]);
 
   const isManager = useMemo(() => {
     const currentMember = group.members.find((m) => m.userId === userId);
@@ -145,21 +157,36 @@ export function AdvancedSettings({ userId, group }: IProps) {
     });
   }, [group.id, onOpen, onClose, handleDeleteGroupById]);
 
+  useEffect(() => {
+    if (timeRemaining <= 0) return;
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timeRemaining]);
+
+  const isMounted = useIsMounted();
+  if (!isMounted) return null;
+
   return (
     <section className="space-y-6">
       <h3 className="px-4 text-base font-semibold">Advanced</h3>
       <ul className="space-y-4">
         <AdvancedSettingEntry
-          groupId={group.id}
           icon={FcCalculator}
           isCalc={isPendingCalc}
+          timeRemaining={timeRemaining}
           title="Calculate debts"
-          description="Automatically combines debts to reduce the total number of repayments between group members."
-          disabled={isPendingRemove || isPendingDelete || isPendingCalc}
+          description="This is done automatically, but if you see something off, you can trigger it manually, once every 5 minutes."
+          disabled={
+            isPendingRemove ||
+            isPendingDelete ||
+            isPendingCalc ||
+            timeRemaining > 0
+          }
           action={() => handleCalculateDebts(group.id)}
         />
         <AdvancedSettingEntry
-          groupId={group.id}
           title="Change currency"
           currency={group.currency}
           description="Change the currency used in this group."
@@ -171,7 +198,6 @@ export function AdvancedSettings({ userId, group }: IProps) {
           }
         />
         <AdvancedSettingEntry
-          groupId={group.id}
           icon={GiExitDoor}
           title="Leave group"
           description={
@@ -185,7 +211,6 @@ export function AdvancedSettings({ userId, group }: IProps) {
           action={handleLeaveGroup}
         />
         <AdvancedSettingEntry
-          groupId={group.id}
           icon={RiDeleteBin6Line}
           title="Delete group"
           description={
