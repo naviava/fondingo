@@ -156,14 +156,6 @@ export const deleteGroupById = privateProcedure
     });
   });
 
-/**
- * Retrieves all groups that the current user is a member of.
- *
- * @function
- * @param {Object} ctx - The context object containing the user information.
- * @returns {Promise<Array>} A promise that resolves to an array of group objects.
- * @throws Will throw an error if the database query fails.
- */
 export const getGroups = privateProcedure.query(async ({ ctx }) => {
   const { user } = ctx;
   const groups = await splitdb.group.findMany({
@@ -184,6 +176,7 @@ export const getGroups = privateProcedure.query(async ({ ctx }) => {
         },
       },
     },
+    orderBy: { updatedAt: "desc" },
   });
   return groups || [];
 });

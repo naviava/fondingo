@@ -16,6 +16,7 @@ import { GiExitDoor } from "react-icons/gi";
 import { serverClient } from "~/lib/trpc/server-client";
 import { trpc } from "~/lib/trpc/client";
 import { useIsMounted } from "~/hooks/use-is-mounted";
+import { Loader } from "@fondingo/ui/lucide";
 
 interface IProps {
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;
@@ -166,7 +167,13 @@ export function AdvancedSettings({ userId, group }: IProps) {
   }, [timeRemaining]);
 
   const isMounted = useIsMounted();
-  if (!isMounted) return null;
+  // TODO: Add loading state
+  if (!isMounted)
+    return (
+      <div className="flex items-center justify-center p-10">
+        <Loader className="animate-spin text-neutral-400" />
+      </div>
+    );
 
   return (
     <section className="space-y-6">

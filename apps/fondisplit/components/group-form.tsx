@@ -288,9 +288,13 @@ function _GroupForm({ isEditing, initialData }: IProps) {
                         <SelectValue placeholder="Select a currency" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-neutral-100">
                       {Object.values(currencyIconMap).map((c) => (
-                        <SelectItem key={c.code} value={c.code}>
+                        <SelectItem
+                          key={c.code}
+                          value={c.code}
+                          className="focus:bg-white"
+                        >
                           {`${c.code} - ${c.name}`}
                         </SelectItem>
                       ))}
