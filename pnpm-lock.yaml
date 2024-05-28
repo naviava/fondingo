@@ -231,6 +231,9 @@ importers:
       lucide-react:
         specifier: ^0.378.0
         version: 0.378.0(react@18.2.0)
+      react-hook-form:
+        specifier: ^7.51.4
+        version: 7.51.4(react@18.2.0)
       tailwind-merge:
         specifier: ^2.3.0
         version: 2.3.0

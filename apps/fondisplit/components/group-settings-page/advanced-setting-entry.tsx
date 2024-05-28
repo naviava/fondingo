@@ -1,31 +1,35 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { CurrencyCode } from "@fondingo/db-split";
-import { IconType } from "react-icons";
-import { useMemo } from "react";
 import { cn } from "@fondingo/ui/utils";
 
+import { Loader } from "@fondingo/ui/lucide";
+import { IconType } from "react-icons";
+
 interface IProps {
-  groupId: string;
   title: string;
-  description?: string;
+  groupId: string;
+  isCalc?: boolean;
   disabled?: boolean;
+  smallIcon?: boolean;
+  description?: string;
   currency?: CurrencyCode;
   icon?: IconType;
-  smallIcon?: boolean;
   action: () => void;
 }
 
 export function AdvancedSettingEntry({
-  groupId,
   title,
-  description,
+  isCalc,
   currency,
   disabled,
-  icon: Icon,
   smallIcon,
+  description,
   action,
+  icon: Icon,
 }: IProps) {
   const CurrencyIcon = useMemo(
     () => (currency ? currencyIconMap[currency].icon : null),
@@ -54,10 +58,13 @@ export function AdvancedSettingEntry({
             />
           )}
         </div>
-        <div className="flex-1 font-medium">
+        <div
+          className={cn("flex-1 font-medium", isCalc && "flex items-center")}
+        >
           <h4 className={cn("line-clamp-1", disabled && "text-neutral-400")}>
             {title}
           </h4>
+          {isCalc && <Loader className="ml-2 h-5 w-5 animate-spin" />}
         </div>
       </div>
       {!!description && (

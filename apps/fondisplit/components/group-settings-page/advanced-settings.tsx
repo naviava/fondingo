@@ -38,6 +38,24 @@ export function AdvancedSettings({ userId, group }: IProps) {
     [group.simplifiedDebts, userId],
   );
 
+  const { mutate: handleCalculateDebts, isPending: isPendingCalc } =
+    trpc.group.calculateGroupDebts.useMutation({
+      onError: ({ message }) =>
+        toast({
+          variant: "destructive",
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        invalidateAll();
+        router.refresh();
+      },
+    });
+
   const { mutate: handleRemoveMember, isPending: isPendingRemove } =
     trpc.group.removeMemberFromGroup.useMutation({
       onError: ({ message }) =>
@@ -80,7 +98,7 @@ export function AdvancedSettings({ userId, group }: IProps) {
         title: "Delete group?",
         description:
           "Are you sure you want to delete this group? This will delete all expenses, payments and members within the group. This action is irreversible.",
-        confirmAction: () => {},
+        confirmAction: () => handleDeleteGroupById(group.id),
         cancelAction: onClose,
       });
     }
@@ -107,13 +125,14 @@ export function AdvancedSettings({ userId, group }: IProps) {
       cancelAction: onClose,
     });
   }, [
-    handleRemoveMember,
+    userId,
+    group.id,
+    isManager,
+    group.members,
     onOpen,
     onClose,
-    group.id,
-    group.members,
-    userId,
-    isManager,
+    handleRemoveMember,
+    handleDeleteGroupById,
   ]);
 
   const handleDeleteGroup = useCallback(() => {
@@ -133,21 +152,18 @@ export function AdvancedSettings({ userId, group }: IProps) {
         <AdvancedSettingEntry
           groupId={group.id}
           icon={FcCalculator}
+          isCalc={isPendingCalc}
           title="Calculate debts"
           description="Automatically combines debts to reduce the total number of repayments between group members."
-          disabled={isPendingRemove || isPendingDelete}
-          action={async () => {
-            await calculateDebts(group.id);
-            invalidateAll();
-            router.refresh();
-          }}
+          disabled={isPendingRemove || isPendingDelete || isPendingCalc}
+          action={() => handleCalculateDebts(group.id)}
         />
         <AdvancedSettingEntry
           groupId={group.id}
           title="Change currency"
           currency={group.currency}
           description="Change the currency used in this group."
-          disabled={isPendingRemove || isPendingDelete}
+          disabled={isPendingRemove || isPendingDelete || isPendingCalc}
           action={() =>
             router.push(
               `/groups/${group.id}/edit?groupName=${group.name}&color=${group.color.slice(1)}&type=${group.type}&currency=${group.currency}`,
@@ -163,7 +179,9 @@ export function AdvancedSettings({ userId, group }: IProps) {
               ? "You can't leave this group because you have outstanding debts with other group members."
               : ""
           }
-          disabled={hasBalances || isPendingRemove || isPendingDelete}
+          disabled={
+            hasBalances || isPendingRemove || isPendingDelete || isPendingCalc
+          }
           action={handleLeaveGroup}
         />
         <AdvancedSettingEntry
@@ -173,7 +191,9 @@ export function AdvancedSettings({ userId, group }: IProps) {
           description={
             isManager ? "" : "Only group managers can delete a group."
           }
-          disabled={!isManager || isPendingRemove || isPendingDelete}
+          disabled={
+            !isManager || isPendingRemove || isPendingDelete || isPendingCalc
+          }
           action={handleDeleteGroup}
           smallIcon
         />

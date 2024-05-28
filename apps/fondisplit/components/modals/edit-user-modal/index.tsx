@@ -28,6 +28,7 @@ const formSchema = z.object({
     .string()
     .min(2, { message: "Display name must be at least 2 characters long." })
     .max(50, { message: "Display name cannot be longer than 50 characters." }),
+  email: z.string().email(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   phone: z
@@ -51,6 +52,7 @@ export function EditUserModal() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       displayName: user?.name || "",
+      email: user?.email || "",
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       phone: user?.phone || "",
@@ -85,12 +87,20 @@ export function EditUserModal() {
   useEffect(() => {
     form.reset({
       displayName: user?.name || "",
+      email: user?.email || "",
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       phone: user?.phone || "",
     });
     () => form.reset();
-  }, [user?.name, user?.firstName, user?.lastName, user?.phone, form]);
+  }, [
+    user?.name,
+    user?.email,
+    user?.firstName,
+    user?.lastName,
+    user?.phone,
+    form,
+  ]);
 
   return (
     <Dialog
@@ -166,8 +176,8 @@ export function EditUserModal() {
             </div>
             <FormInput
               form={form}
-              fieldName="email"
               label="Email"
+              fieldName="email"
               placeholder="yourname@email.com"
               disabled={isPending}
               value={user?.email}

@@ -12,7 +12,7 @@ import {
 
 interface IProps {
   label: string;
-  fieldName: string;
+  fieldName: "phone" | "firstName" | "lastName" | "displayName" | "email";
   value?: string;
   disabled?: boolean;
   showError?: boolean;
@@ -22,9 +22,10 @@ interface IProps {
   form: UseFormReturn<
     {
       displayName: string;
-      phone?: string | undefined;
+      email: string;
       firstName?: string | undefined;
       lastName?: string | undefined;
+      phone?: string | undefined;
     },
     any,
     undefined

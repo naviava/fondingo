@@ -996,11 +996,13 @@ export const calculateGroupDebts = privateProcedure
       });
     if (
       group.lastCacluatedDebtsAt &&
-      Date.now() - new Date(group.lastCacluatedDebtsAt).getTime() < 5000
+      Date.now() - new Date(group.lastCacluatedDebtsAt).getTime() <
+        1000 * 60 * 5
     )
       throw new TRPCError({
         code: "BAD_REQUEST",
-        message: "Debts calculated recently. Try again later.",
+        message:
+          "Debts can be manually calculated every 5 minutes. Try again later.",
       });
 
     const res = await calculateDebts(groupId);
@@ -1142,6 +1144,12 @@ export async function calculateDebts(
           });
         }
       }
+      await db.group.update({
+        where: { id: groupId },
+        data: {
+          lastCacluatedDebtsAt: new Date(),
+        },
+      });
       return { success: "Simplified debts calculated and stored" };
     });
   } catch (err) {
