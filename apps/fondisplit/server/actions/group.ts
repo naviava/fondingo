@@ -998,7 +998,7 @@ export const calculateGroupDebts = privateProcedure
           "Debts can be manually calculated every 5 minutes. Try again later.",
       });
 
-    const res = await calculateDebts(groupId);
+    const res = await calculateDebts(groupId, true);
     if (!("success" in res) || !res.success)
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -1033,6 +1033,7 @@ export const calculateGroupDebts = privateProcedure
  */
 export async function calculateDebts(
   groupId: string,
+  isManualUpdate: boolean = false,
 ): Promise<{ success: string } | { error: string }> {
   "use server";
 
@@ -1137,12 +1138,14 @@ export async function calculateDebts(
           });
         }
       }
-      await db.group.update({
-        where: { id: groupId },
-        data: {
-          lastCacluatedDebtsAt: new Date(),
-        },
-      });
+
+      if (isManualUpdate)
+        await splitdb.group.update({
+          where: { id: groupId },
+          data: {
+            lastCacluatedDebtsAt: new Date(),
+          },
+        });
       return { success: "Simplified debts calculated and stored" };
     });
   } catch (err) {

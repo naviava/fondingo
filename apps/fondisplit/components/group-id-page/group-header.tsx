@@ -4,6 +4,7 @@ import { CurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/lib/utils";
+import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 interface IProps {
   userId: string | undefined;
@@ -39,15 +40,50 @@ export function GroupHeader({
       {hasExpenses && !groupDebts.length && (
         <p className="text-base">All debts settled.</p>
       )}
-      <ul className="mt-2 w-fit space-y-1">
-        {hasExpenses && isEven ? (
-          <p className="text-muted-foreground flex items-center text-xs">
-            You're all settled up.
-          </p>
-        ) : (
-          !!myCredits.length &&
-          myCredits.map((credit, idx) => {
-            if (idx > 2) return null;
+      <ScrollArea className={cn("w-fit pr-6", totalLength > 3 && "h-[4.3rem]")}>
+        <ul className="mt-2 w-fit space-y-1">
+          {hasExpenses && isEven ? (
+            <p className="text-muted-foreground flex items-center text-xs">
+              You're all settled up.
+            </p>
+          ) : (
+            !!myCredits.length &&
+            myCredits.map((credit) => {
+              return (
+                <li
+                  key={credit.id}
+                  className="text-muted-foreground flex items-center text-xs"
+                >
+                  {credit.from.name} owes you{" "}
+                  <DisplayAmount
+                    variant="xs"
+                    amount={credit.amount}
+                    currency={currency}
+                    className="text-cta ml-0.5 font-semibold"
+                  />
+                </li>
+              );
+            })
+          )}
+          {!!myDebts.length &&
+            myDebts.map((debt) => {
+              return (
+                <li
+                  key={debt.id}
+                  className="text-muted-foreground flex items-center text-sm"
+                >
+                  You owe {debt.to.name}{" "}
+                  <DisplayAmount
+                    variant="sm"
+                    amount={debt.amount}
+                    currency={currency}
+                    className="ml-0.5 font-semibold text-orange-600"
+                  />
+                </li>
+              );
+            })}
+          {/* !!myCredits.length &&
+          myCredits.slice(0, 3).map((credit, idx) => {
             if (idx === 2)
               return (
                 <p className="text-muted-foreground flex items-center justify-end text-xs">
@@ -71,51 +107,32 @@ export function GroupHeader({
           })
         )}
         {!!myDebts.length &&
-          myDebts.map((debt, idx) => {
-            if (idx > 2) return null;
-            if (myCredits.length > 2) return null;
-            if (myCredits.length === 2 && idx > 0) return null;
-            if (myCredits.length === 1 && idx > 1) return null;
-
-            if (
-              (myCredits.length === 0 && idx === 2) ||
-              (myCredits.length === 1 && idx === 1) ||
-              (myCredits.length === 2 && idx === 0)
-            )
+          myDebts
+            .slice(0, Math.max(0, 3 - myCredits.length))
+            .map((debt, idx) => {
+              if (idx === 2 - myCredits.length)
+                return (
+                  <p className="text-muted-foreground flex items-center justify-end text-xs">
+                    ...and {totalLength - 2} more
+                  </p>
+                );
               return (
-                <p className="text-muted-foreground flex items-center justify-end text-xs">
-                  ...and {totalLength - 2} more
-                </p>
+                <li
+                  key={debt.id}
+                  className="text-muted-foreground flex items-center text-sm"
+                >
+                  You owe {debt.to.name}{" "}
+                  <DisplayAmount
+                    variant="sm"
+                    amount={debt.amount}
+                    currency={currency}
+                    className="ml-0.5 font-semibold text-orange-600"
+                  />
+                </li>
               );
-
-            // if (myCredits.length === 0 && idx === 2)
-            //   return (
-            //     <p className="text-muted-foreground flex items-center justify-end text-xs">
-            //       ...and {totalLength - 2} more
-            //     </p>
-            //   );
-            // if (myCredits.length === 2 && idx === 0)
-            //   return (
-            //     <p className="text-muted-foreground flex items-center justify-end text-xs">
-            //       ...and {totalLength - 2} more
-            //     </p>
-            //   );
-            return (
-              <li
-                key={debt.id}
-                className="text-muted-foreground flex items-center text-sm"
-              >
-                You owe {debt.to.name}{" "}
-                <DisplayAmount
-                  variant="sm"
-                  amount={debt.amount}
-                  currency={currency}
-                  className="ml-0.5 font-semibold text-orange-600"
-                />
-              </li>
-            );
-          })}
-      </ul>
+            })} */}
+        </ul>
+      </ScrollArea>
     </div>
   );
 }

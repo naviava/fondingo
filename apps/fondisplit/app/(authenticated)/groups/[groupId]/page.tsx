@@ -21,7 +21,6 @@ interface IProps {
 }
 
 export default async function GroupIdPage({ params, searchParams }: IProps) {
-  // TODO: Handle this better
   const currentUser = await serverClient.user.getAuthProfile();
   const group = await serverClient.group.getGroupById(params.groupId);
   const currentUserRole = group.members.find(

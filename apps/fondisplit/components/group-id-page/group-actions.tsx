@@ -91,7 +91,7 @@ function _GroupActions({
   return (
     <div ref={topDivRef}>
       <ScrollArea hideVerticalScrollbar>
-        <div className="my-8 flex gap-x-4 px-4">
+        <div className="my-6 flex gap-x-4 px-4">
           {options.map((option) => {
             if (
               option.label === "Settle up" &&
