@@ -9,19 +9,9 @@ interface IProps {
   email: string;
   userName: string;
   imageUrl: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
 }
 
-export function Header({
-  email,
-  userName,
-  imageUrl,
-  firstName,
-  lastName,
-  phone,
-}: IProps) {
+export function Header({ email, userName, imageUrl }: IProps) {
   const { onOpen } = useEditUserModal((state) => state);
 
   return (

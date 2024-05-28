@@ -158,7 +158,7 @@ export function EditUserModal() {
                     phone: user?.phone || "",
                   })
                 }
-                className="absolute right-0 top-6 z-[5] text-rose-600 hover:text-rose-600"
+                className="absolute right-0 top-6 z-[5] text-rose-600 hover:bg-transparent hover:text-rose-600"
               >
                 <X className="mr-1 h-4 w-4" />
                 Reset
