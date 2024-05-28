@@ -977,6 +977,44 @@ export const getGroupTotals = privateProcedure
     };
   });
 
+export const calculateGroupDebts = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .mutation(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+    const group = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    if (!group)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+    if (
+      group.lastCacluatedDebtsAt &&
+      Date.now() - new Date(group.lastCacluatedDebtsAt).getTime() < 5000
+    )
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Debts calculated recently. Try again later.",
+      });
+
+    const res = await calculateDebts(groupId);
+    if (!("success" in res) || !res.success)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to calculate debts",
+      });
+    return {
+      toastTitle: `${group.name} debts calculated.`,
+      toastDescription: "Debts have been calculated and stored",
+    };
+  });
+
 /**
  * This function is used to calculate and store the simplified debts for a group. It takes a string input representing the group ID.
  *

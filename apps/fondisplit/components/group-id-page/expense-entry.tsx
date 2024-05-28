@@ -93,7 +93,11 @@ export async function ExpenseEntry({
           )}
         >
           <p className="text-xs font-medium md:text-sm">{displayText.label}</p>
-          <DisplayAmount amount={grossBalance} currency={currency} />
+          <DisplayAmount
+            amount={grossBalance}
+            currency={currency}
+            className="font-semibold"
+          />
         </div>
       ) : (
         <span className="text-xs font-medium italic text-neutral-400">

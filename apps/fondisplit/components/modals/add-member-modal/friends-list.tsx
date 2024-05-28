@@ -25,9 +25,11 @@ export function FriendsList({ disabled }: IProps) {
   return (
     <section className="select-none">
       <ScrollArea className={cn(totalLength > 4 && "h-[35vh]")}>
-        <h4 className="mb-3 px-4 text-left text-base font-semibold">
-          Friends on Fondisplit
-        </h4>
+        {!!friends && !!friends.length && (
+          <h4 className="mb-3 px-4 text-left text-base font-semibold">
+            Friends on Fondisplit
+          </h4>
+        )}
         {!!friends &&
           !!friends.length &&
           friends.map((friend) => (
@@ -40,7 +42,11 @@ export function FriendsList({ disabled }: IProps) {
               disabled={disabled}
             />
           ))}
-        <h4 className="my-3 px-4 text-left text-base font-semibold">Others</h4>
+        {!!tempFriends && !!tempFriends.length && (
+          <h4 className="my-3 px-4 text-left text-base font-semibold">
+            Others
+          </h4>
+        )}
         {!!tempFriends &&
           !!tempFriends.length &&
           tempFriends.map((friend) => (

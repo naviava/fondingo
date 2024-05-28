@@ -56,7 +56,6 @@ export async function GroupLog({
             </Link>
           );
         }
-
         if (entry.type === "settlement") {
           const settlement = settlements.find((s) => s.id === entry.id);
           if (!settlement) return null;
