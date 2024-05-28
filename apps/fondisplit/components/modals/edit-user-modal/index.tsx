@@ -1,9 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@fondingo/ui/use-toast";
 import { useForm } from "react-hook-form";
+import { trpc } from "~/lib/trpc/client";
 import { z } from "@fondingo/utils/zod";
 
 import { useEditUserModal } from "@fondingo/store/fondisplit";
@@ -17,8 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@fondingo/ui/dialog";
-
-import { trpc } from "~/lib/trpc/client";
+import { X } from "@fondingo/ui/lucide";
+import { useUtils } from "~/hooks/use-utils";
 
 const formSchema = z.object({
   displayName: z
@@ -37,52 +40,86 @@ const formSchema = z.object({
 });
 
 export function EditUserModal() {
+  const router = useRouter();
+  const { invalidateUserQueries } = useUtils();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const { isOpen, displayName, firstName, lastName, phone, onClose } =
-    useEditUserModal((state) => state);
+  const { isOpen, onClose } = useEditUserModal((state) => state);
   const { data: user } = trpc.user.getAuthProfile.useQuery();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      displayName: displayName,
-      firstName: firstName,
-      lastName: lastName,
-      phone: phone,
+      displayName: user?.name || "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      phone: user?.phone || "",
     },
   });
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    console.log(values);
-  }, []);
+  const { mutate: handleEditProfile, isPending } =
+    trpc.user.editProfile.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        onClose();
+        invalidateUserQueries();
+        router.refresh();
+      },
+    });
+
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      handleEditProfile(values);
+    },
+    [handleEditProfile],
+  );
 
   useEffect(() => {
     form.reset({
-      displayName: displayName,
-      firstName: firstName,
-      lastName: lastName,
-      phone: phone,
+      displayName: user?.name || "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      phone: user?.phone || "",
     });
-  }, [displayName, firstName, lastName, phone, form]);
+    () => form.reset();
+  }, [user?.name, user?.firstName, user?.lastName, user?.phone, form]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        form.reset();
+        onClose();
+      }}
+    >
       <DialogContent hideDefaultCloseButton className="px-0 py-4">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <Button
-              variant="splitGhost"
               size="sm"
-              onClick={onClose}
+              variant="splitGhost"
+              onClick={() => {
+                form.reset();
+                onClose();
+              }}
+              disabled={isPending}
               className="min-w-[5rem]"
             >
               Close
             </Button>
             <DialogTitle>Edit account details</DialogTitle>
             <Button
-              variant="splitGhost"
               size="sm"
+              variant="splitGhost"
+              disabled={isPending}
               onClick={() => {
                 submitButtonRef.current?.click();
               }}
@@ -99,19 +136,40 @@ export function EditUserModal() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8 px-4"
           >
-            <FormInput
-              form={form}
-              fieldName="displayName"
-              label="Display Name"
-              placeholder={`${user?.name?.split(" ")[0]}123`}
-              description="This is your public name."
-              showError
-            />
+            <div className="relative">
+              <FormInput
+                form={form}
+                fieldName="displayName"
+                label="Display Name"
+                placeholder={`${user?.name?.split(" ")[0]}123`}
+                disabled={isPending}
+                description="This is your public name."
+                showError
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() =>
+                  form.reset({
+                    displayName: user?.name || "",
+                    firstName: user?.firstName || "",
+                    lastName: user?.lastName || "",
+                    phone: user?.phone || "",
+                  })
+                }
+                className="absolute right-0 top-6 z-[5] text-rose-600 hover:text-rose-600"
+              >
+                <X className="mr-1 h-4 w-4" />
+                Reset
+              </Button>
+            </div>
             <FormInput
               form={form}
               fieldName="email"
               label="Email"
               placeholder="yourname@email.com"
+              disabled={isPending}
               value={user?.email}
             />
             <div className="flex items-center gap-x-6">
@@ -120,12 +178,14 @@ export function EditUserModal() {
                 form={form}
                 fieldName="firstName"
                 label="First name"
+                disabled={isPending}
               />
               <FormInput
                 isOptional
                 form={form}
                 fieldName="lastName"
                 label="Last name"
+                disabled={isPending}
               />
             </div>
             <FormInput
@@ -133,6 +193,7 @@ export function EditUserModal() {
               form={form}
               fieldName="phone"
               label="Phone number"
+              disabled={isPending}
               showError
             />
             <button ref={submitButtonRef} type="submit" className="hidden">

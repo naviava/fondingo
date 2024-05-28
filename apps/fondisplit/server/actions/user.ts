@@ -35,6 +35,72 @@ export const getAuthProfile = publicProcedure.query(async () => {
   return userWithoutPassword;
 });
 
+export const editProfile = privateProcedure
+  .input(
+    z.object({
+      displayName: z
+        .string()
+        .min(2, { message: "Display name must be at least 2 characters long." })
+        .max(50, {
+          message: "Display name cannot be longer than 50 characters.",
+        }),
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+      phone: z
+        .string()
+        .regex(
+          new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/),
+          { message: "Invalid phone number." },
+        )
+        .optional(),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { displayName, firstName, lastName, phone } = input;
+
+    const enabledUserAccount = await splitdb.user.findUnique({
+      where: {
+        id: user.id,
+        disabled: false,
+      },
+    });
+    if (!enabledUserAccount)
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not authorized to edit this profile.",
+      });
+
+    const existingPhoneNumber = await splitdb.user.findFirst({
+      where: { phone },
+    });
+    if (!!existingPhoneNumber && existingPhoneNumber.id !== user.id)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Phone number is already in use.",
+      });
+
+    const updatedUser = await splitdb.user.update({
+      where: { id: user.id },
+      data: {
+        name: displayName,
+        firstName,
+        lastName,
+        phone,
+      },
+    });
+    if (!updatedUser)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to update profile.",
+      });
+
+    return {
+      toastTitle: "Profile updated",
+      toastDescription: "Come back and customize any time.",
+    };
+  });
+
 /**
  * This function is used to send a friend request in the application.
  * It is a private procedure that takes an email string input representing the recipient of the friend request.

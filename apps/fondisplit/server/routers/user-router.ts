@@ -11,10 +11,12 @@ import {
   findUsers,
   getFriendRequests,
   findFriends,
+  editProfile,
 } from "../actions/user";
 
 export const userRouter = router({
   getAuthProfile,
+  editProfile,
   sendFriendRequest,
   getFriendRequests,
   declineFriendRequest,

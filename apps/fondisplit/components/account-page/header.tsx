@@ -35,14 +35,7 @@ export function Header({
           <Button
             size="sm"
             variant="splitGhost"
-            onClick={() =>
-              onOpen({
-                displayName: userName,
-                firstName,
-                lastName,
-                phone,
-              })
-            }
+            onClick={onOpen}
             className="h-auto p-2"
           >
             <BiSolidEdit className="h-6 w-6" />
