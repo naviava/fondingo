@@ -34,11 +34,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn("text-neutral-700 antialiased", font.className)}>
+      <body
+        className={cn("h-dvh text-neutral-700 antialiased", font.className)}
+      >
         <NextTopLoader color="#11998E" showSpinner={false} height={5} />
         <SessionProvider session={session}>
           <Providers>
-            <main className="h-full bg-black/20">{children}</main>
+            <main className="h-dvh bg-black/20">{children}</main>
             <Toaster />
           </Providers>
         </SessionProvider>
