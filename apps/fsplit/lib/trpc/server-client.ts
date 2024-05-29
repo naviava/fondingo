@@ -1,6 +1,6 @@
-import { appRouter } from "~/server";
+import { createCallerFactory } from "@fondingo/api/fsplit";
+import { appRouter } from "@fondingo/api/fsplit";
 import { httpBatchLink } from "@trpc/client";
-import { createCallerFactory } from "~/server/trpc";
 
 const createCaller = createCallerFactory(appRouter);
 

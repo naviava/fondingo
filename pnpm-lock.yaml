@@ -27,11 +27,39 @@ importers:
         specifier: latest
         version: 1.13.3
 
+  apps/api:
+    dependencies:
+      '@auth/prisma-adapter':
+        specifier: ^2.0.0
+        version: 2.0.0(@prisma/client@5.13.0(prisma@5.13.0))
+      '@fondingo/db-split':
+        specifier: workspace:*
+        version: link:../../packages/db-split
+      '@fondingo/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      '@trpc/server':
+        specifier: 11.0.0-rc.366
+        version: 11.0.0-rc.366
+      next-auth:
+        specifier: ^4.24.7
+        version: 4.24.7(next@14.1.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+    devDependencies:
+      '@fondingo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@fondingo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+
   apps/fsplit:
     dependencies:
       '@auth/prisma-adapter':
         specifier: ^2.0.0
         version: 2.0.0(@prisma/client@5.13.0(prisma@5.13.0))
+      '@fondingo/api':
+        specifier: workspace:*
+        version: link:../api
       '@fondingo/db-split':
         specifier: workspace:*
         version: link:../../packages/db-split
@@ -280,6 +308,9 @@ importers:
 
   packages/utils:
     dependencies:
+      bcrypt:
+        specifier: ^5.1.1
+        version: 5.1.1
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
@@ -296,6 +327,9 @@ importers:
         specifier: ^3.23.8
         version: 3.23.8
     devDependencies:
+      '@types/bcrypt':
+        specifier: ^5.0.2
+        version: 5.0.2
       '@types/jsonwebtoken':
         specifier: ^9.0.6
         version: 9.0.6

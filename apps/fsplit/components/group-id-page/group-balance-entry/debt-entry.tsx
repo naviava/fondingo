@@ -1,15 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { memo, useMemo } from "react";
+import { memo } from "react";
 
-import { currencyIconMap } from "@fondingo/ui/constants";
 import { CurrencyCode } from "@fondingo/db-split";
 import { cn } from "@fondingo/ui/utils";
 
+import { DisplayAmount } from "~/components/display-amount";
 import { Button } from "@fondingo/ui/button";
 import { Avatar } from "@fondingo/ui/avatar";
-import { DisplayAmount } from "../../display-amount";
 
 interface IProps {
   groupId: string;

@@ -6,9 +6,9 @@ import { AuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { Adapter } from "next-auth/adapters";
 
+import { compare } from "@fondingo/utils/bcrypt";
 import { sign } from "@fondingo/utils/jwt";
 import splitdb from "@fondingo/db-split";
-import { compare } from "bcrypt";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(splitdb) as Adapter,

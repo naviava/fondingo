@@ -5,11 +5,11 @@ import "./globals.css";
 import { getServerSession } from "next-auth";
 import NextTopLoader from "nextjs-toploader";
 
-import { mergeUserAccounts } from "~/server/actions/user";
 import { authOptions } from "~/lib/auth";
 import { cn } from "@fondingo/ui/utils";
 
 import SessionProvider from "~/components/providers/session-provider";
+import { mergeUserAccounts } from "~/lib/merge-user-account";
 import { Providers } from "~/components/providers";
 import { Toaster } from "@fondingo/ui/toaster";
 

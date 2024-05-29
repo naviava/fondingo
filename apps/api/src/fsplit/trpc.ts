@@ -1,5 +1,5 @@
-import { TRPCError, initTRPC } from "@trpc/server";
 import { getServerSession } from "next-auth";
+import { TRPCError, initTRPC } from "@trpc/server";
 import splitdb from "@fondingo/db-split";
 
 const t = initTRPC.create();
@@ -23,6 +23,7 @@ const isAuthenticated = middleware(async (opts) => {
     });
   return opts.next({
     ctx: {
+      splitdb,
       user: {
         id: user.id,
         name: user.name,
@@ -52,6 +53,7 @@ const isAdmin = middleware(async (opts) => {
     });
   return opts.next({
     ctx: {
+      splitdb,
       user: {
         id: user.id,
         name: user.name,
