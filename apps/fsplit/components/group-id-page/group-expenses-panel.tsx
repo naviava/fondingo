@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
 
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { UserPlus } from "@fondingo/ui/lucide";

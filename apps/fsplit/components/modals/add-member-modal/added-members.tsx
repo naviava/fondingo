@@ -1,4 +1,4 @@
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Avatar } from "@fondingo/ui/avatar";
 import { cn } from "@fondingo/ui/utils";

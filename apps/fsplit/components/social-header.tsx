@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-import { useAddFriendModal } from "@fondingo/store/fondisplit";
+import { useAddFriendModal } from "@fondingo/store/fsplit";
 import { SearchBar } from "~/components/search-bar";
 import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";

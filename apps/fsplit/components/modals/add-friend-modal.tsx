@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
-import { useAddFriendModal } from "@fondingo/store/fondisplit";
+import { useAddFriendModal } from "@fondingo/store/fsplit";
 import { useDebounceValue } from "@fondingo/utils/hooks";
 
 import { Separator } from "@fondingo/ui/separator";

@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { trpc } from "~/lib/trpc/client";
 import { z } from "@fondingo/utils/zod";
 
-import { useEditUserModal } from "@fondingo/store/fondisplit";
+import { useEditUserModal } from "@fondingo/store/fsplit";
 import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";
 import { FormInput } from "./form-input";

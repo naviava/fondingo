@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { ExpensePaymentsMember } from "./expense-payments-member";
-import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { useExpenseDetails } from "@fondingo/store/fsplit";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";

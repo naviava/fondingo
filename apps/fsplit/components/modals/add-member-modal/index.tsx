@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { useDebounceValue } from "@fondingo/utils/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -144,7 +144,7 @@ export function AddMemberModal() {
               >
                 <UserPlus className="mr-4" />
                 <span className="text-base font-medium">
-                  Add a new contact to Fondisplit
+                  Add a new contact to FSplit
                 </span>
               </div>
             )}

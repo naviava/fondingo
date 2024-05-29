@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { useExpenseDetails } from "@fondingo/store/fsplit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUtils } from "~/hooks/use-utils";
 import { useForm } from "react-hook-form";

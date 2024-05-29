@@ -1,6 +1,6 @@
 "use client";
 
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { PiUserCirclePlus } from "react-icons/pi";
 
 interface IProps {

@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 
-import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { useExpenseDetails } from "@fondingo/store/fsplit";
 import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";

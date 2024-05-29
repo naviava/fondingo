@@ -27,7 +27,7 @@ export function FriendsList({ disabled }: IProps) {
       <ScrollArea className={cn(totalLength > 4 && "h-[35vh]")}>
         {!!friends && !!friends.length && (
           <h4 className="mb-3 px-4 text-left text-base font-semibold">
-            Friends on Fondisplit
+            Friends on FSplit
           </h4>
         )}
         {!!friends &&

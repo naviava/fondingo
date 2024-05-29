@@ -20,7 +20,7 @@ const font = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Fondisplit",
+  title: "FSplit",
   description: "Your favorite expenses app",
 };
 

@@ -3,7 +3,7 @@
 import { Dispatch, RefObject, SetStateAction, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { UseFormReturn } from "react-hook-form";
 
 import { DialogTitle } from "@fondingo/ui/dialog";

@@ -2,7 +2,7 @@
   "name": "@fondingo/store",
   "version": "0.0.0",
   "exports": {
-    "./fondisplit": "./src/fondisplit/index.ts",
+    "./fsplit": "./src/fsplit/index.ts",
     "./use-confirm-modal": "./src/use-confirm-modal.ts",
     "./use-panel-height": "./src/use-panel-height.ts"
   },

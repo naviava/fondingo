@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { CheckCircle, TriangleAlert } from "@fondingo/ui/lucide";
-import { useExpenseDetails } from "@fondingo/store/fondisplit";
+import { useExpenseDetails } from "@fondingo/store/fsplit";
 import { ExpenseSplitsMember } from "./expense-splits-member";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";

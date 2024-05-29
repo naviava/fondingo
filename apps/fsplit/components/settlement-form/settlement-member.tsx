@@ -1,4 +1,4 @@
-import { useSettlementDrawer } from "@fondingo/store/fondisplit";
+import { useSettlementDrawer } from "@fondingo/store/fsplit";
 import { Avatar } from "@fondingo/ui/avatar";
 import { GroupMemberClient } from "~/types";
 import { Dispatch, memo, SetStateAction } from "react";

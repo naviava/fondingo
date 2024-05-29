@@ -2,7 +2,7 @@ import { GroupMemberClient } from "~/types";
 import { cn } from "@fondingo/ui/utils";
 import { useCallback } from "react";
 
-import { useSettlementDrawer } from "@fondingo/store/fondisplit";
+import { useSettlementDrawer } from "@fondingo/store/fsplit";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";
 import { Avatar } from "@fondingo/ui/avatar";

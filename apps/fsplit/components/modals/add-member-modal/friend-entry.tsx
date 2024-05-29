@@ -1,4 +1,4 @@
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { Separator } from "@fondingo/ui/separator";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Check } from "@fondingo/ui/lucide";

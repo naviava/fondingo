@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditUserModal } from "@fondingo/store/fondisplit";
+import { useEditUserModal } from "@fondingo/store/fsplit";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Button } from "@fondingo/ui/button";
 import { BiSolidEdit } from "react-icons/bi";

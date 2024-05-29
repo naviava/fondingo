@@ -3,7 +3,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useSettlementDrawer } from "@fondingo/store/fondisplit";
+import { useSettlementDrawer } from "@fondingo/store/fsplit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUtils } from "~/hooks/use-utils";
 import { GroupMemberClient } from "~/types";

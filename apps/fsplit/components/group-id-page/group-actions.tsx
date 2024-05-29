@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
-import { useAddMemberModal } from "@fondingo/store/fondisplit";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
 
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { toast } from "@fondingo/ui/use-toast";
