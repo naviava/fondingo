@@ -59,7 +59,8 @@ export async function ExpenseEntry({
       <ExpenseAvatar groupColor={groupColor} />
       <div className="flex-1">
         <h5 className="line-clamp-1 font-medium">{expense.name}</h5>
-        {expense.payments.map((payment) => {
+        {expense.payments.map((payment, idx) => {
+          if (idx > 0) return null;
           return (
             <div
               key={payment.id}

@@ -17,6 +17,8 @@ import { serverClient } from "~/lib/trpc/server-client";
 import { trpc } from "~/lib/trpc/client";
 import { useIsMounted } from "~/hooks/use-is-mounted";
 import { Loader } from "@fondingo/ui/lucide";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 interface IProps {
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;
@@ -177,7 +179,9 @@ export function AdvancedSettings({ userId, group }: IProps) {
 
   return (
     <section className="space-y-6">
-      <h3 className="px-4 text-base font-semibold">Advanced</h3>
+      <h3 className={cn("px-4 text-base font-semibold", hfont.className)}>
+        Advanced
+      </h3>
       <ul className="space-y-4">
         <AdvancedSettingEntry
           icon={FcCalculator}

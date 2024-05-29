@@ -2,6 +2,43 @@ import { DisplayAmount } from "~/components/display-amount";
 import { serverClient } from "~/lib/trpc/server-client";
 import { CurrencyCode } from "@fondingo/db-split";
 
+function MoreBalances({ totalLength }: { totalLength: number }) {
+  return (
+    <p className="text-muted-foreground text-xs italic">
+      plus {totalLength - 2} more balances
+    </p>
+  );
+}
+
+function ListItem({
+  id,
+  name,
+  amount,
+  currency,
+  isCredit,
+}: {
+  id: string;
+  name: string;
+  amount: number;
+  isCredit: boolean;
+  currency: CurrencyCode;
+}) {
+  return (
+    <li
+      key={id}
+      className="text-muted-foreground flex items-center text-sm font-medium"
+    >
+      {isCredit ? `${name} owes you ` : `You owe ${name}`}
+      <DisplayAmount
+        variant="sm"
+        amount={amount}
+        currency={currency}
+        className={`ml-1 font-semibold ${isCredit ? "text-cta" : "text-orange-600"}`}
+      />
+    </li>
+  );
+}
+
 interface IProps {
   userId: string;
   groupId: string;
@@ -15,37 +52,36 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
     (credit) => credit.to.user?.id === userId,
   );
   const myDebts = allMyBalances.filter((debt) => debt.from.user?.id === userId);
+  const totalLength = myCredits.length + myDebts.length;
 
   return (
-    <ul className="space-y-1.5">
-      {myCredits.map((credit) => (
-        <li
-          key={credit.id}
-          className="text-muted-foreground flex items-center text-sm font-medium"
-        >
-          {credit.from.name} owes you{" "}
-          <DisplayAmount
-            variant="sm"
+    <ul className="space-y-0.5">
+      {myCredits.slice(0, 3).map((credit, idx) => {
+        if (idx === 2 && totalLength > 3)
+          return <MoreBalances totalLength={totalLength} />;
+        return (
+          <ListItem
+            id={credit.id}
+            name={credit.from.name}
             amount={credit.amount}
             currency={currency}
-            className="text-cta ml-1 font-semibold"
+            isCredit={true}
           />
-        </li>
-      ))}
-      {myDebts.map((debt) => (
-        <li
-          key={debt.id}
-          className="text-muted-foreground flex items-center text-sm font-medium"
-        >
-          You owe {debt.to.name}
-          <DisplayAmount
-            variant="sm"
+        );
+      })}
+      {myDebts.slice(0, Math.max(0, 3 - myCredits.length)).map((debt, idx) => {
+        if (idx === 2 - myCredits.length && totalLength > 3)
+          return <MoreBalances totalLength={totalLength} />;
+        return (
+          <ListItem
+            id={debt.id}
+            name={debt.to.name}
             amount={debt.amount}
             currency={currency}
-            className="ml-1 font-semibold text-orange-600"
+            isCredit={false}
           />
-        </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }

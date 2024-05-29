@@ -1,6 +1,8 @@
 import { serverClient } from "~/lib/trpc/server-client";
 import { MemberEntry } from "./member-entry";
 import { AddMemberOption } from "./add-member-option";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 interface IProps {
   userId?: string;
@@ -10,7 +12,9 @@ interface IProps {
 export function MembersPanel({ userId = "", group }: IProps) {
   return (
     <section className="space-y-6">
-      <h3 className="px-4 text-base font-semibold">Group members</h3>
+      <h3 className={cn("px-4 text-base font-semibold", hfont.className)}>
+        Group members
+      </h3>
       <AddMemberOption userId={userId} groupId={group.id} />
       <ul className="space-y-4 px-4">
         {group.members.map((member) => (

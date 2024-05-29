@@ -52,7 +52,7 @@ export function GroupHeader({
               return (
                 <li
                   key={credit.id}
-                  className="text-muted-foreground flex items-center text-xs"
+                  className="text-muted-foreground flex items-center text-xs md:text-sm"
                 >
                   {credit.from.name} owes you{" "}
                   <DisplayAmount
@@ -70,11 +70,11 @@ export function GroupHeader({
               return (
                 <li
                   key={debt.id}
-                  className="text-muted-foreground flex items-center text-sm"
+                  className="text-muted-foreground flex items-center text-xs md:text-sm"
                 >
                   You owe {debt.to.name}{" "}
                   <DisplayAmount
-                    variant="sm"
+                    variant="xs"
                     amount={debt.amount}
                     currency={currency}
                     className="ml-0.5 font-semibold text-orange-600"
@@ -82,55 +82,6 @@ export function GroupHeader({
                 </li>
               );
             })}
-          {/* !!myCredits.length &&
-          myCredits.slice(0, 3).map((credit, idx) => {
-            if (idx === 2)
-              return (
-                <p className="text-muted-foreground flex items-center justify-end text-xs">
-                  ...and {totalLength - 2} more
-                </p>
-              );
-            return (
-              <li
-                key={credit.id}
-                className="text-muted-foreground flex items-center text-xs"
-              >
-                {credit.from.name} owes you{" "}
-                <DisplayAmount
-                  variant="xs"
-                  amount={credit.amount}
-                  currency={currency}
-                  className="text-cta ml-0.5 font-semibold"
-                />
-              </li>
-            );
-          })
-        )}
-        {!!myDebts.length &&
-          myDebts
-            .slice(0, Math.max(0, 3 - myCredits.length))
-            .map((debt, idx) => {
-              if (idx === 2 - myCredits.length)
-                return (
-                  <p className="text-muted-foreground flex items-center justify-end text-xs">
-                    ...and {totalLength - 2} more
-                  </p>
-                );
-              return (
-                <li
-                  key={debt.id}
-                  className="text-muted-foreground flex items-center text-sm"
-                >
-                  You owe {debt.to.name}{" "}
-                  <DisplayAmount
-                    variant="sm"
-                    amount={debt.amount}
-                    currency={currency}
-                    className="ml-0.5 font-semibold text-orange-600"
-                  />
-                </li>
-              );
-            })} */}
         </ul>
       </ScrollArea>
     </div>

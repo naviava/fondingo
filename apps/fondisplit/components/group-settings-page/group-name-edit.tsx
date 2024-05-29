@@ -3,6 +3,8 @@ import { GroupAvatar } from "../group-avatar";
 import { TGroupType } from "~/types";
 import Link from "next/link";
 import { CurrencyCode } from "@fondingo/db-split";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/lib/utils";
 
 interface IProps {
   groupId: string;
@@ -23,10 +25,17 @@ export function GroupNameEdit({
     <section className="mt-6 flex items-center justify-between px-4">
       <div className="flex items-center gap-x-2">
         <GroupAvatar groupType={groupType} groupColor={groupColor} />
-        <h2 className="line-clamp-1 font-semibold">{groupName}</h2>
+        <h2 className={cn("line-clamp-1 font-semibold", hfont.className)}>
+          {groupName}
+        </h2>
       </div>
       {/* TODO: Activate this link */}
-      <Button asChild size="sm" variant="splitGhost">
+      <Button
+        asChild
+        size="sm"
+        variant="splitGhost"
+        className={hfont.className}
+      >
         <Link
           href={`/groups/${groupId}/edit?groupName=${groupName}&color=${groupColor.slice(1)}&type=${groupType}&currency=${currency}`}
         >
