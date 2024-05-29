@@ -58,9 +58,10 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
     <ul className="space-y-0.5">
       {myCredits.slice(0, 3).map((credit, idx) => {
         if (idx === 2 && totalLength > 3)
-          return <MoreBalances totalLength={totalLength} />;
+          return <MoreBalances key={credit.id} totalLength={totalLength} />;
         return (
           <ListItem
+            key={credit.id}
             id={credit.id}
             name={credit.from.name}
             amount={credit.amount}
@@ -71,9 +72,10 @@ export async function DebtsOverview({ userId, groupId, currency }: IProps) {
       })}
       {myDebts.slice(0, Math.max(0, 3 - myCredits.length)).map((debt, idx) => {
         if (idx === 2 - myCredits.length && totalLength > 3)
-          return <MoreBalances totalLength={totalLength} />;
+          return <MoreBalances key={debt.id} totalLength={totalLength} />;
         return (
           <ListItem
+            key={debt.id}
             id={debt.id}
             name={debt.to.name}
             amount={debt.amount}

@@ -53,13 +53,11 @@ export const authOptions: AuthOptions = {
           id: user.id,
           email: user.email,
         };
-        token.accessToken = sign(tokenObject, process.env.NEXTAUTH_SECRET!);
-      }
-      if (!!user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.image = user.image;
+        token.apiToken = sign(tokenObject, process.env.NEXTAUTH_SECRET!);
       }
       return { ...token };
     },
