@@ -11,6 +11,7 @@
     "./rsc-wrapper": "./src/rsc-wrapper.tsx",
     "./confirm-modal": "./src/confirm-modal.tsx",
     "./refresh-button": "./src/refresh-button.tsx",
+    "./skeleton-wrapper": "./src/skeleton-wrapper.tsx",
     "./form": "./src/shadcn/form.tsx",
     "./input": "./src/shadcn/input.tsx",
     "./label": "./src/shadcn/label.tsx",
