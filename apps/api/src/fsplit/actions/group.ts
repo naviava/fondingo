@@ -1,5 +1,3 @@
-"use server";
-
 import splitdb, { ZGroupType, ZCurrencyCode } from "@fondingo/db-split";
 import { calculateDebts } from "../utils/calculate-debts";
 import { privateProcedure } from "../trpc";

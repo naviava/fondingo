@@ -1,11 +1,10 @@
-"use server";
-
 import { privateProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
+
+import { calculateDebts } from "../utils/calculate-debts";
+import { hasDuplicates } from "../utils";
 import splitdb from "@fondingo/db-split";
 import { z } from "@fondingo/utils/zod";
-import { calculateDebts } from "./group";
-import { hasDuplicates } from "../utils";
 
 /**
  * This function is used to add an expense to a group. It is a private procedure that takes an input object with the following properties:
