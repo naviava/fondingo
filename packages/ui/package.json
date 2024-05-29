@@ -21,6 +21,7 @@
     "./drawer": "./src/shadcn/drawer.tsx",
     "./select": "./src/shadcn/select.tsx",
     "./toaster": "./src/shadcn/toaster.tsx",
+    "./skeleton": "./src/shadcn/skeleton.tsx",
     "./use-toast": "./src/shadcn/use-toast.tsx",
     "./accordion": "./src/shadcn/accordion.tsx",
     "./separator": "./src/shadcn/separator.tsx",

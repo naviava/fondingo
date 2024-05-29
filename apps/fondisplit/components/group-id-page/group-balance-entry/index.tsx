@@ -3,8 +3,9 @@
 import { useLocalStorage } from "@fondingo/utils/hooks";
 import { useCallback, useMemo } from "react";
 
-import { currencyIconMap } from "@fondingo/ui/constants";
+import { DisplayAmount } from "~/components/display-amount";
 import { CurrencyCode } from "@fondingo/db-split";
+import { LoadingState } from "../loading-state";
 import { Avatar } from "@fondingo/ui/avatar";
 import { DebtEntry } from "./debt-entry";
 import {
@@ -16,16 +17,21 @@ import {
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
-import { DisplayAmount } from "../display-amount";
 
 interface IProps {
+  index: number;
   groupId: string;
   memberId: string;
   currency: CurrencyCode;
 }
 
-export function GroupBalanceEntry({ groupId, memberId, currency }: IProps) {
-  const { data } = trpc.group.getDebtsByMemberId.useQuery({
+export function GroupBalanceEntry({
+  index,
+  groupId,
+  memberId,
+  currency,
+}: IProps) {
+  const { data, isFetching } = trpc.group.getDebtsByMemberId.useQuery({
     groupId,
     memberId,
   });
@@ -40,10 +46,6 @@ export function GroupBalanceEntry({ groupId, memberId, currency }: IProps) {
         isInDebt: false,
       },
     [data],
-  );
-  const CurrencyIcon = useMemo(
-    () => currencyIconMap[currency].icon,
-    [currency],
   );
   const displayAmount = useMemo(
     () => (isInDebt ? -grossBalance : grossBalance),
@@ -61,7 +63,10 @@ export function GroupBalanceEntry({ groupId, memberId, currency }: IProps) {
     [setExpanded],
   );
 
-  if (!data || !grossBalance) return null;
+  if (isFetching) {
+    if (index > 0) return null;
+    return <LoadingState />;
+  }
 
   return (
     <li>
@@ -86,7 +91,7 @@ export function GroupBalanceEntry({ groupId, memberId, currency }: IProps) {
               />
               <div className="flex items-center gap-x-1 font-medium">
                 <span className="font-bold">{member?.name}</span>
-                <span>{data.isInDebt ? "owes" : "gets back"}</span>
+                <span>{data?.isInDebt ? "owes" : "gets back"}</span>
                 <div
                   className={cn(
                     "flex items-center font-semibold",

@@ -2,13 +2,15 @@ import { GroupExpensesPanel } from "~/components/group-id-page/group-expenses-pa
 import { UtilityButtons } from "~/components/group-id-page/utility-buttons";
 import { GroupActions } from "~/components/group-id-page/group-actions";
 import { GroupHeader } from "~/components/group-id-page/group-header";
-import { GroupBalanceEntry } from "~/components/group-balance-entry";
+import { GroupBalanceEntry } from "~/components/group-id-page/group-balance-entry";
 import { GroupLog } from "~/components/group-id-page/group-log";
-import { GroupTotals } from "~/components/group-totals";
+import { GroupTotals } from "~/components/group-id-page/group-totals";
 import { GroupAvatar } from "~/components/group-avatar";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { linearGradientWithAlpha } from "~/lib/utils";
+import { Suspense } from "react";
+import { LoadingState } from "~/components/group-id-page/loading-state";
 
 interface IProps {
   params: {
@@ -74,9 +76,10 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
         >
           {searchParams.showBalances && !searchParams.showTotals && (
             <ul>
-              {groupMemberIds.map((id) => (
+              {groupMemberIds.map((id, idx) => (
                 <GroupBalanceEntry
                   key={id}
+                  index={idx}
                   groupId={group.id}
                   memberId={id}
                   currency={group.currency}
@@ -85,7 +88,9 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
             </ul>
           )}
           {searchParams.showTotals && !searchParams.showBalances && (
-            <GroupTotals groupId={group.id} />
+            <Suspense fallback={<LoadingState />}>
+              <GroupTotals groupId={group.id} />
+            </Suspense>
           )}
           {((!searchParams.showBalances && !searchParams.showTotals) ||
             (searchParams.showBalances && searchParams.showTotals)) && (

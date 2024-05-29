@@ -9,7 +9,7 @@ import { cn } from "@fondingo/ui/utils";
 
 import { Button } from "@fondingo/ui/button";
 import { Avatar } from "@fondingo/ui/avatar";
-import { DisplayAmount } from "../display-amount";
+import { DisplayAmount } from "../../display-amount";
 
 interface IProps {
   groupId: string;
