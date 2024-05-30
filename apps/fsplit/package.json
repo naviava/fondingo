@@ -9,11 +9,12 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-    "@fondingo/ui": "workspace:*",
     "@fondingo/api": "workspace:*",
-    "@fondingo/store": "workspace:*",
-    "@fondingo/utils": "workspace:*",
+    "@fondingo/db-auth": "workspace:*",
     "@fondingo/db-split": "workspace:*",
+    "@fondingo/store": "workspace:*",
+    "@fondingo/ui": "workspace:*",
+    "@fondingo/utils": "workspace:*",
     "@auth/prisma-adapter": "^2.0.0",
     "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.35.5",

@@ -10,6 +10,7 @@
     "@fondingo/typescript-config": "workspace:*"
   },
   "dependencies": {
+    "@fondingo/db-auth": "workspace:*",
     "@fondingo/db-split": "workspace:*",
     "@fondingo/utils": "workspace:*",
     "@trpc/server": "11.0.0-rc.366",

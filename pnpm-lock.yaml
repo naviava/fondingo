@@ -57,9 +57,15 @@ importers:
       '@fondingo/api':
         specifier: workspace:*
         version: link:../api
+      '@fondingo/db-auth':
+        specifier: workspace:*
+        version: link:../../packages/db-auth
       '@fondingo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@fondingo/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@hookform/resolvers':
         specifier: ^3.3.4
         version: 3.3.4(react-hook-form@7.51.4(react@18.2.0))
@@ -139,6 +145,9 @@ importers:
       '@fondingo/api':
         specifier: workspace:*
         version: link:../api
+      '@fondingo/db-auth':
+        specifier: workspace:*
+        version: link:../../packages/db-auth
       '@fondingo/db-split':
         specifier: workspace:*
         version: link:../../packages/db-split
@@ -236,6 +245,22 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
+
+  packages/db-auth:
+    dependencies:
+      '@prisma/client':
+        specifier: ^5.13.0
+        version: 5.13.0(prisma@5.13.0)
+    devDependencies:
+      '@fondingo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@fondingo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      prisma:
+        specifier: ^5.13.0
+        version: 5.13.0
 
   packages/db-split:
     dependencies:
