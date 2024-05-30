@@ -198,7 +198,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
     <>
       <div className="flex items-center justify-between px-2 pt-4">
         <Button
-          variant="splitGhost"
+          variant="ctaGhost"
           disabled={isPendingCreate || isPendingEdit}
           className={hfont.className}
         >
@@ -215,7 +215,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
         </h1>
         <Button
           type="button"
-          variant="splitGhost"
+          variant="ctaGhost"
           disabled={isPendingCreate || isPendingEdit}
           className={cn("w-20", hfont.className)}
           onClick={() => {

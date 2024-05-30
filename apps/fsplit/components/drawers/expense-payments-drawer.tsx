@@ -92,7 +92,7 @@ export function ExpensePaymentsDrawer() {
           <DrawerTitle className="flex items-center justify-between px-4">
             <Button
               size="sm"
-              variant="splitGhost"
+              variant="ctaGhost"
               onClick={onPaymentsDrawerClose}
             >
               Cancel
@@ -100,7 +100,7 @@ export function ExpensePaymentsDrawer() {
             Choose payer
             <Button
               size="sm"
-              variant="splitGhost"
+              variant="ctaGhost"
               disabled={
                 sum !== expenseAmount ||
                 (!!paymentsState.length && hasNegativeAmount)

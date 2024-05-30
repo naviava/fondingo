@@ -18,8 +18,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        splitCta: "bg-gradient-to-tr from-cta to-[#186E60] text-white",
-        splitGhost: "text-cta text-base font-semibold",
+        cta: "bg-gradient-to-tr from-cta to-[#186E60] text-white",
+        ctaGhost: "text-cta text-base font-semibold",
       },
       size: {
         default: "h-10 px-4 py-2",

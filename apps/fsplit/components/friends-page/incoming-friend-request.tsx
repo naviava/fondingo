@@ -86,7 +86,7 @@ function _IncomingFriendRequest({
           <>
             <Button
               size="sm"
-              variant="splitGhost"
+              variant="ctaGhost"
               disabled={isAccepting || isDeclining}
               onClick={() => handleAcceptFriendRequest({ requestId, fromId })}
             >

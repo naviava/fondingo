@@ -115,7 +115,7 @@ export function EditUserModal() {
           <div className="flex items-center justify-between">
             <Button
               size="sm"
-              variant="splitGhost"
+              variant="ctaGhost"
               onClick={() => {
                 form.reset();
                 onClose();
@@ -128,7 +128,7 @@ export function EditUserModal() {
             <DialogTitle>Edit account details</DialogTitle>
             <Button
               size="sm"
-              variant="splitGhost"
+              variant="ctaGhost"
               disabled={isPending}
               onClick={() => {
                 submitButtonRef.current?.click();

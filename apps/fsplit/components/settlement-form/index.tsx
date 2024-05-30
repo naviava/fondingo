@@ -172,7 +172,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
         <h1 className="text-lg font-semibold">Record a payment</h1>
         <Button
           size="sm"
-          variant="splitGhost"
+          variant="ctaGhost"
           disabled={isPendingAdd || isPendingEdit}
           onClick={() => {
             submitButtonRef.current?.click();

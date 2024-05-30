@@ -24,7 +24,7 @@ export function Header({ email, userName, imageUrl }: IProps) {
         <div className="absolute -right-12 top-1/2 flex -translate-y-1/2 items-center justify-center">
           <Button
             size="sm"
-            variant="splitGhost"
+            variant="ctaGhost"
             onClick={onOpen}
             className="h-auto p-2"
           >

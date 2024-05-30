@@ -99,17 +99,13 @@ export function ExpenseSplitsDrawer() {
       <DrawerContent className="mx-auto max-w-xl">
         <DrawerHeader className="px-0 py-1">
           <DrawerTitle className="flex items-center justify-between px-4">
-            <Button
-              size="sm"
-              variant="splitGhost"
-              onClick={onSplitsDrawerClose}
-            >
+            <Button size="sm" variant="ctaGhost" onClick={onSplitsDrawerClose}>
               Cancel
             </Button>
             Split options
             <Button
               size="sm"
-              variant="splitGhost"
+              variant="ctaGhost"
               disabled={splitType === "custom" && sum !== expenseAmount}
               onClick={handleCustomSplit}
               className="disabled:text-muted-foreground disabled:cursor-not-allowed"

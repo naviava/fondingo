@@ -102,7 +102,7 @@ export function Navbar() {
       ))}
       <Button
         type="button"
-        variant="splitCta"
+        variant="cta"
         onClick={handleClick}
         className="aspect-square h-full px-3"
       >

@@ -30,7 +30,7 @@ export async function FriendEntry({
       </div>
       <div className="flex flex-col items-end justify-center">
         {hideDebts ? (
-          <Button type="button" variant="splitGhost" size="sm">
+          <Button type="button" variant="ctaGhost" size="sm">
             Invite
           </Button>
         ) : amount === 0 ? (

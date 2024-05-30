@@ -13,7 +13,7 @@ export function UtilityButtons({ groupId, showBalances, showTotals }: IProps) {
     <>
       <Button
         asChild
-        variant="splitGhost"
+        variant="ctaGhost"
         className="absolute left-4 top-4 text-white"
       >
         <Link
@@ -25,7 +25,7 @@ export function UtilityButtons({ groupId, showBalances, showTotals }: IProps) {
       <Button
         asChild
         type="button"
-        variant="splitGhost"
+        variant="ctaGhost"
         className="absolute right-4 top-4 text-white"
       >
         <Link href={`/groups/${groupId}/settings`}>

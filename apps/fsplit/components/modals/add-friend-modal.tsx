@@ -67,7 +67,7 @@ export function AddFriendModal() {
         <DialogHeader>
           <div className="flex items-center justify-between">
             <Button
-              variant="splitGhost"
+              variant="ctaGhost"
               size="sm"
               disabled={isPending}
               onClick={onClose}
@@ -77,7 +77,7 @@ export function AddFriendModal() {
             </Button>
             <DialogTitle>Add friend</DialogTitle>
             <Button
-              variant="splitGhost"
+              variant="ctaGhost"
               size="sm"
               disabled={isPending}
               onClick={onClose}
@@ -132,7 +132,7 @@ export function AddFriendModal() {
                 ) : (
                   <Button
                     size="sm"
-                    variant="splitGhost"
+                    variant="ctaGhost"
                     disabled={isPending}
                     onClick={() => handleFriendRequest(user?.id || "")}
                     className="px-0 text-sm"

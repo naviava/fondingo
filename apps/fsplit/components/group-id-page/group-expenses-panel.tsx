@@ -40,7 +40,7 @@ function _GroupExpensesPanel({
           </h2>
           <Button
             type="button"
-            variant="splitCta"
+            variant="cta"
             onClick={() => onOpen({ userId, groupId })}
             className="h-14 w-64 text-lg shadow-md shadow-neutral-500"
           >

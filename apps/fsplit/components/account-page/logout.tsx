@@ -10,7 +10,7 @@ export function Logout() {
     <div className="my-6">
       <Button
         size="lg"
-        variant="splitGhost"
+        variant="ctaGhost"
         onClick={() => signOut()}
         className={cn(
           "w-full rounded-none py-8 hover:bg-neutral-200",

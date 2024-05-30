@@ -30,12 +30,7 @@ export function GroupNameEdit({
         </h2>
       </div>
       {/* TODO: Activate this link */}
-      <Button
-        asChild
-        size="sm"
-        variant="splitGhost"
-        className={hfont.className}
-      >
+      <Button asChild size="sm" variant="ctaGhost" className={hfont.className}>
         <Link
           href={`/groups/${groupId}/edit?groupName=${groupName}&color=${groupColor.slice(1)}&type=${groupType}&currency=${currency}`}
         >

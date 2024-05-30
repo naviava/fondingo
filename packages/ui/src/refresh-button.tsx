@@ -15,8 +15,8 @@ interface IProps {
     | "secondary"
     | "ghost"
     | "link"
-    | "splitCta"
-    | "splitGhost";
+    | "cta"
+    | "ctaGhost";
 }
 
 export function RefreshButton({ size = "sm", variant = "ghost" }: IProps) {

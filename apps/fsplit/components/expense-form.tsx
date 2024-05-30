@@ -200,7 +200,7 @@ export default function ExpenseForm({
       <div className="flex items-center justify-between px-2 pt-4">
         <Button
           asChild
-          variant="splitGhost"
+          variant="ctaGhost"
           disabled={isPendingAdd || isPendingEdit}
         >
           <Link
@@ -218,7 +218,7 @@ export default function ExpenseForm({
         </h1>
         <Button
           type="button"
-          variant="splitGhost"
+          variant="ctaGhost"
           disabled={isPendingAdd || isPendingEdit}
           onClick={() => {
             submitButtonRef.current?.click();
@@ -316,7 +316,7 @@ export default function ExpenseForm({
             <p>Paid by</p>
             <Button
               type="button"
-              variant="splitGhost"
+              variant="ctaGhost"
               size="sm"
               disabled={isPendingAdd || isPendingEdit}
               onClick={() => {
@@ -339,7 +339,7 @@ export default function ExpenseForm({
             <p>and split</p>
             <Button
               type="button"
-              variant="splitGhost"
+              variant="ctaGhost"
               size="sm"
               disabled={isPendingAdd || isPendingEdit}
               onClick={() => {

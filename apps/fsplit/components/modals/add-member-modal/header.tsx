@@ -86,7 +86,7 @@ export function Header({
     <div className="flex items-center justify-between">
       {isAddingContact ? (
         <Button
-          variant="splitGhost"
+          variant="ctaGhost"
           size="sm"
           disabled={disabled}
           onClick={() => {
@@ -99,7 +99,7 @@ export function Header({
         </Button>
       ) : (
         <Button
-          variant="splitGhost"
+          variant="ctaGhost"
           size="sm"
           disabled={disabled}
           onClick={onClose}
@@ -111,7 +111,7 @@ export function Header({
       <DialogTitle>Add group members</DialogTitle>
       {isAddingContact ? (
         <Button
-          variant="splitGhost"
+          variant="ctaGhost"
           size="sm"
           disabled={disabled}
           onClick={() => submitButtonRef.current?.click()}
@@ -121,7 +121,7 @@ export function Header({
         </Button>
       ) : (
         <Button
-          variant="splitGhost"
+          variant="ctaGhost"
           size="sm"
           disabled={disabled || !Object.keys(addedMembers).length}
           onClick={() =>
