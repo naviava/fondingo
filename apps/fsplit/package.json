@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@fondingo/api": "workspace:*",
-    "@fondingo/db-auth": "workspace:*",
     "@fondingo/db-split": "workspace:*",
     "@fondingo/store": "workspace:*",
     "@fondingo/ui": "workspace:*",
