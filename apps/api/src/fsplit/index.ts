@@ -12,3 +12,4 @@ export const appRouter = router({
 
 export type AppRouter = typeof appRouter;
 export { createCallerFactory } from "./trpc";
+export { fetchRequestHandler } from "@trpc/server/adapters/fetch";

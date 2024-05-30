@@ -1,4 +1,4 @@
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { fetchRequestHandler } from "@fondingo/api/fsplit";
 import { appRouter } from "@fondingo/api/fsplit";
 
 function handler(req: Request) {

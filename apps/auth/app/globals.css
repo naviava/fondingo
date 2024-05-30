@@ -87,24 +87,3 @@ body,
       "calt" 1;
   }
 }
-
-.form-input {
-  @apply focus-visible:border-b-cta rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70;
-}
-
-.special {
-  font: 22px Arial;
-  display: inline-block;
-  padding: 1em 2em;
-  text-align: center;
-  color: white;
-
-  /* "to left" / "to right" - affects initial color */
-  background: linear-gradient(to right, salmon 50%, lightblue 50%) right;
-  background-size: 201%;
-  transition: 0.5s ease-out;
-}
-
-.special:hover {
-  background-position: left;
-}

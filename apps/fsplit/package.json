@@ -1,5 +1,5 @@
 {
-  "name": "@fondingo/fsplit",
+  "name": "fsplit",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,12 +9,12 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.0.0",
-    "@fondingo/api": "workspace:*",
-    "@fondingo/db-split": "workspace:*",
-    "@fondingo/store": "workspace:*",
     "@fondingo/ui": "workspace:*",
+    "@fondingo/api": "workspace:*",
+    "@fondingo/store": "workspace:*",
     "@fondingo/utils": "workspace:*",
+    "@fondingo/db-split": "workspace:*",
+    "@auth/prisma-adapter": "^2.0.0",
     "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.35.5",
     "@trpc/client": "11.0.0-rc.366",

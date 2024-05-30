@@ -25,9 +25,12 @@ export default function Page() {
           Sign In
         </Button>
       ) : (
-        <Button type="button" onClick={() => signOut()}>
-          Sign out
-        </Button>
+        <button type="button" onClick={() => signOut()} className="special">
+          <span className="block">Sign out</span>
+        </button>
+        // <Button type="button" onClick={() => signOut()}>
+        //   Sign out
+        // </Button>
       )}
     </div>
   );
