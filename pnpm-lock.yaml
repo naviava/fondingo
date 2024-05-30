@@ -81,6 +81,9 @@ importers:
       '@trpc/react-query':
         specifier: 11.0.0-rc.366
         version: 11.0.0-rc.366(@tanstack/react-query@5.35.5(react@18.2.0))(@trpc/client@11.0.0-rc.366(@trpc/server@11.0.0-rc.366))(@trpc/server@11.0.0-rc.366)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      bcrypt:
+        specifier: ^5.1.1
+        version: 5.1.1
       next:
         specifier: ^14.1.1
         version: 14.1.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -118,6 +121,9 @@ importers:
       '@next/eslint-plugin-next':
         specifier: ^14.1.1
         version: 14.1.1
+      '@types/bcrypt':
+        specifier: ^5.0.2
+        version: 5.0.2
       '@types/eslint':
         specifier: ^8.56.5
         version: 8.56.5
@@ -296,9 +302,6 @@ importers:
 
   packages/utils:
     dependencies:
-      bcrypt:
-        specifier: ^5.1.1
-        version: 5.1.1
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
@@ -315,9 +318,6 @@ importers:
         specifier: ^3.23.8
         version: 3.23.8
     devDependencies:
-      '@types/bcrypt':
-        specifier: ^5.0.2
-        version: 5.0.2
       '@types/jsonwebtoken':
         specifier: ^9.0.6
         version: 9.0.6
