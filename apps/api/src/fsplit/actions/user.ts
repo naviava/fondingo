@@ -77,7 +77,7 @@ export const createNewUser = publicProcedure
 
     return splitdb.$transaction(async (db) => {
       const hashedPassword = await hash(password, 10);
-      const newUser = await splitdb.user.create({
+      const newUser = await db.user.create({
         data: {
           name: displayName,
           email: email.toLowerCase(),
@@ -160,42 +160,55 @@ export const editProfile = privateProcedure
         message: "Phone number is already in use.",
       });
 
-    const updatedUser = await splitdb.user.update({
-      where: { id: user.id },
-      data: {
-        name: displayName,
-        firstName,
-        lastName,
-        phone,
-      },
-    });
-    if (!updatedUser)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to update profile.",
+    return splitdb.$transaction(async (db) => {
+      const existingUser = await db.user.findUnique({
+        where: { id: user.id },
       });
+      const updatedUser = await db.user.update({
+        where: { id: existingUser?.id },
+        data: {
+          name: displayName,
+          firstName,
+          lastName,
+          phone,
+        },
+      });
+      if (!updatedUser)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update profile.",
+        });
 
-    return {
-      toastTitle: "Profile updated",
-      toastDescription: "Come back and customize any time.",
-    };
+      if (
+        existingUser?.name !== updatedUser.name ||
+        existingUser?.phone !== updatedUser.phone ||
+        existingUser?.image !== updatedUser.image ||
+        existingUser?.email !== updatedUser.email ||
+        existingUser?.disabled !== updatedUser.disabled ||
+        existingUser?.lastName !== updatedUser.lastName ||
+        existingUser?.firstName !== updatedUser.firstName
+      ) {
+        const log = await db.log.create({
+          data: {
+            userId: user.id,
+            type: "USER",
+            message: `${user.name} updated their profile.`,
+          },
+        });
+        if (!log) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create log. Profile update failed.",
+          });
+        }
+      }
+      return {
+        toastTitle: "Profile updated",
+        toastDescription: "Come back and customize any time.",
+      };
+    });
   });
 
-/**
- * This function is used to send a friend request in the application.
- * It is a private procedure that takes an email string input representing the recipient of the friend request.
- * The email should be valid, otherwise an error message is thrown.
- *
- * @function sendFriendRequest
- * @param {Object} ctx - The context object containing the user information.
- * @param {string} email - The email of the user to whom the friend request will be sent.
- * @throws {TRPCError} Will throw an error if the user tries to send a friend request to themselves.
- * @throws {TRPCError} Will throw an error if the user with the provided email does not exist.
- * @throws {TRPCError} Will throw an error if the user is already a friend.
- * @throws {TRPCError} Will throw an error if a friend request already exists between the two users.
- * @throws {TRPCError} Will throw an error if the friend request could not be created due to a server error.
- * @returns {Promise<Object>} A Promise that resolves with a toast message when the friend request has been successfully sent.
- */
 export const sendFriendRequest = privateProcedure
   .input(z.string().min(1, { message: "Requested ID is required" }))
   .mutation(async ({ ctx, input: requestedId }) => {
@@ -255,27 +268,58 @@ export const sendFriendRequest = privateProcedure
         message: "Friend request already already exists.",
       });
 
-    const friendRequest = await splitdb.friendRequest.create({
-      data: {
-        fromId: user.id,
-        toId: existingUser.id,
-      },
-      include: {
-        to: {
-          select: { email: true },
+    return splitdb.$transaction(async (db) => {
+      const friendRequest = await db.friendRequest.create({
+        data: {
+          fromId: user.id,
+          toId: existingUser.id,
         },
-      },
-    });
-    if (!friendRequest)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to send friend request.",
+        include: {
+          to: {
+            select: {
+              name: true,
+            },
+          },
+        },
       });
+      if (!friendRequest)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send friend request.",
+        });
 
-    return {
-      toastTitle: "Friend request sent",
-      toastDescription: `Friend request has been sent to ${friendRequest.to.email}.`,
-    };
+      const sentFriendRequestLog = await db.log.create({
+        data: {
+          userId: user.id,
+          type: "USER",
+          message: `Sent friend request to ${friendRequest.to.name}.`,
+        },
+      });
+      if (!sentFriendRequestLog) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Friend request failed.",
+        });
+      }
+      const receivedFriendRequestLog = await db.log.create({
+        data: {
+          userId: existingUser.id,
+          type: "USER",
+          message: `Received friend request from ${user.name}.`,
+        },
+      });
+      if (!receivedFriendRequestLog) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Friend request failed.",
+        });
+      }
+
+      return {
+        toastTitle: "Friend request sent",
+        toastDescription: `Friend request has been sent to ${friendRequest.to.name}.`,
+      };
+    });
   });
 
 export const getFriendRequests = privateProcedure.query(async ({ ctx }) => {
@@ -296,19 +340,6 @@ export const getFriendRequests = privateProcedure.query(async ({ ctx }) => {
   };
 });
 
-/**
- * This function is used to decline a friend request in the application.
- * It is a private procedure that takes a string input representing the friend request ID.
- * The ID should be at least 1 character long, otherwise an error message is thrown.
- *
- * @function declineFriendRequest
- * @param {Object} ctx - The context object containing the user information.
- * @param {string} friendReqId - The ID of the friend request to be declined.
- * @throws {TRPCError} Will throw an error if the friend request is not found.
- * @throws {TRPCError} Will throw an error if the user is not authorized to decline the friend request.
- * @throws {TRPCError} Will throw an error if the friend request could not be deleted due to a server error.
- * @returns {Promise<Object>} A Promise that resolves with a toast message when the friend request has been successfully deleted.
- */
 export const declineFriendRequest = privateProcedure
   .input(
     z.object({
@@ -355,19 +386,6 @@ export const declineFriendRequest = privateProcedure
     };
   });
 
-/**
- * This function accepts a friend request by creating a new friendship and deleting the friend request.
- * It is a private procedure that requires the user to be authenticated.
- *
- * @function acceptFriendRequest
- * @param {string} friendReqId - The ID of the friend request to be accepted. It must be a non-empty string.
- * @returns {Promise<Object>} A promise that resolves to an object containing a success message and the names of the new friends.
- *
- * @throws {TRPCError} Will throw an error if the friend request ID is not found.
- * @throws {TRPCError} Will throw an error if the user is not authorized to accept the friend request.
- * @throws {TRPCError} Will throw an error if the creation of the friend fails.
- * @throws {TRPCError} Will throw an error if the deletion of the friend request fails.
- */
 export const acceptFriendRequest = privateProcedure
   .input(
     z.object({
@@ -407,7 +425,10 @@ export const acceptFriendRequest = privateProcedure
         },
         include: {
           user1: {
-            select: { name: true },
+            select: {
+              id: true,
+              name: true,
+            },
           },
           user2: {
             select: { name: true },
@@ -427,6 +448,31 @@ export const acceptFriendRequest = privateProcedure
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete friend request.",
+        });
+
+      const receivedLog = await db.log.create({
+        data: {
+          userId: user.id,
+          type: "USER",
+          message: `You and ${friend.user1.name} became friends.`,
+        },
+      });
+      if (!receivedLog)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Couldn't accept friend request.",
+        });
+      const sentLog = await db.log.create({
+        data: {
+          userId: friend.user1.id,
+          type: "USER",
+          message: `You and ${friend.user2.name} became friends.`,
+        },
+      });
+      if (!sentLog)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Couldn't accept friend request.",
         });
 
       return {
@@ -465,35 +511,6 @@ export const getFriends = privateProcedure.query(async ({ ctx }) => {
   };
 });
 
-/**
- * This function is an asynchronous operation that calculates and returns the gross balance of a user.
- * The gross balance is calculated as the difference between the total amount of credits and the total amount of debts of the user.
- *
- * The function is exported as a `privateProcedure.query` which means it's a private method that can be queried.
- *
- * The function takes an object as an argument which contains a `ctx` property. The `ctx` property is an object that contains the `user` object.
- * The `user` object is expected to have an `id` property which is used to query the database for the user's debts and credits.
- *
- * The function queries the `splitdb.simplifiedDebt` table twice:
- * 1. First, it finds all the debts where the user is the debtor (`from: { userId: user.id }`).
- * 2. Then, it finds all the credits where the user is the creditor (`to: { userId: user.id }`).
- *
- * After retrieving the debts and credits, it calculates the total amount of debts and credits by reducing the arrays of debts and credits.
- * The `reduce` function is used to sum up the `amount` property of each debt and credit.
- *
- * The function then returns the difference between the total credit amount and the total debt amount which represents the user's gross balance.
- *
- * If any error occurs during the execution of the function, it logs the error to the console and throws a new `TRPCError` with the code "INTERNAL_SERVER_ERROR" and a message "Failed to get gross balance."
- *
- * @async
- * @function getGrossBalance
- * @param {Object} arg - The argument object.
- * @param {Object} arg.ctx - The context object.
- * @param {Object} arg.ctx.user - The user object.
- * @param {string} arg.ctx.user.id - The ID of the user.
- * @returns {Promise<number>} The gross balance of the user.
- * @throws {TRPCError} Will throw an error if the operation fails.
- */
 export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
   const { user } = ctx;
 
