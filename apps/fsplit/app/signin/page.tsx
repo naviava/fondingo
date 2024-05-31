@@ -9,7 +9,12 @@ export default function SignInPage() {
   const { formType } = useAuthForm();
 
   return (
-    <div className="relative flex h-full flex-col items-center justify-center">
+    <div
+      className={cn(
+        "relative flex h-full flex-col items-center justify-center px-4",
+        formType === "register" && "py-4",
+      )}
+    >
       {formType === "signin" && (
         <h1 className={cn("mb-10 text-2xl font-bold", hfont.className)}>
           Welcome to FSplit

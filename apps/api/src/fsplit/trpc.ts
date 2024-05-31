@@ -1,9 +1,8 @@
 import { getServerSession } from "next-auth";
 import { TRPCError, initTRPC } from "@trpc/server";
 import splitdb from "@fondingo/db-split";
-import { Context } from "./context";
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.create();
 export const middleware = t.middleware;
 
 // Logged in users only middleware.
@@ -68,7 +67,6 @@ const isAdmin = middleware(async (opts) => {
 });
 
 export const router = t.router;
-export { createContext } from "./context";
 export const createCallerFactory = t.createCallerFactory;
 
 export const publicProcedure = t.procedure;

@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { TRPCError } from "@trpc/server";
+import splitdb from "@fondingo/db-split";
 
 import { privateProcedure, publicProcedure } from "../trpc";
 import { z } from "@fondingo/utils/zod";
@@ -15,8 +16,7 @@ import { hash } from "bcrypt";
  *
  * @returns {Promise<object|null>} A Promise that resolves to the user object without the hashed password, or null if no user is found.
  */
-export const getAuthProfile = publicProcedure.query(async ({ ctx }) => {
-  const { splitdb } = ctx;
+export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
   if (!session || !session.user || !session.user.email) {
     return null;
@@ -56,8 +56,7 @@ export const createNewUser = publicProcedure
         .optional(),
     }),
   )
-  .mutation(async ({ ctx, input }) => {
-    const { splitdb } = ctx;
+  .mutation(async ({ input }) => {
     const {
       displayName,
       email,
@@ -128,7 +127,7 @@ export const editProfile = privateProcedure
     }),
   )
   .mutation(async ({ ctx, input }) => {
-    const { splitdb, user } = ctx;
+    const { user } = ctx;
     const { displayName, firstName, lastName, phone } = input;
 
     const enabledUserAccount = await splitdb.user.findUnique({
@@ -191,7 +190,7 @@ export const editProfile = privateProcedure
 export const sendFriendRequest = privateProcedure
   .input(z.string().min(1, { message: "Requested ID is required" }))
   .mutation(async ({ ctx, input: requestedId }) => {
-    const { splitdb, user } = ctx;
+    const { user } = ctx;
     if (user.id === requestedId)
       throw new TRPCError({
         code: "BAD_REQUEST",
@@ -271,7 +270,7 @@ export const sendFriendRequest = privateProcedure
   });
 
 export const getFriendRequests = privateProcedure.query(async ({ ctx }) => {
-  const { splitdb, user } = ctx;
+  const { user } = ctx;
   const sentFriendRequests = await splitdb.friendRequest.findMany({
     where: { fromId: user.id },
     include: { to: true },
@@ -311,7 +310,7 @@ export const declineFriendRequest = privateProcedure
     }),
   )
   .mutation(async ({ ctx, input }) => {
-    const { splitdb, user } = ctx;
+    const { user } = ctx;
     const { requestId, fromId } = input;
 
     const friendRequest = await splitdb.friendRequest.findUnique({
@@ -370,7 +369,7 @@ export const acceptFriendRequest = privateProcedure
     }),
   )
   .mutation(async ({ ctx, input }) => {
-    const { splitdb, user } = ctx;
+    const { user } = ctx;
     const { requestId, fromId } = input;
 
     const friendRequest = await splitdb.friendRequest.findUnique({
@@ -429,7 +428,7 @@ export const acceptFriendRequest = privateProcedure
   });
 
 export const getFriends = privateProcedure.query(async ({ ctx }) => {
-  const { splitdb, user } = ctx;
+  const { user } = ctx;
   const friends = await splitdb.friend.findMany({
     where: {
       OR: [{ user1Id: user.id }, { user2Id: user.id }],
@@ -487,7 +486,7 @@ export const getFriends = privateProcedure.query(async ({ ctx }) => {
  * @throws {TRPCError} Will throw an error if the operation fails.
  */
 export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
-  const { splitdb, user } = ctx;
+  const { user } = ctx;
 
   try {
     const debts = await splitdb.simplifiedDebt.findMany({
@@ -541,7 +540,7 @@ export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
 export const getDebtWithFriend = privateProcedure
   .input(z.string().min(1, { message: "Friend ID cannot be empty" }))
   .query(async ({ ctx, input: friendId }) => {
-    const { splitdb, user } = ctx;
+    const { user } = ctx;
 
     try {
       const existingFriend = await splitdb.user.findUnique({
@@ -597,7 +596,7 @@ export const getDebtWithFriend = privateProcedure
 export const findFriends = privateProcedure
   .input(z.string().min(1, { message: "Search query cannot be empty" }))
   .query(async ({ ctx, input }) => {
-    const { splitdb, user } = ctx;
+    const { user } = ctx;
     const searchTerm = input.toLowerCase();
 
     const friends = await splitdb.friend.findMany({
@@ -647,7 +646,7 @@ export const findFriends = privateProcedure
 export const findUsers = privateProcedure
   .input(z.string().min(1, { message: "Search query cannot be empty" }))
   .query(async ({ ctx, input }) => {
-    const { splitdb, user } = ctx;
+    const { user } = ctx;
     const searchTerm = input.toLowerCase();
 
     const users = await splitdb.user.findMany({

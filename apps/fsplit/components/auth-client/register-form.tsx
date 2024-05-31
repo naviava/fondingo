@@ -88,7 +88,12 @@ export function RegisterForm() {
           name="displayName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={cn("font-semibold", hfont.className)}>
+              <FormLabel
+                className={cn(
+                  "text-xs font-semibold md:text-sm",
+                  hfont.className,
+                )}
+              >
                 Display name
               </FormLabel>
               <FormControl>
@@ -98,7 +103,7 @@ export function RegisterForm() {
                   className="auth-form-input placeholder:text-neutral-400"
                 />
               </FormControl>
-              <FormDescription className="text-neutral-500">
+              <FormDescription className="text-xs italic text-neutral-500/90 md:text-sm">
                 This will be your public name.
               </FormDescription>
             </FormItem>
@@ -109,7 +114,12 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={cn("font-semibold", hfont.className)}>
+              <FormLabel
+                className={cn(
+                  "text-xs font-semibold md:text-sm",
+                  hfont.className,
+                )}
+              >
                 Email address
               </FormLabel>
               <FormControl>
@@ -129,9 +139,14 @@ export function RegisterForm() {
             name="firstName"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className={cn("font-semibold", hfont.className)}>
+                <FormLabel
+                  className={cn(
+                    "text-xs font-semibold md:text-sm",
+                    hfont.className,
+                  )}
+                >
                   First name
-                  <span className="ml-1 text-xs font-normal italic">
+                  <span className="ml-1 text-[11px] font-normal italic md:text-xs">
                     (optional)
                   </span>
                 </FormLabel>
@@ -147,9 +162,14 @@ export function RegisterForm() {
             name="lastName"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className={cn("font-semibold", hfont.className)}>
+                <FormLabel
+                  className={cn(
+                    "text-xs font-semibold md:text-sm",
+                    hfont.className,
+                  )}
+                >
                   Last name
-                  <span className="ml-1 text-xs font-normal italic">
+                  <span className="ml-1 text-[11px] font-normal italic md:text-xs">
                     (optional)
                   </span>
                 </FormLabel>
@@ -166,9 +186,14 @@ export function RegisterForm() {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={cn("font-semibold", hfont.className)}>
+              <FormLabel
+                className={cn(
+                  "text-xs font-semibold md:text-sm",
+                  hfont.className,
+                )}
+              >
                 Phone number
-                <span className="ml-1 text-xs font-normal italic">
+                <span className="ml-1 text-[11px] font-normal italic md:text-xs">
                   (optional)
                 </span>
               </FormLabel>
@@ -184,7 +209,12 @@ export function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={cn("font-semibold", hfont.className)}>
+              <FormLabel
+                className={cn(
+                  "text-xs font-semibold md:text-sm",
+                  hfont.className,
+                )}
+              >
                 Password
               </FormLabel>
               <FormControl>
@@ -214,7 +244,12 @@ export function RegisterForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={cn("font-semibold", hfont.className)}>
+              <FormLabel
+                className={cn(
+                  "text-xs font-semibold md:text-sm",
+                  hfont.className,
+                )}
+              >
                 Confirm password
               </FormLabel>
               <FormControl>
