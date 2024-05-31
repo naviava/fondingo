@@ -9,9 +9,6 @@ interface IProps {
 }
 
 export default async function AuthenticatedLayout({ children }: IProps) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) return redirect("/api/auth/signin");
-
   return (
     <div className="relative mx-auto flex h-dvh w-full max-w-xl flex-col bg-[#F4F4F4]">
       {children}
