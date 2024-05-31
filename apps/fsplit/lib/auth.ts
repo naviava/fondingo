@@ -1,6 +1,9 @@
 import CredentialsProvider from "next-auth/providers/credentials";
+import DiscordProvider from "next-auth/providers/discord";
+import TwitterProvider from "next-auth/providers/twitter";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
+import FacebookProvider from "next-auth/providers/facebook";
 import { AuthOptions } from "next-auth";
 
 import { PrismaAdapter } from "@auth/prisma-adapter";
@@ -22,6 +25,18 @@ export const authOptions: AuthOptions = {
     GithubProvider({
       clientId: process.env.AUTH_GITHUB_ID ?? "",
       clientSecret: process.env.AUTH_GITHUB_SECRET ?? "",
+    }),
+    DiscordProvider({
+      clientId: process.env.AUTH_DISCORD_ID ?? "",
+      clientSecret: process.env.AUTH_DISCORD_SECRET ?? "",
+    }),
+    TwitterProvider({
+      clientId: process.env.AUTH_TWITTER_ID ?? "",
+      clientSecret: process.env.AUTH_TWITTER_SECRET ?? "",
+    }),
+    TwitterProvider({
+      clientId: process.env.AUTH_FACEBOOK_ID ?? "",
+      clientSecret: process.env.AUTH_FACEBOOK_SECRET ?? "",
     }),
     CredentialsProvider({
       name: "credentials",
