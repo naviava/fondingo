@@ -13,6 +13,8 @@
     "@fondingo/db-split": "workspace:*",
     "@fondingo/utils": "workspace:*",
     "@trpc/server": "11.0.0-rc.366",
+    "@types/bcrypt": "^5.0.2",
+    "bcrypt": "^5.1.1",
     "next-auth": "^4.24.7"
   }
 }

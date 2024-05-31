@@ -20,6 +20,9 @@ import {
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/lib/utils";
 import { Eye, EyeOff } from "@fondingo/ui/lucide";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "@fondingo/ui/use-toast";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -29,6 +32,7 @@ const formSchema = z.object({
 interface IProps {}
 
 export function SigninForm({}: IProps) {
+  const router = useRouter();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,8 +43,19 @@ export function SigninForm({}: IProps) {
     },
   });
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
+    await signIn("credentials", {
+      ...values,
+      redirect: false,
+    }).then((res) => {
+      if (res?.ok) router.refresh();
+      else
+        toast({
+          title: "Sign in failed",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
+    });
   }, []);
 
   return (
@@ -51,14 +66,14 @@ export function SigninForm({}: IProps) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={cn(hfont.className)}>
+              <FormLabel className={cn("font-semibold", hfont.className)}>
                 Email address
               </FormLabel>
               <FormControl>
                 <Input
                   placeholder="yourname@email.com"
                   {...field}
-                  className="border-2 border-white bg-neutral-100/70"
+                  className="auth-form-input placeholder:text-neutral-400"
                 />
               </FormControl>
               <FormMessage />
@@ -70,14 +85,16 @@ export function SigninForm({}: IProps) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={cn(hfont.className)}>Password</FormLabel>
+              <FormLabel className={cn("font-semibold", hfont.className)}>
+                Password
+              </FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
                     type={isPasswordShown ? "text" : "password"}
                     placeholder="******"
                     {...field}
-                    className="border-2 border-white bg-neutral-100/70 pr-16"
+                    className="auth-form-input pr-16 placeholder:text-neutral-400"
                   />
                   <Button
                     type="button"

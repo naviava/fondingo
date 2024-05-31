@@ -12,6 +12,7 @@ import {
   getFriendRequests,
   findFriends,
   editProfile,
+  createNewUser,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -26,4 +27,5 @@ export const userRouter = router({
   getDebtWithFriend,
   findUsers,
   findFriends,
+  createNewUser,
 });

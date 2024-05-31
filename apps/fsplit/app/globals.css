@@ -92,6 +92,10 @@ body,
   @apply focus-visible:border-b-cta rounded-none border-b-2 bg-transparent px-0 py-3 text-lg font-medium transition placeholder:font-medium placeholder:text-neutral-400/70;
 }
 
+.auth-form-input {
+  @apply border-2 border-white bg-neutral-100/70;
+}
+
 .special {
   font: 22px Arial;
   display: inline-block;

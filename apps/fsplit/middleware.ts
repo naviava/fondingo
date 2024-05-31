@@ -10,5 +10,6 @@ export const config = {
     "/create-group/:path*",
     "/friends/:path*",
     "/groups/:path*",
+    "/new-user/:path*",
   ],
 };
