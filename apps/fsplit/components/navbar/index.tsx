@@ -97,6 +97,7 @@ export function Navbar() {
             isActive={option.isActive}
             activeIcon={option.activeIcon}
             inactiveIcon={option.inactiveIcon}
+            showNotification={option.label === "Friends"}
           />
         </Link>
       ))}
