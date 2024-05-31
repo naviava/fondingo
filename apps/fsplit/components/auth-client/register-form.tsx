@@ -1,12 +1,15 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { signIn } from "next-auth/react";
 import { z } from "@fondingo/utils/zod";
 
 import { Eye, EyeOff } from "@fondingo/ui/lucide";
+import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 import {
@@ -22,32 +25,34 @@ import {
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/lib/utils";
-import { toast } from "@fondingo/ui/use-toast";
 
-const formSchema = z.object({
-  displayName: z
-    .string()
-    .min(1, { message: "Display name cannot be empty" })
-    .max(20, { message: "Display name cannot be longer than 20 characters." }),
-  email: z.string().email({ message: "Invalid email" }),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  password: z.string().min(6, { message: "Password too short" }),
-  confirmPassword: z.string(),
-  phone: z
-    .string()
-    .regex(
-      new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/),
-      { message: "Invalid phone number." },
-    )
-    .optional(),
-});
-// .refine((data) => data.password === data.confirmPassword, {
-//   message: "Passwords do not match",
-//   path: ["confirmPassword"],
-// });
+const formSchema = z
+  .object({
+    displayName: z
+      .string()
+      .min(1, { message: "Cannot be empty" })
+      .max(20, { message: "Max 20 characters." }),
+    email: z.string().email({ message: "Invalid email" }),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    password: z.string().min(6, { message: "Password too short" }),
+    confirmPassword: z.string(),
+    phone: z
+      .string()
+      .regex(
+        new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}?$/),
+        { message: "Invalid phone number." },
+      )
+      .optional()
+      .or(z.literal("")),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export function RegisterForm() {
+  const router = useRouter();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -69,11 +74,25 @@ export function RegisterForm() {
         title: "Something went wrong",
         description: message,
       }),
-    onSuccess: ({ toastTitle, toastDescription }) =>
+    onSuccess: async ({ toastTitle, toastDescription }) => {
       toast({
         title: toastTitle,
         description: toastDescription,
-      }),
+      });
+      await signIn("credentials", {
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+        redirect: false,
+      }).then((res) => {
+        if (res?.ok) router.refresh();
+        else
+          toast({
+            title: "Sign in failed",
+            description: "Invalid credentials. Please try again.",
+            variant: "destructive",
+          });
+      });
+    },
   });
 
   const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
@@ -267,7 +286,7 @@ export function RegisterForm() {
             hfont.className,
           )}
         >
-          Sign in
+          Register & Sign in
         </Button>
       </form>
     </Form>

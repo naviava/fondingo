@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@fondingo/ui/use-toast";
+import { useUtils } from "~/hooks/use-utils";
 import { useForm } from "react-hook-form";
 import { trpc } from "~/lib/trpc/client";
 import { z } from "@fondingo/utils/zod";
@@ -14,20 +15,19 @@ import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";
 import { FormInput } from "./form-input";
 import { Form } from "@fondingo/ui/form";
+import { X } from "@fondingo/ui/lucide";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@fondingo/ui/dialog";
-import { X } from "@fondingo/ui/lucide";
-import { useUtils } from "~/hooks/use-utils";
 
 const formSchema = z.object({
   displayName: z
     .string()
     .min(2, { message: "Display name must be at least 2 characters long." })
-    .max(50, { message: "Display name cannot be longer than 50 characters." }),
+    .max(20, { message: "Display name cannot be longer than 20 characters." }),
   email: z.string().email(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),

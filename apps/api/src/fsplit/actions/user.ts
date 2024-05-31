@@ -50,10 +50,11 @@ export const createNewUser = publicProcedure
       phone: z
         .string()
         .regex(
-          new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/),
+          new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}?$/),
           { message: "Invalid phone number." },
         )
-        .optional(),
+        .optional()
+        .or(z.literal("")),
     }),
   )
   .mutation(async ({ input }) => {
@@ -112,8 +113,8 @@ export const editProfile = privateProcedure
       displayName: z
         .string()
         .min(2, { message: "Display name must be at least 2 characters long." })
-        .max(50, {
-          message: "Display name cannot be longer than 50 characters.",
+        .max(20, {
+          message: "Display name cannot be longer than 20 characters.",
         }),
       firstName: z.string().optional(),
       lastName: z.string().optional(),
