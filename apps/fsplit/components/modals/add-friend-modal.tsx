@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import { useAddFriendModal } from "@fondingo/store/fsplit";
-import { useDebounceValue } from "@fondingo/utils/hooks";
+import { useDebounceValue, useMediaQuery } from "@fondingo/utils/hooks";
 
+import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";
 import { toast } from "@fondingo/ui/use-toast";
 import { Avatar } from "@fondingo/ui/avatar";
@@ -26,9 +27,11 @@ import {
 } from "@fondingo/ui/dialog";
 
 import { trpc } from "~/lib/trpc/client";
+import { cn } from "@fondingo/ui/utils";
 
 export function AddFriendModal() {
   const router = useRouter();
+  const { isMobile, isTab } = useMediaQuery();
   const { isOpen, onClose } = useAddFriendModal();
   const [debouncedValue, setValue] = useDebounceValue("", 500);
   const { data: foundUsers } = trpc.user.findUsers.useQuery(debouncedValue);
@@ -104,52 +107,65 @@ export function AddFriendModal() {
           </div>
         </DialogHeader>
         <Separator />
-        <ul className="mx-auto grid w-[90%] select-none grid-cols-1 gap-x-4 gap-y-4 px-4 md:w-full md:grid-cols-2">
-          {foundUsers?.map((user) => (
-            <li
-              key={user?.id}
-              className="flex cursor-pointer items-center justify-between gap-x-2 rounded-md px-2 py-1 transition hover:bg-neutral-100"
-            >
-              <div className="flex items-center gap-x-2">
-                <Avatar
-                  variant="sm"
-                  userName={user?.name}
-                  userImageUrl={user?.image}
-                />
-                <p className="line-clamp-1 text-sm font-medium">{user?.name}</p>
-              </div>
-              {!!user?.id &&
-                (sentFriendRequestIds?.includes(user.id) ? (
-                  <div className="text-muted-foreground flex items-center text-xs font-medium italic">
-                    Sent
-                    <ArrowRight className="h-3 w-3 md:hidden" />
-                  </div>
-                ) : receivedFriendRequestIds?.includes(user.id) ? (
-                  <div className="text-muted-foreground flex items-center text-xs font-medium italic">
-                    <ArrowLeft className="h-3 w-3 md:hidden" />
-                    Received
-                  </div>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="ctaGhost"
-                    disabled={isPending}
-                    onClick={() => handleFriendRequest(user?.id || "")}
-                    className="px-0 text-sm"
-                  >
-                    {isPending ? (
-                      <Loader className="animate-spin" />
-                    ) : (
-                      <>
-                        <UserPlus className="mr-1 h-4 w-4" />
-                        <span>Add</span>
-                      </>
-                    )}
-                  </Button>
-                ))}
-            </li>
-          ))}
-        </ul>
+        <ScrollArea
+          className={cn(
+            !!foundUsers &&
+              (isMobile
+                ? foundUsers?.length > 6
+                  ? "h-[40vh]"
+                  : ""
+                : foundUsers?.length > 12
+                  ? "h-[40vh]"
+                  : ""),
+          )}
+        >
+          <ul className="mx-auto grid w-[90%] select-none grid-cols-1 gap-x-4 gap-y-4 px-4 md:w-full md:grid-cols-2">
+            {foundUsers?.map((user) => (
+              <li
+                key={user?.id}
+                className="flex cursor-pointer items-center justify-between gap-x-2 rounded-md px-2 py-1 transition hover:bg-neutral-100"
+              >
+                <div className="flex items-center gap-x-2">
+                  <Avatar
+                    variant={isTab ? "sm" : "default"}
+                    userName={user?.name}
+                    userImageUrl={user?.image}
+                  />
+                  <p className="truncate text-sm font-medium">{user?.name}</p>
+                </div>
+                {!!user?.id &&
+                  (sentFriendRequestIds?.includes(user.id) ? (
+                    <div className="text-muted-foreground flex items-center text-xs font-medium italic">
+                      Sent
+                      <ArrowRight className="h-3 w-3 md:hidden" />
+                    </div>
+                  ) : receivedFriendRequestIds?.includes(user.id) ? (
+                    <div className="text-muted-foreground flex items-center text-xs font-medium italic">
+                      <ArrowLeft className="h-3 w-3 md:hidden" />
+                      Received
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ctaGhost"
+                      disabled={isPending}
+                      onClick={() => handleFriendRequest(user?.id || "")}
+                      className="px-0 text-sm"
+                    >
+                      {isPending ? (
+                        <Loader className="animate-spin" />
+                      ) : (
+                        <>
+                          <UserPlus className="mr-1 h-4 w-4" />
+                          <span>Add</span>
+                        </>
+                      )}
+                    </Button>
+                  ))}
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

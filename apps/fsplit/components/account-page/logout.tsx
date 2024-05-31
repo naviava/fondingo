@@ -11,7 +11,7 @@ export function Logout() {
       <Button
         size="lg"
         variant="ctaGhost"
-        onClick={() => signOut()}
+        onClick={() => signOut({ callbackUrl: "/" })}
         className={cn(
           "w-full rounded-none py-8 hover:bg-neutral-200",
           hfont.className,

@@ -15,11 +15,15 @@ export default function SignInPage() {
         formType === "register" && "py-4",
       )}
     >
-      {formType === "signin" && (
-        <h1 className={cn("mb-10 text-2xl font-bold", hfont.className)}>
-          Welcome to FSplit
-        </h1>
-      )}
+      <h1
+        className={cn(
+          "mb-10 text-2xl font-bold",
+          hfont.className,
+          formType === "register" && "hidden md:block",
+        )}
+      >
+        Welcome to FSplit
+      </h1>
       <AuthClient />
     </div>
   );

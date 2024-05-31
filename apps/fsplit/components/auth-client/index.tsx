@@ -25,12 +25,6 @@ const OPTIONS = [
   },
   {
     id: uuid(),
-    icon: SiGithub,
-    authTag: "github",
-    fill: "#333",
-  },
-  {
-    id: uuid(),
     icon: RiTwitterXFill,
     authTag: "twitter",
     fill: "#000",
@@ -40,6 +34,12 @@ const OPTIONS = [
     icon: FaDiscord,
     authTag: "discord",
     fill: "#7289da",
+  },
+  {
+    id: uuid(),
+    icon: SiGithub,
+    authTag: "github",
+    fill: "#333",
   },
   {
     id: uuid(),
@@ -58,9 +58,13 @@ export function AuthClient() {
       <div className="mt-8 text-center">
         {formType === "signin" && (
           <>
-            <span className={cn("text-sm font-medium", hfont.className)}>
-              Or sign in with
-            </span>
+            <div className="flex items-center justify-center gap-x-2">
+              <div className="h-[2px] w-16 rounded-full bg-black/20" />
+              <span className={cn("text-sm font-medium", hfont.className)}>
+                Or sign in with
+              </span>
+              <div className="h-[2px] w-16 rounded-full bg-black/20" />
+            </div>
             <div className="mt-4 flex items-center justify-center gap-x-4">
               {OPTIONS.map((option) => (
                 <SocialAuthButton key={option.id} {...option} />
