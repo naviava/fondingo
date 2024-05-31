@@ -22,34 +22,72 @@ export const createGroup = privateProcedure
     const { user } = ctx;
     const { groupName, color, type, currency } = input;
 
-    const group = await splitdb.group.create({
-      data: {
-        name: groupName,
-        color,
-        type,
-        currency,
-        members: {
-          create: {
-            userId: user.id,
-            name: user.name || user.email,
-            email: user.email,
-            role: "MANAGER",
+    return splitdb.$transaction(async (db) => {
+      const group = await db.group.create({
+        data: {
+          name: groupName,
+          color,
+          type,
+          currency,
+          members: {
+            create: {
+              userId: user.id,
+              name: user.name || user.email,
+              email: user.email,
+              role: "MANAGER",
+            },
           },
         },
-      },
-    });
-
-    if (!group)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to create group. Try again later.",
+        include: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       });
+      if (!group)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create group. Try again later.",
+        });
 
-    return {
-      groupId: group.id,
-      toastTitle: `${group.name} created.`,
-      toastDescription: "You can now invite members to the group.",
-    };
+      const groupLog = await db.log.create({
+        data: {
+          type: "GROUP",
+          groupId: group.id,
+          message: `${group.name} was created.`,
+        },
+      });
+      if (!groupLog)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create group log. Couldn't create group.",
+        });
+
+      const members = await db.log.createMany({
+        data: group.members.map((member) => ({
+          type: "GROUP",
+          groupId: group.id,
+          message: `${member.name} was added to the group.`,
+        })),
+      });
+      if (!members)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create group members log. Couldn't create group.",
+        });
+
+      return {
+        groupId: group.id,
+        toastTitle: `${group.name} created.`,
+        toastDescription: "You can now invite members to the group.",
+      };
+    });
   });
 
 export const editGroup = privateProcedure
@@ -69,31 +107,67 @@ export const editGroup = privateProcedure
     const { user } = ctx;
     const { groupId, groupName, color, type, currency } = input;
 
-    const updatedGroup = await splitdb.group.update({
-      where: {
-        id: groupId,
-        members: {
-          some: { userId: user.id },
+    return splitdb.$transaction(async (db) => {
+      const existingGroup = await db.group.findUnique({
+        where: {
+          id: groupId,
+          members: {
+            some: { userId: user.id },
+          },
         },
-      },
-      data: {
-        name: groupName,
-        color,
-        type,
-        currency,
-      },
-    });
-    if (!updatedGroup)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to update group. Try again later.",
       });
+      if (!existingGroup)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Group not found",
+        });
 
-    return {
-      groupId: updatedGroup.id,
-      toastTitle: `${updatedGroup.name} updated.`,
-      toastDescription: "Group details have been updated.",
-    };
+      const updatedGroup = await splitdb.group.update({
+        where: {
+          id: groupId,
+          members: {
+            some: { userId: user.id },
+          },
+        },
+        data: {
+          name: groupName,
+          color,
+          type,
+          currency,
+        },
+      });
+      if (!updatedGroup)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update group. Try again later.",
+        });
+
+      if (
+        existingGroup.name !== updatedGroup.name ||
+        existingGroup.color !== updatedGroup.color ||
+        existingGroup.type !== updatedGroup.type ||
+        existingGroup.currency !== updatedGroup.currency
+      ) {
+        const groupLog = await db.log.create({
+          data: {
+            type: "GROUP",
+            groupId: updatedGroup.id,
+            message: `Group details were updated by ${user.name || user.email}.`,
+          },
+        });
+        if (!groupLog)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create group log. Couldn't update group.",
+          });
+      }
+
+      return {
+        groupId: updatedGroup.id,
+        toastTitle: `${updatedGroup.name} updated.`,
+        toastDescription: "Group details have been updated.",
+      };
+    });
   });
 
 export const deleteGroupById = privateProcedure
@@ -148,6 +222,24 @@ export const deleteGroupById = privateProcedure
       const deletedGroup = await db.group.delete({
         where: { id: existingGroup.id },
       });
+      if (!deletedGroup)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete group. Try again later.",
+        });
+
+      const log = await db.log.create({
+        data: {
+          type: "USER",
+          userId: user.id,
+          message: `You deleted the group, ${deletedGroup.name}.`,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Couldn't delete group.",
+        });
       return {
         toastTitle: `${deletedGroup.name} deleted.`,
         toastDescription: "Group has been deleted.",
@@ -279,18 +371,38 @@ export const addMember = privateProcedure
     });
 
     if (!!existingMemberInGroup && existingMemberInGroup.isDeleted) {
-      const addedUser = await splitdb.groupMember.update({
-        where: { id: existingMemberInGroup.id },
-        data: {
-          name: memberName,
-          isDeleted: false,
-          userId: !!existingUser?.id ? existingUser?.id : "",
-        },
+      return splitdb.$transaction(async (db) => {
+        const addedUser = await db.groupMember.update({
+          where: { id: existingMemberInGroup.id },
+          data: {
+            name: memberName,
+            isDeleted: false,
+            userId: !!existingUser?.id ? existingUser?.id : "",
+          },
+        });
+        if (!addedUser)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to add user to the group",
+          });
+
+        const log = await db.log.create({
+          data: {
+            type: "GROUP",
+            groupId,
+            message: `${addedUser.name} was added back to the group.`,
+          },
+        });
+        if (!log)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create log. Couldn't add user to group.",
+          });
+        return {
+          toastTitle: `${addedUser.name} added to the group.`,
+          toastDescription: "You can now split expenses with them.",
+        };
       });
-      return {
-        toastTitle: `${addedUser.name} added to the group.`,
-        toastDescription: "You can now split expenses with them.",
-      };
     }
     if (!!existingMemberInGroup && !existingMemberInGroup.isDeleted)
       throw new TRPCError({
@@ -329,19 +441,39 @@ export const addMember = privateProcedure
 
     // If the user exists and is a friend, add them to the group.
     if (!!existingUser && isFriend) {
-      const newGroupMember = await splitdb.groupMember.create({
-        data: {
-          groupId,
-          name: memberName,
-          email: existingUser.email,
-          userId: existingUser.id,
-          role: "MEMBER",
-        },
+      return splitdb.$transaction(async (db) => {
+        const newGroupMember = await db.groupMember.create({
+          data: {
+            groupId,
+            name: memberName,
+            email: existingUser.email,
+            userId: existingUser.id,
+            role: "MEMBER",
+          },
+        });
+        if (!newGroupMember)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to add user to the group",
+          });
+
+        const log = await db.log.create({
+          data: {
+            type: "GROUP",
+            groupId,
+            message: `${newGroupMember.name} was added to the group.`,
+          },
+        });
+        if (!log)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create log. Couldn't add user to group.",
+          });
+        return {
+          toastTitle: `${newGroupMember.name} added to the group.`,
+          toastDescription: "You can now split expenses with them.",
+        };
       });
-      return {
-        toastTitle: `${newGroupMember.name} added to the group.`,
-        toastDescription: "You can now split expenses with them.",
-      };
     }
 
     // If the user does not exist, add them to the group, and add them as a temp friend.
@@ -355,6 +487,25 @@ export const addMember = privateProcedure
           role: "MEMBER",
         },
       });
+      if (!newGroupMember)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to add user to the group",
+        });
+
+      const newMemberLog = await db.log.create({
+        data: {
+          type: "GROUP",
+          groupId,
+          message: `${newGroupMember.name} was added to the group.`,
+        },
+      });
+      if (!newMemberLog)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            "Failed to create new member log. Couldn't add user to group.",
+        });
 
       const existingTempFriend = await db.tempFriend.findUnique({
         where: {
@@ -377,6 +528,24 @@ export const addMember = privateProcedure
           userId: user.id,
         },
       });
+      if (!newTempFriend)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create temp friend. Couldn't add user to group.",
+        });
+      const newTempFriendLog = await db.log.create({
+        data: {
+          type: "USER",
+          userId: user.id,
+          message: `${newTempFriend.name} was added to your temp friends.`,
+        },
+      });
+      if (!newTempFriendLog)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            "Failed to create new temp friend log. Couldn't add user to group.",
+        });
       return {
         toastTitle: `${newGroupMember.name} added to the group.`,
         toastDescription: `You can now split expenses with them. ${newTempFriend.email} has been added to your friends list.`,
@@ -418,7 +587,7 @@ export const addMultipleMembers = privateProcedure
     const updates = await splitdb.$transaction(async (db) => {
       const promises = newMembers.map(async (member) => {
         // Check if the user is already in the group.
-        const existingMemberInGroup = await splitdb.groupMember.findUnique({
+        const existingMemberInGroup = await db.groupMember.findUnique({
           where: {
             groupId_email: {
               groupId,
@@ -427,17 +596,24 @@ export const addMultipleMembers = privateProcedure
           },
         });
         // Check if the user exists in the database and is a friend.
-        const existingUser = await splitdb.user.findUnique({
+        const existingUser = await db.user.findUnique({
           where: { email: member.email },
         });
 
         if (!!existingMemberInGroup && existingMemberInGroup.isDeleted) {
-          const addedUser = await splitdb.groupMember.update({
+          const addedUser = await db.groupMember.update({
             where: { id: existingMemberInGroup.id },
             data: {
               name: member.name,
               isDeleted: false,
               userId: !!existingUser?.id ? existingUser?.id : "",
+            },
+          });
+          await db.log.create({
+            data: {
+              type: "GROUP",
+              groupId,
+              message: `${addedUser.name} was added back to the group.`,
             },
           });
           return addedUser;
@@ -488,6 +664,13 @@ export const addMultipleMembers = privateProcedure
               role: "MEMBER",
             },
           });
+          await db.log.create({
+            data: {
+              type: "GROUP",
+              groupId,
+              message: `${newGroupMember.name} was added to the group.`,
+            },
+          });
           return newGroupMember;
         }
 
@@ -499,6 +682,13 @@ export const addMultipleMembers = privateProcedure
             name: member.name,
             email: member.email,
             role: "MEMBER",
+          },
+        });
+        await db.log.create({
+          data: {
+            type: "GROUP",
+            groupId,
+            message: `${newGroupMember.name} was added to the group.`,
           },
         });
 
@@ -517,6 +707,13 @@ export const addMultipleMembers = privateProcedure
             name: member.name,
             email: member.email,
             userId: user.id,
+          },
+        });
+        await db.log.create({
+          data: {
+            type: "USER",
+            userId: user.id,
+            message: `${member.name} was added to your temp friends.`,
           },
         });
         return newGroupMember;
@@ -589,108 +786,110 @@ export const removeMemberFromGroup = privateProcedure
     const { user } = ctx;
     const { groupId, memberId } = input;
 
-    try {
-      return splitdb.$transaction(async (db) => {
-        const group = await db.group.findUnique({
-          where: {
-            id: groupId,
-            members: {
-              some: { userId: user.id },
-            },
+    return splitdb.$transaction(async (db) => {
+      const group = await db.group.findUnique({
+        where: {
+          id: groupId,
+          members: {
+            some: { userId: user.id },
           },
-          include: { members: true },
-        });
-        if (!group)
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Group not found",
-          });
-        if (group.members.length === 1)
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Cannot remove the last member from the group",
-          });
-
-        const member = await db.groupMember.findUnique({
-          where: {
-            groupId,
-            id: memberId,
-          },
-        });
-        if (!member)
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Member not found",
-          });
-        if (member.isDeleted)
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Member not found",
-          });
-
-        const noOfManagers = group.members.filter(
-          (m) => m.role === "MANAGER" && !m.isDeleted,
-        ).length;
-        if (noOfManagers === 1 && member.role === "MANAGER")
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message:
-              "Assign someone else as Manager before removing this member",
-          });
-
-        const currentUserInGroup = group.members.find(
-          (m) => m.userId === user.id,
-        );
-        if (
-          member.email !== user.email &&
-          currentUserInGroup?.role !== "MANAGER"
-        )
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "You are not authorized to remove this member",
-          });
-
-        const isSelf = user.email === member.email;
-        const hasPendingDebts = await db.simplifiedDebt.findFirst({
-          where: {
-            groupId,
-            OR: [{ fromId: memberId }, { toId: memberId }],
-          },
-        });
-        if (!!hasPendingDebts)
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `${isSelf ? "You have" : member.name + " has"} pending debts in the group`,
-          });
-
-        const updatedMember = await db.groupMember.update({
-          where: { id: member.id },
-          data: {
-            name: "(deleted)",
-            isDeleted: true,
-            role: "MEMBER",
-            userId: null,
-          },
-        });
-        if (!updatedMember)
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to remove member from group",
-          });
-        return {
-          toastTitle: isSelf ? "You left" : "Member removed",
-          toastDescription: isSelf
-            ? `You are no longer part of ${group.name}`
-            : `${updatedMember.name} has been removed from the group`,
-        };
+        },
+        include: { members: true },
       });
-    } catch (err) {
-      console.error(err);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to remove member from group",
+      if (!group)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Group not found",
+        });
+      if (group.members.length === 1)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot remove the last member from the group",
+        });
+
+      const member = await db.groupMember.findUnique({
+        where: {
+          groupId,
+          id: memberId,
+        },
       });
-    }
+      if (!member)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Member not found",
+        });
+      if (member.isDeleted)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Member not found",
+        });
+
+      const noOfManagers = group.members.filter(
+        (m) => m.role === "MANAGER" && !m.isDeleted,
+      ).length;
+      if (noOfManagers === 1 && member.role === "MANAGER")
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Assign someone else as Manager before removing this member",
+        });
+
+      const currentUserInGroup = group.members.find(
+        (m) => m.userId === user.id,
+      );
+      if (member.email !== user.email && currentUserInGroup?.role !== "MANAGER")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to remove this member",
+        });
+
+      const isSelf = user.email === member.email;
+      const hasPendingDebts = await db.simplifiedDebt.findFirst({
+        where: {
+          groupId,
+          OR: [{ fromId: memberId }, { toId: memberId }],
+        },
+      });
+      if (!!hasPendingDebts)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `${isSelf ? "You have" : member.name + " has"} pending debts in the group`,
+        });
+
+      const updatedMember = await db.groupMember.update({
+        where: { id: member.id },
+        data: {
+          name: "(deleted)",
+          isDeleted: true,
+          role: "MEMBER",
+          userId: null,
+        },
+      });
+      if (!updatedMember)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to remove member from group",
+        });
+
+      const log = await db.log.create({
+        data: {
+          type: "GROUP",
+          groupId,
+          message: `${member.name} left the group.`,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Couldn't remove member from group.",
+        });
+
+      return {
+        toastTitle: isSelf ? "You left" : "Member removed",
+        toastDescription: isSelf
+          ? `You are no longer part of ${group.name}`
+          : `${updatedMember.name} has been removed from the group`,
+      };
+    });
   });
 
 /**
@@ -1003,6 +1202,13 @@ export const calculateGroupDebts = privateProcedure
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to calculate debts",
       });
+    await splitdb.log.create({
+      data: {
+        type: "GROUP",
+        groupId: group.id,
+        message: `Manual debts calculation request by ${user.name || user.email}.`,
+      },
+    });
     return {
       toastTitle: `${group.name} debts calculated.`,
       toastDescription: "Debts have been calculated and stored",
