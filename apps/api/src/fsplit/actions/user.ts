@@ -6,16 +6,6 @@ import { privateProcedure, publicProcedure } from "../trpc";
 import { z } from "@fondingo/utils/zod";
 import { hash } from "bcrypt";
 
-/**
- * This function is a public procedure that queries for an authenticated user's profile.
- * It first retrieves the server session and checks if a user with an email exists in the session.
- * If not, it returns null.
- * If a user exists, it queries the database for a user with the matching email.
- * If no user is found in the database, it returns null.
- * If a user is found, it removes the hashed password from the user object and returns the user object.
- *
- * @returns {Promise<object|null>} A Promise that resolves to the user object without the hashed password, or null if no user is found.
- */
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
   if (!session || !session.user || !session.user.email) {
@@ -85,28 +75,44 @@ export const createNewUser = publicProcedure
         message: "Phone number is already in use.",
       });
 
-    const hashedPassword = await hash(password, 10);
-    const newUser = await splitdb.user.create({
-      data: {
-        name: displayName,
-        email: email.toLowerCase(),
-        hashedPassword,
-        firstName,
-        lastName,
-        phone,
-      },
-    });
-    if (!newUser)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to create user.",
+    return splitdb.$transaction(async (db) => {
+      const hashedPassword = await hash(password, 10);
+      const newUser = await splitdb.user.create({
+        data: {
+          name: displayName,
+          email: email.toLowerCase(),
+          hashedPassword,
+          firstName,
+          lastName,
+          phone,
+        },
       });
+      if (!newUser)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create user.",
+        });
 
-    return {
-      toastTitle: "Account created",
-      toastDescription:
-        "Welcome to FSplit! Start splitting bills with friends.",
-    };
+      const log = await db.log.create({
+        data: {
+          userId: newUser.id,
+          type: "USER",
+          message: `${newUser.name} joined FSplit.`,
+        },
+      });
+      if (!log) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Account creation failed.",
+        });
+      }
+
+      return {
+        toastTitle: "Account created",
+        toastDescription:
+          "Welcome to FSplit! Start splitting bills with friends.",
+      };
+    });
   });
 
 export const editProfile = privateProcedure
