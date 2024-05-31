@@ -30,7 +30,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  await mergeUserAccounts();
+  if (!!session && !!session.user && !!session.user.email)
+    await mergeUserAccounts();
 
   return (
     <html lang="en">

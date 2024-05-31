@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "./auth";
 import splitdb from "@fondingo/db-split";
+import { authOptions } from "./auth";
 
 export async function mergeUserAccounts() {
   const session = await getServerSession(authOptions);
@@ -14,7 +14,7 @@ export async function mergeUserAccounts() {
       isMerged: false,
     },
   });
-  if (!existingUser) return null;
+  if (!existingUser) return true;
 
   return splitdb.$transaction(async (db) => {
     await db.groupMember.updateMany({

@@ -4,7 +4,8 @@
   "exports": {
     "./fsplit": "./src/fsplit/index.ts",
     "./use-confirm-modal": "./src/use-confirm-modal.ts",
-    "./use-panel-height": "./src/use-panel-height.ts"
+    "./use-panel-height": "./src/use-panel-height.ts",
+    "./use-auth-form": "./src/use-auth-form.ts"
   },
   "dependencies": {
     "@fondingo/db-split": "workspace:*",

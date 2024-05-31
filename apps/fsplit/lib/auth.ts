@@ -66,4 +66,8 @@ export const authOptions: AuthOptions = {
       return session;
     },
   },
+  pages: {
+    signIn: "/signin",
+    newUser: "/new-user",
+  },
 };

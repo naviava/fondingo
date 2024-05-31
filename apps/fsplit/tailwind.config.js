@@ -20,7 +20,10 @@ module.exports = {
     },
     extend: {
       colors: {
-        cta: "#11998E",
+        cta: {
+          DEFAULT: "#11998E",
+          secondary: "#186E60",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
