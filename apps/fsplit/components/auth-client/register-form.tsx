@@ -8,19 +8,10 @@ import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { z } from "@fondingo/utils/zod";
 
-import { Eye, EyeOff } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
+import { AuthFormInput } from "./form-input";
 import { Button } from "@fondingo/ui/button";
-import { Input } from "@fondingo/ui/input";
-import {
-  Form,
-  FormItem,
-  FormLabel,
-  FormField,
-  FormMessage,
-  FormControl,
-  FormDescription,
-} from "@fondingo/ui/form";
+import { Form } from "@fondingo/ui/form";
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
@@ -47,7 +38,7 @@ const formSchema = z
       .or(z.literal("")),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
@@ -102,192 +93,74 @@ export function RegisterForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
-        <FormField
-          control={form.control}
-          name="displayName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel
-                className={cn(
-                  "text-xs font-semibold md:text-sm",
-                  hfont.className,
-                )}
-              >
-                Display name
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="ImAwesome123"
-                  {...field}
-                  className="auth-form-input placeholder:text-neutral-400"
-                />
-              </FormControl>
-              <FormDescription className="text-xs italic text-neutral-500/90 md:text-sm">
-                This will be your public name.
-              </FormDescription>
-            </FormItem>
-          )}
+        <AuthFormInput
+          form={form}
+          fieldName="displayName"
+          label="Display name"
+          placeholder="ImAwesome123"
+          description="This will be your public name."
+          disabled={false}
         />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel
-                className={cn(
-                  "text-xs font-semibold md:text-sm",
-                  hfont.className,
-                )}
-              >
-                Email address
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="yourname@email.com"
-                  {...field}
-                  className="auth-form-input placeholder:text-neutral-400"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <AuthFormInput
+          form={form}
+          fieldName="email"
+          label="Email address"
+          placeholder="yourname@email.com"
+          disabled={false}
         />
         <div className="flex items-center gap-x-2 md:gap-x-4">
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel
-                  className={cn(
-                    "text-xs font-semibold md:text-sm",
-                    hfont.className,
-                  )}
-                >
-                  First name
-                  <span className="ml-1 text-[11px] font-normal italic md:text-xs">
-                    (optional)
-                  </span>
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} className="auth-form-input" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+          <AuthFormInput
+            form={form}
+            fieldName="firstName"
+            label="First name"
+            disabled={false}
+            forceFullWidth
+            isOptional
           />
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel
-                  className={cn(
-                    "text-xs font-semibold md:text-sm",
-                    hfont.className,
-                  )}
-                >
-                  Last name
-                  <span className="ml-1 text-[11px] font-normal italic md:text-xs">
-                    (optional)
-                  </span>
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} className="auth-form-input" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+          <AuthFormInput
+            form={form}
+            fieldName="lastName"
+            label="Last name"
+            disabled={false}
+            forceFullWidth
+            isOptional
           />
         </div>
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel
-                className={cn(
-                  "text-xs font-semibold md:text-sm",
-                  hfont.className,
-                )}
-              >
-                Phone number
-                <span className="ml-1 text-[11px] font-normal italic md:text-xs">
-                  (optional)
-                </span>
-              </FormLabel>
-              <FormControl>
-                <Input {...field} className="auth-form-input" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <AuthFormInput
+          form={form}
+          fieldName="phone"
+          label="Phone number"
+          disabled={false}
+          isOptional
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel
-                className={cn(
-                  "text-xs font-semibold md:text-sm",
-                  hfont.className,
-                )}
-              >
-                Password
-              </FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    type={isPasswordShown ? "text" : "password"}
-                    {...field}
-                    className="auth-form-input pr-16"
-                  />
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setIsPasswordShown((prev) => !prev)}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 text-neutral-400 hover:bg-transparent hover:text-neutral-500"
-                  >
-                    {isPasswordShown ? <EyeOff /> : <Eye />}
-                  </Button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <AuthFormInput
+          form={form}
+          fieldName="password"
+          label="Password"
+          type="password"
+          disabled={false}
+          isPasswordShown={isPasswordShown}
+          setIsPasswordShown={setIsPasswordShown}
         />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel
-                className={cn(
-                  "text-xs font-semibold md:text-sm",
-                  hfont.className,
-                )}
-              >
-                Confirm password
-              </FormLabel>
-              <FormControl>
-                <Input type="password" {...field} className="auth-form-input" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <AuthFormInput
+          form={form}
+          type="password"
+          fieldName="confirmPassword"
+          label="Confirm password"
+          disabled={false}
         />
-        <Button
-          variant="cta"
-          type="submit"
-          className={cn(
-            "text w-full transition focus:scale-[0.98]",
-            hfont.className,
-          )}
-        >
-          Register & Sign in
-        </Button>
+        <div>
+          <Button
+            variant="cta"
+            type="submit"
+            className={cn(
+              "text mt-6 w-full transition focus:scale-[0.98]",
+              hfont.className,
+            )}
+          >
+            Register & Sign in
+          </Button>
+        </div>
       </form>
     </Form>
   );

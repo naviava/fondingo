@@ -76,7 +76,6 @@ export function SigninForm({}: IProps) {
                   className="auth-form-input placeholder:text-neutral-400"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -107,7 +106,6 @@ export function SigninForm({}: IProps) {
                   </Button>
                 </div>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />

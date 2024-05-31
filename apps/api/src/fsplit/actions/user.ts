@@ -47,14 +47,7 @@ export const createNewUser = publicProcedure
       lastName: z.string().optional(),
       password: z.string().min(6, { message: "Password too short" }),
       confirmPassword: z.string(),
-      phone: z
-        .string()
-        .regex(
-          new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}?$/),
-          { message: "Invalid phone number." },
-        )
-        .optional()
-        .or(z.literal("")),
+      phone: z.string().optional(),
     }),
   )
   .mutation(async ({ input }) => {
@@ -81,6 +74,15 @@ export const createNewUser = publicProcedure
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: "User with that email already exists.",
+      });
+
+    const existingPhoneNumber = await splitdb.user.findFirst({
+      where: { phone },
+    });
+    if (!!existingPhoneNumber)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Phone number is already in use.",
       });
 
     const hashedPassword = await hash(password, 10);

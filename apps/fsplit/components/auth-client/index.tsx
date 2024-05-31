@@ -70,7 +70,7 @@ export function AuthClient() {
         )}
         <div
           className={cn(
-            "flex items-center justify-center",
+            "-mt-2 flex items-center justify-center",
             formType === "signin" && "mt-6",
           )}
         >
