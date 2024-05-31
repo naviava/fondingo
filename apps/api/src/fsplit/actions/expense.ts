@@ -171,6 +171,20 @@ export const addExpense = privateProcedure
             message: "Failed to create expense",
           });
 
+        const log = await db.log.create({
+          data: {
+            type: "EXPENSE",
+            groupId,
+            expenseId: expense.id,
+            message: `${user.name} added an expense of ${(expense.amount / 100).toFixed(2)}`,
+          },
+        });
+        if (!log)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create log. Expense not added.",
+          });
+
         for (const payment of payments) {
           const expensePayment = await db.expensePayment.create({
             data: {
@@ -256,7 +270,6 @@ export const updateExpense = privateProcedure
     } = input;
     const expenseAmount = Math.floor(unformatedExpenseAmount * 100);
 
-    // try {
     const existingExpense = await splitdb.expense.findUnique({
       where: {
         id: expenseId,
@@ -372,6 +385,37 @@ export const updateExpense = privateProcedure
           message: "Failed to update expense",
         });
 
+      if (updatedExpense.name !== existingExpense.name) {
+        const log = await db.log.create({
+          data: {
+            type: "EXPENSE",
+            groupId,
+            expenseId: updatedExpense.id,
+            message: `${user.name} updated the name to ${updatedExpense.name}`,
+          },
+        });
+        if (!log)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create name log. Expense not updated.",
+          });
+      }
+      if (updatedExpense.amount !== existingExpense.amount) {
+        const log = await db.log.create({
+          data: {
+            type: "EXPENSE",
+            groupId,
+            expenseId: updatedExpense.id,
+            message: `${user.name} updated the amount to ${(updatedExpense.amount / 100).toFixed(2)}`,
+          },
+        });
+        if (!log)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create amount log. Expense not updated.",
+          });
+      }
+
       for (const payment of payments) {
         const expensePayment = await db.expensePayment.create({
           data: {
@@ -415,13 +459,6 @@ export const updateExpense = privateProcedure
       toastTitle: `${updatedExpense.name} added`,
       toastDescription: `Expense of ${updatedExpense.amount / 100} added to the group`,
     };
-    // } catch (err) {
-    //   console.error("\n\nError adding expense:\n\n", err);
-    //   throw new TRPCError({
-    //     code: "INTERNAL_SERVER_ERROR",
-    //     message: "Something went wrong. Try again later.",
-    //   });
-    // }
   });
 
 export const getExpenseIds = privateProcedure
@@ -524,27 +561,42 @@ export const deleteExpenseById = privateProcedure
         code: "NOT_FOUND",
         message: "Expense not found",
       });
-    const deletedExpense = await splitdb.expense.delete({
-      where: { id: existingExpense.id },
+
+    return splitdb.$transaction(async (db) => {
+      const deletedExpense = await db.expense.delete({
+        where: { id: existingExpense.id },
+      });
+      if (!deletedExpense)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete expense",
+        });
+
+      const log = await db.log.create({
+        data: {
+          type: "GROUP",
+          groupId,
+          message: `${user.name} deleted an expense of ${(deletedExpense.amount / 100).toFixed(2)}`,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Expense not deleted.",
+        });
+
+      const res = await calculateDebts(groupId);
+      if (!("success" in res) || !res.success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to calculate debts",
+        });
+      }
+      return {
+        toastTitle: `${deletedExpense.name} deleted`,
+        toastDescription: `The expense of ${(deletedExpense.amount / 100).toLocaleString()} has been deleted successfully.`,
+      };
     });
-    if (!deletedExpense)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to delete expense",
-      });
-
-    const res = await calculateDebts(groupId);
-    if (!("success" in res) || !res.success) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to calculate debts",
-      });
-    }
-
-    return {
-      toastTitle: `${deletedExpense.name} deleted`,
-      toastDescription: `The expense of ${(deletedExpense.amount / 100).toLocaleString()} has been deleted successfully.`,
-    };
   });
 
 /**
@@ -628,38 +680,52 @@ export const addSettlement = privateProcedure
         message: "Both debtor and creditor should be in the group",
       });
 
-    const settlement = await splitdb.settlement.create({
-      data: {
-        groupId,
-        fromId,
-        toId,
-        createdById: user.id,
-        lastModifiedById: user.id,
-        amount: Math.floor(amount * 100),
-      },
-      include: {
-        from: true,
-        to: true,
-      },
+    return splitdb.$transaction(async (db) => {
+      const settlement = await db.settlement.create({
+        data: {
+          groupId,
+          fromId,
+          toId,
+          createdById: user.id,
+          lastModifiedById: user.id,
+          amount: Math.floor(amount * 100),
+        },
+        include: {
+          from: true,
+          to: true,
+        },
+      });
+      if (!settlement)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create settlement",
+        });
+
+      const log = await db.log.create({
+        data: {
+          type: "SETTLEMENT",
+          groupId,
+          message: `${user.name} added a payment of ${(settlement.amount / 100).toFixed(2)}, from ${settlement.from.name} to ${settlement.to.name}`,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Settlement not added.",
+        });
+
+      const res = await calculateDebts(groupId);
+      if (!("success" in res) || !res.success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to calculate debts",
+        });
+      }
+      return {
+        toastTitle: "Settlement added",
+        toastDescription: `${settlement.from.name} paid ${settlement.to.name} $${settlement.amount / 100}`,
+      };
     });
-    if (!settlement)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to create settlement",
-      });
-
-    const res = await calculateDebts(groupId);
-    if (!("success" in res) || !res.success) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to calculate debts",
-      });
-    }
-
-    return {
-      toastTitle: "Settlement added",
-      toastDescription: `${settlement.from.name} paid ${settlement.to.name} $${settlement.amount / 100}`,
-    };
   });
 
 export const updateSettlement = privateProcedure
@@ -718,39 +784,62 @@ export const updateSettlement = privateProcedure
         message: "Both debtor and creditor should be in the group",
       });
 
-    const updatedSettlement = await splitdb.settlement.update({
-      where: {
-        id: existingSettlement.id,
-      },
-      data: {
-        fromId,
-        toId,
-        lastModifiedById: user.id,
-        amount: Math.floor(amount * 100),
-      },
-      include: {
-        from: true,
-        to: true,
-      },
+    return splitdb.$transaction(async (db) => {
+      const updatedSettlement = await db.settlement.update({
+        where: {
+          id: existingSettlement.id,
+        },
+        data: {
+          fromId,
+          toId,
+          lastModifiedById: user.id,
+          amount: Math.floor(amount * 100),
+        },
+        include: {
+          from: true,
+          to: true,
+        },
+      });
+      if (!updatedSettlement)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update settlement",
+        });
+
+      const isDebtorSame =
+        existingSettlement.fromId === updatedSettlement.fromId;
+      const isCreditorSame = existingSettlement.toId === updatedSettlement.toId;
+      const isAmountSame =
+        existingSettlement.amount === updatedSettlement.amount;
+
+      if (!isDebtorSame || !isCreditorSame || !isAmountSame) {
+        const log = await db.log.create({
+          data: {
+            type: "SETTLEMENT",
+            groupId,
+            message: `${user.name} updated the payment to ${updatedSettlement.amount / 100}, from ${updatedSettlement.from.name} to ${updatedSettlement.to.name}.`,
+          },
+        });
+        if (!log)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create log. Settlement not updated.",
+          });
+      }
+
+      const res = await calculateDebts(groupId);
+      if (!("success" in res) || !res.success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to calculate debts",
+        });
+      }
+
+      return {
+        toastTitle: "Settlement updated",
+        toastDescription: `${updatedSettlement.from.name} paid ${updatedSettlement.to.name} $${updatedSettlement.amount / 100}`,
+      };
     });
-    if (!updatedSettlement)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to update settlement",
-      });
-
-    const res = await calculateDebts(groupId);
-    if (!("success" in res) || !res.success) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to calculate debts",
-      });
-    }
-
-    return {
-      toastTitle: "Settlement updated",
-      toastDescription: `${updatedSettlement.from.name} paid ${updatedSettlement.to.name} $${updatedSettlement.amount / 100}`,
-    };
   });
 
 export const getSettlements = privateProcedure
@@ -879,25 +968,42 @@ export const deleteSettlementById = privateProcedure
         code: "NOT_FOUND",
         message: "Settlement not found",
       });
-    const deletedSettlement = await splitdb.settlement.delete({
-      where: { id: existingSettlement.id },
+
+    return splitdb.$transaction(async (db) => {
+      const deletedSettlement = await db.settlement.delete({
+        where: { id: existingSettlement.id },
+      });
+      if (!deletedSettlement)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete Settlement",
+        });
+
+      const log = await db.log.create({
+        data: {
+          type: "GROUP",
+          userId: user.id,
+          groupId,
+          message: `${user.name} deleted a payment of ${(deletedSettlement.amount / 100).toFixed(2)}.`,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Settlement not deleted.",
+        });
+
+      const res = await calculateDebts(groupId);
+      if (!("success" in res) || !res.success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to calculate debts",
+        });
+      }
+
+      return {
+        toastTitle: `Payment deleted`,
+        toastDescription: `The payment of ${(deletedSettlement.amount / 100).toLocaleString()} has been deleted successfully.`,
+      };
     });
-    if (!deletedSettlement)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to delete Settlement",
-      });
-
-    const res = await calculateDebts(groupId);
-    if (!("success" in res) || !res.success) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to calculate debts",
-      });
-    }
-
-    return {
-      toastTitle: `Payment deleted`,
-      toastDescription: `The payment of ${(deletedSettlement.amount / 100).toLocaleString()} has been deleted successfully.`,
-    };
   });
