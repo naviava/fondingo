@@ -48,5 +48,12 @@ export async function mergeUserAccounts() {
       where: { id: existingUser.id },
       data: { isMerged: true },
     });
+    await db.log.create({
+      data: {
+        userId: existingUser.id,
+        type: "USER",
+        message: `${existingUser.name} joined FSplit.`,
+      },
+    });
   });
 }
