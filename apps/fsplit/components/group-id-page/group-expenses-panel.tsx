@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { UserPlus } from "@fondingo/ui/lucide";
@@ -31,9 +31,17 @@ function _GroupExpensesPanel({
   const { onOpen } = useAddMemberModal();
   const { panelHeight, topRef, bottomRef } = usePanelHeight((state) => state);
 
+  const height = useMemo(
+    () => (!!topRef && !!bottomRef ? `${panelHeight - 16}px` : "default"),
+    [topRef, bottomRef, panelHeight],
+  );
+
   if (!hasMembers) {
     return (
-      <div className="flex h-[55vh] flex-col items-center justify-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
+      <div
+        className="flex flex-col items-center justify-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"
+        style={{ height }}
+      >
         <div className="flex -translate-y-1/2 flex-col items-center justify-center">
           <h2 className="mb-10 text-center text-gray-500">
             You're the only one here!
@@ -54,7 +62,10 @@ function _GroupExpensesPanel({
 
   if (hasMembers && !hasExpenses) {
     return (
-      <div className="flex h-[55vh] flex-col items-center justify-center px-4 text-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
+      <div
+        className="flex h-[55vh] flex-col items-center justify-center px-4 text-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"
+        style={{ height }}
+      >
         <h2 className="mb-2 text-center font-semibold tracking-wide">
           No expenses here yet.
         </h2>
@@ -80,12 +91,6 @@ function _GroupExpensesPanel({
 
   return (
     // <ScrollArea className="h-[55vh] md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
-    <ScrollArea
-      style={{
-        height: topRef && bottomRef ? `${panelHeight - 16}px` : "default",
-      }}
-    >
-      {children}
-    </ScrollArea>
+    <ScrollArea style={{ height }}>{children}</ScrollArea>
   );
 }

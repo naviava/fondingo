@@ -1,8 +1,4 @@
-import { authOptions } from "~/lib/auth";
-import { getServerSession } from "next-auth";
-
 import { Navbar } from "~/components/navbar";
-import { redirect } from "next/navigation";
 
 interface IProps {
   children: React.ReactNode;

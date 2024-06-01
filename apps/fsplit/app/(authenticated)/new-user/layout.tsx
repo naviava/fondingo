@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { mergeUserAccounts } from "~/lib/merge-user-account";
+import { mergeUserAccounts } from "~/utils/merge-user-account";
 
 interface IProps {
   children: React.ReactNode;

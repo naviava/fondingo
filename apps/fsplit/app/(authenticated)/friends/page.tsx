@@ -6,7 +6,6 @@ import { serverClient } from "~/lib/trpc/server-client";
 import { OverallGrossBalance } from "~/components/overall-gross-balance";
 import { FcRating } from "react-icons/fc";
 import { IncomingFriendRequest } from "~/components/friends-page/incoming-friend-request";
-import { getToken } from "next-auth/jwt";
 
 export default async function FriendsPage() {
   const { friends: friendsInApp, tempFriends: friendsInGroups } =

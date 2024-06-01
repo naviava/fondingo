@@ -21,7 +21,7 @@ import { Input } from "@fondingo/ui/input";
 import { serverClient } from "~/lib/trpc/server-client";
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
-import \{ hexToRgb \} from "~/utils";
+import { hexToRgb } from "~/utils";
 
 const formSchema = z.object({
   groupId: z.string().min(1, { message: "Group ID is required" }),
