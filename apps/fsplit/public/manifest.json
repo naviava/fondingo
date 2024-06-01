@@ -1,0 +1,17 @@
+{
+  "name": "FSplit",
+  "short_name": "FSplit",
+  "icons": [
+    {
+      "src": "images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#F4F4F4",
+  "background_color": "#F4F4F4",
+  "start_url": "/groups",
+  "display": "standalone",
+  "orientation": "portrait"
+}

@@ -1,5 +1,5 @@
+import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
-import type { Metadata } from "next";
 import "./globals.css";
 
 import { getServerSession } from "next-auth";
@@ -19,9 +19,49 @@ const font = Roboto({
   subsets: ["latin"],
 });
 
+const APP_NAME = "FSplit";
+const APP_DEFAULT_TITLE = "FSplit";
+const APP_TITLE_TEMPLATE = "%s - FSplit";
+const APP_DESCRIPTION = "Your favorite expenses app";
+
 export const metadata: Metadata = {
-  title: "FSplit",
-  description: "Your favorite expenses app",
+  applicationName: APP_NAME,
+  title: {
+    default: APP_DEFAULT_TITLE,
+    template: APP_TITLE_TEMPLATE,
+  },
+  description: APP_DESCRIPTION,
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_DEFAULT_TITLE,
+    startupImage: ["images/logo.png"],
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary",
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F4F4F4",
 };
 
 export default async function RootLayout({
