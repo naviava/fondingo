@@ -83,7 +83,7 @@ export function Navbar() {
     updateNavbarPosition();
     window.addEventListener("resize", updateNavbarPosition);
     return () => window.removeEventListener("resize", updateNavbarPosition);
-  }, [setBottomRef]);
+  }, [setBottomRef, navbarRef]);
 
   return (
     <nav

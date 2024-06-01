@@ -2,7 +2,7 @@
 
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { serverClient } from "~/lib/trpc/server-client";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { PaymentSplitEntry } from "./payment-split-entry";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
@@ -20,6 +20,11 @@ export function ExpenseDetails({ user, group, expense }: IProps) {
     (state) => state,
   );
 
+  const height = useMemo(
+    () => (!!panelHeight ? `${panelHeight - 32}px` : "default"),
+    [panelHeight],
+  );
+
   useEffect(() => {
     function updateTopDivPosition() {
       const topDiv = topDivRef.current?.getBoundingClientRect();
@@ -28,16 +33,12 @@ export function ExpenseDetails({ user, group, expense }: IProps) {
     updateTopDivPosition();
     window.addEventListener("resize", updateTopDivPosition);
     return () => window.removeEventListener("resize", updateTopDivPosition);
-  }, [setTopRef]);
+  }, [setTopRef, topDivRef]);
 
   return (
     <>
       <Separator ref={topDivRef} className="my-4" />
-      <ScrollArea
-        style={{
-          height: topRef && bottomRef ? `${panelHeight - 32}px` : "default",
-        }}
-      >
+      <ScrollArea style={{ height }}>
         <div className="px-6">
           <ul>
             {expense.payments.map((payment) => (
