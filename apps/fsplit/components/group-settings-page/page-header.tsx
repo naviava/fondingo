@@ -2,7 +2,7 @@ import { ChevronLeft } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 import Link from "next/link";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 interface IProps {
   groupId: string;

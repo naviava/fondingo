@@ -3,7 +3,7 @@
 import { useAuthForm } from "@fondingo/store/use-auth-form";
 import { uuid } from "@fondingo/utils/uuid";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 import { RiTwitterXFill } from "react-icons/ri";
 import { FaFacebook } from "react-icons/fa6";

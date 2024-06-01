@@ -6,7 +6,7 @@ import { Feedback } from "~/components/account-page/feedback";
 import { Header } from "~/components/account-page/header";
 import { Logout } from "~/components/account-page/logout";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 export default async function AccountPage() {
   const user = await serverClient.user.getAuthProfile();

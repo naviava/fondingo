@@ -1,5 +1,5 @@
 import { FcComboChart } from "react-icons/fc";
-import { hexToRgb } from "~/lib/utils";
+import { hexToRgb } from "~/utils";
 
 interface IProps {
   groupColor: string;

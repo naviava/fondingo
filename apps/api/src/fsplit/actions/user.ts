@@ -126,13 +126,7 @@ export const editProfile = privateProcedure
         }),
       firstName: z.string().optional(),
       lastName: z.string().optional(),
-      phone: z
-        .string()
-        .regex(
-          new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/),
-          { message: "Invalid phone number." },
-        )
-        .optional(),
+      phone: z.string().optional(),
     }),
   )
   .mutation(async ({ ctx, input }) => {

@@ -5,7 +5,7 @@ import { cn } from "@fondingo/ui/utils";
 
 import { IconType } from "react-icons";
 import { TGroupType } from "~/types";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 interface IProps {
   label: string;

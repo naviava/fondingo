@@ -1,9 +1,10 @@
 "use client";
 
-import { AuthClient } from "~/components/auth-client";
-import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
 import { useAuthForm } from "@fondingo/store/use-auth-form";
+import { AuthClient } from "~/components/auth-client";
+
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
 
 export default function SignInPage() {
   const { formType } = useAuthForm();

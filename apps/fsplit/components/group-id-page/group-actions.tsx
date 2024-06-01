@@ -9,8 +9,8 @@ import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
-import { hexToRgb } from "~/lib/utils";
 import { cn } from "@fondingo/ui/utils";
+import { hexToRgb } from "~/utils";
 
 interface IProps {
   userId?: string;

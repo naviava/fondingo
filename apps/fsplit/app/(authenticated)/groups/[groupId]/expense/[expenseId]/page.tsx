@@ -9,7 +9,7 @@ import { Button } from "@fondingo/ui/button";
 import { serverClient } from "~/lib/trpc/server-client";
 import { format } from "@fondingo/utils/date-fns";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import \{ hfont \} from "~/utils";
 
 interface IProps {
   params: {

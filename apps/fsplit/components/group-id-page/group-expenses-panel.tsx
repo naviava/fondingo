@@ -1,14 +1,14 @@
 "use client";
 
 import { memo } from "react";
-import { useAddMemberModal } from "@fondingo/store/fsplit";
 
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { UserPlus } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 
-import { linearGradientWithAlpha } from "~/lib/utils";
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
+import { linearGradientWithAlpha } from "~/utils";
 
 interface IProps {
   children: React.ReactNode;

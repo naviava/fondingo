@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import splitdb from "@fondingo/db-split";
-import { authOptions } from "./auth";
+import { authOptions } from "~/lib/auth";
 
 export async function mergeUserAccounts() {
   const session = await getServerSession(authOptions);

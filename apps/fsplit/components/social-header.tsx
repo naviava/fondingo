@@ -7,7 +7,7 @@ import { useAddFriendModal } from "@fondingo/store/fsplit";
 import { SearchBar } from "~/components/search-bar";
 import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 export function SocialHeader() {
   const pathname = usePathname();

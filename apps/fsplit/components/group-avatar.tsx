@@ -3,7 +3,7 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import { FaRegListAlt } from "react-icons/fa";
 import { TGroupType } from "~/types";
 
-import { linearGradientWithAlpha } from "~/lib/utils";
+import { linearGradientWithAlpha } from "~/utils";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {

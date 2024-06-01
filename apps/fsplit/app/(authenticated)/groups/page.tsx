@@ -11,7 +11,7 @@ import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 export default async function GroupsPage() {
   const user = await serverClient.user.getAuthProfile();

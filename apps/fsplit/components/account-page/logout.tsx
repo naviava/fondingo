@@ -3,7 +3,7 @@
 import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";
 import { signOut } from "next-auth/react";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 export function Logout() {
   return (

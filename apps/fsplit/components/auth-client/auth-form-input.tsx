@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Eye, EyeOff } from "@fondingo/ui/lucide";
 import { UseFormReturn } from "react-hook-form";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";

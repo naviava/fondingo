@@ -8,7 +8,7 @@ import { GroupTotals } from "~/components/group-id-page/group-totals";
 import { GroupAvatar } from "~/components/group-avatar";
 
 import { serverClient } from "~/lib/trpc/server-client";
-import { linearGradientWithAlpha } from "~/lib/utils";
+import { linearGradientWithAlpha } from "~/utils";
 import { Suspense } from "react";
 import { LoadingState } from "~/components/group-id-page/loading-state";
 

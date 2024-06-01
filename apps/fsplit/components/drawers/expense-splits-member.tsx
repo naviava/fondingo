@@ -7,9 +7,9 @@ import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Input } from "@fondingo/ui/input";
 
-import { adjustMinorAmount } from "~/lib/utils";
-import { cn } from "@fondingo/ui/utils";
 import { currencyIconMap } from "@fondingo/ui/constants";
+import { cn } from "@fondingo/ui/utils";
+import { adjustMinorAmount } from "~/utils";
 
 interface IProps {
   userId: string;

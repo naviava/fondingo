@@ -2,7 +2,7 @@ import { serverClient } from "~/lib/trpc/server-client";
 import { MemberEntry } from "./member-entry";
 import { AddMemberOption } from "./add-member-option";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 interface IProps {
   userId?: string;

@@ -44,7 +44,7 @@ import {
   FormMessage,
 } from "@fondingo/ui/form";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 const formSchema = z.object({
   groupName: z

@@ -1,10 +1,12 @@
-import { RefreshButton } from "@fondingo/ui/refresh-button";
-import { DisplayAmount } from "~/components/display-amount";
 import { CurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
-import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+
+import { RefreshButton } from "@fondingo/ui/refresh-button";
+import { DisplayAmount } from "~/components/display-amount";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
+
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
 
 interface IProps {
   userId: string | undefined;

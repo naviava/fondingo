@@ -9,7 +9,7 @@ import { authOptions } from "~/lib/auth";
 import { cn } from "@fondingo/ui/utils";
 
 import SessionProvider from "~/components/providers/session-provider";
-import { mergeUserAccounts } from "~/lib/merge-user-account";
+import { mergeUserAccounts } from "~/utils/merge-user-account";
 import { Providers } from "~/components/providers";
 import { Toaster } from "@fondingo/ui/toaster";
 

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
+import { useEditUserModal } from "@fondingo/store/fsplit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@fondingo/ui/use-toast";
 import { useUtils } from "~/hooks/use-utils";
@@ -10,7 +11,6 @@ import { useForm } from "react-hook-form";
 import { trpc } from "~/lib/trpc/client";
 import { z } from "@fondingo/utils/zod";
 
-import { useEditUserModal } from "@fondingo/store/fsplit";
 import { Separator } from "@fondingo/ui/separator";
 import { Button } from "@fondingo/ui/button";
 import { FormInput } from "./form-input";
@@ -34,10 +34,11 @@ const formSchema = z.object({
   phone: z
     .string()
     .regex(
-      new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/),
+      new RegExp(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}?$/),
       { message: "Invalid phone number." },
     )
-    .optional(),
+    .optional()
+    .or(z.literal("")),
 });
 
 export function EditUserModal() {
@@ -79,6 +80,22 @@ export function EditUserModal() {
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
+      console.log(
+        form.getValues("displayName") === user?.name &&
+          form.getValues("email") === user.email &&
+          form.getValues("firstName") === user.firstName &&
+          form.getValues("lastName") === user.lastName &&
+          form.getValues("phone") === user.phone,
+      );
+      if (
+        form.getValues("displayName") === user?.name &&
+        form.getValues("email") === user.email &&
+        form.getValues("firstName") === user.firstName &&
+        form.getValues("lastName") === user.lastName &&
+        form.getValues("phone") === user.phone
+      ) {
+        return onClose();
+      }
       handleEditProfile(values);
     },
     [handleEditProfile],
@@ -151,7 +168,7 @@ export function EditUserModal() {
                 form={form}
                 fieldName="displayName"
                 label="Display Name"
-                placeholder={`${user?.name?.split(" ")[0]}123`}
+                placeholder="ImAwesome123"
                 disabled={isPending}
                 description="This is your public name."
                 showError

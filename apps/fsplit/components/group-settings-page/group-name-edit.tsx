@@ -1,10 +1,12 @@
-import { Button } from "@fondingo/ui/button";
-import { GroupAvatar } from "../group-avatar";
-import { TGroupType } from "~/types";
 import Link from "next/link";
+
 import { CurrencyCode } from "@fondingo/db-split";
+import { TGroupType } from "~/types";
+
+import { GroupAvatar } from "../group-avatar";
+import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 interface IProps {
   groupId: string;

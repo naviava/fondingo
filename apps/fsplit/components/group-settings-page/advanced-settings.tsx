@@ -18,7 +18,7 @@ import { trpc } from "~/lib/trpc/client";
 import { useIsMounted } from "~/hooks/use-is-mounted";
 import { Loader } from "@fondingo/ui/lucide";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 interface IProps {
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;

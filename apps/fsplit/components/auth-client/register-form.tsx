@@ -9,13 +9,13 @@ import { signIn } from "next-auth/react";
 import { z } from "@fondingo/utils/zod";
 
 import { toast } from "@fondingo/ui/use-toast";
-import { AuthFormInput } from "./form-input";
+import { AuthFormInput } from "./auth-form-input";
 import { Button } from "@fondingo/ui/button";
 import { Form } from "@fondingo/ui/form";
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/lib/utils";
+import { hfont } from "~/utils";
 
 const formSchema = z
   .object({
