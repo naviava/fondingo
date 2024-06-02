@@ -1,5 +1,4 @@
 import { DisplayAmount } from "~/components/display-amount";
-import { currencyIconMap } from "@fondingo/ui/constants";
 import { CurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
 import { cn } from "@fondingo/ui/utils";
@@ -22,7 +21,6 @@ export function GroupBalance({ userId, currency, data }: IProps) {
   }, 0);
 
   const isInDebt = grossBalanceAmount < 0;
-  const CurrencyIcon = currencyIconMap[currency].icon;
 
   if (grossBalanceAmount === 0) {
     return <div className="text-xs font-semibold md:text-sm">settled up</div>;

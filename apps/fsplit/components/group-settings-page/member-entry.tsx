@@ -1,11 +1,10 @@
 import { CurrencyCode, TGroupRole } from "@fondingo/db-split";
-import { currencyIconMap } from "@fondingo/ui/constants";
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
 
+import { DisplayAmount } from "~/components/display-amount";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { Avatar } from "@fondingo/ui/avatar";
-import { DisplayAmount } from "../display-amount";
 
 interface IProps {
   groupId: string;

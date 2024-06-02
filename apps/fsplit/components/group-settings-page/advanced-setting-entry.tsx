@@ -8,7 +8,6 @@ import { cn } from "@fondingo/ui/utils";
 
 import { Loader } from "@fondingo/ui/lucide";
 import { IconType } from "react-icons";
-import { format } from "@fondingo/utils/date-fns";
 
 interface IProps {
   title: string;

@@ -8,7 +8,6 @@ import { Logout } from "~/components/account-page/logout";
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
-import { useMediaQuery } from "@fondingo/utils/hooks";
 
 export function OptionsArea() {
   const { panelHeight } = usePanelHeight((state) => state);

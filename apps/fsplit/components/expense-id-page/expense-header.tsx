@@ -1,4 +1,3 @@
-import { currencyIconMap } from "@fondingo/ui/constants";
 import { ExpenseAvatar } from "../expense-avatar";
 import { CurrencyCode } from "@fondingo/db-split";
 import { DisplayAmount } from "../display-amount";

@@ -86,9 +86,12 @@ export function RegisterForm() {
     },
   });
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    handleCreateNewUser(values);
-  }, []);
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      handleCreateNewUser(values);
+    },
+    [handleCreateNewUser],
+  );
 
   return (
     <Form {...form}>
