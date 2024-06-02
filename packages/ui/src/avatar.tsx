@@ -25,6 +25,7 @@ const variantMap = {
 
 const textSizeMap = {
   default: "text-base",
+  xs: "text-xs",
   sm: "text-sm",
   lg: "text-3xl font-semibold",
   xl: "text-4xl font-semibold",
