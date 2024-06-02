@@ -1,3 +1,5 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
@@ -9,7 +11,6 @@ import { authOptions } from "~/lib/auth";
 import { cn } from "@fondingo/ui/utils";
 
 import SessionProvider from "~/components/providers/session-provider";
-import { mergeUserAccounts } from "~/utils/merge-user-account";
 import { Providers } from "~/components/providers";
 import { Toaster } from "@fondingo/ui/toaster";
 
@@ -83,6 +84,8 @@ export default async function RootLayout({
             <Toaster />
           </Providers>
         </SessionProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
