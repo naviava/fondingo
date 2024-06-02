@@ -11,11 +11,12 @@ import {
 interface IProps {
   userName: string | null | undefined;
   userImageUrl: string | null | undefined;
-  variant?: "default" | "sm" | "lg" | "xl" | "2xl";
+  variant?: "default" | "xs" | "sm" | "lg" | "xl" | "2xl";
 }
 
 const variantMap = {
   default: "h-10 w-10",
+  xs: "h-5 w-5",
   sm: "h-6 w-6",
   lg: "h-12 w-12",
   xl: "h-16 w-16",

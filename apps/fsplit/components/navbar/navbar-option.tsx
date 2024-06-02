@@ -7,6 +7,7 @@ import { trpc } from "~/lib/trpc/client";
 
 import { Avatar } from "@fondingo/ui/avatar";
 import { cn } from "@fondingo/ui/utils";
+import { useMediaQuery } from "@fondingo/utils/hooks";
 
 interface IProps {
   label: string;
@@ -24,6 +25,7 @@ function _NavbarOption({
   activeIcon: ActiveIcon,
   inactiveIcon: InactiveIcon,
 }: IProps) {
+  const { isTab } = useMediaQuery();
   const { data: currentUser } = trpc.user.getAuthProfile.useQuery();
   const { data } = trpc.user.getFriendRequests.useQuery();
 
@@ -34,14 +36,14 @@ function _NavbarOption({
       // TODO: Replace with user avatar
       <div className="flex flex-col items-center gap-y-1">
         <Avatar
-          variant="sm"
+          variant={isTab ? "sm" : "xs"}
           userName={currentUser?.name}
           userImageUrl={currentUser?.image}
         />
         <span
           className={cn(
-            "text-sm font-medium text-neutral-600 md:text-base",
-            isActive && "text-cta font-semibold",
+            "text-xs font-medium text-neutral-600 md:text-base",
+            isActive && "text-cta",
           )}
         >
           {label}
@@ -58,14 +60,14 @@ function _NavbarOption({
         </div>
       )}
       {isActive ? (
-        <ActiveIcon className="text-cta h-6 w-6" />
+        <ActiveIcon className="text-cta h-5 w-5 md:h-6 md:w-6" />
       ) : (
-        <InactiveIcon className="h-6 w-6 text-neutral-600" />
+        <InactiveIcon className="h-5 w-5 text-neutral-600 md:h-6 md:w-6" />
       )}
       <span
         className={cn(
-          "text-sm font-medium text-neutral-600 md:text-base",
-          isActive && "text-cta font-semibold",
+          "text-xs font-medium text-neutral-600 md:text-base",
+          isActive && "text-cta",
         )}
       >
         {label}
