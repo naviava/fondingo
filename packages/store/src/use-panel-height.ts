@@ -22,7 +22,7 @@ export const usePanelHeight = create<PanelHeightStore>((set) => ({
   bottomRef: 0,
   setBottomRef: (ref) =>
     set((state) => ({
-      ...StaticRange,
+      ...state,
       bottomRef: ref,
       panelHeight: !!ref ? ref - state.topRef : 0,
     })),

@@ -1,3 +1,5 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
@@ -9,7 +11,6 @@ import { authOptions } from "~/lib/auth";
 import { cn } from "@fondingo/ui/utils";
 
 import SessionProvider from "~/components/providers/session-provider";
-import { mergeUserAccounts } from "~/utils/merge-user-account";
 import { Providers } from "~/components/providers";
 import { Toaster } from "@fondingo/ui/toaster";
 
@@ -70,21 +71,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  if (!!session && !!session.user && !!session.user.email)
-    await mergeUserAccounts();
 
   return (
     <html lang="en">
       <body
-        className={cn("h-dvh text-neutral-700 antialiased", font.className)}
+        className={cn("h-full text-neutral-700 antialiased", font.className)}
       >
         <NextTopLoader color="#11998E" showSpinner={false} height={5} />
         <SessionProvider session={session}>
           <Providers>
-            <main className="h-dvh bg-black/20">{children}</main>
+            <main className="h-full bg-black/20">{children}</main>
             <Toaster />
           </Providers>
         </SessionProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

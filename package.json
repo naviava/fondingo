@@ -10,9 +10,9 @@
   "devDependencies": {
     "@fondingo/eslint-config": "workspace:*",
     "@fondingo/typescript-config": "workspace:*",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "@types/node": "^20.11.24",
     "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.14",
     "turbo": "latest"
   },
   "packageManager": "pnpm@9.1.4",

@@ -16,6 +16,6 @@
   "devDependencies": {
     "@fondingo/eslint-config": "workspace:*",
     "@fondingo/typescript-config": "workspace:*",
-    "prisma": "^5.13.0"
+    "prisma": "^5.14.0"
   }
 }

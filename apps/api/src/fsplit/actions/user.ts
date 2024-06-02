@@ -93,20 +93,6 @@ export const createNewUser = publicProcedure
           message: "Failed to create user.",
         });
 
-      const log = await db.log.create({
-        data: {
-          userId: newUser.id,
-          type: "USER",
-          message: `${newUser.name} joined FSplit.`,
-        },
-      });
-      if (!log) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create log. Account creation failed.",
-        });
-      }
-
       return {
         toastTitle: "Account created",
         toastDescription:
@@ -536,27 +522,6 @@ export const getGrossBalance = privateProcedure.query(async ({ ctx }) => {
   }
 });
 
-/**
- * This function is a private procedure that calculates the debt between the current user and a friend.
- * It takes a friend's ID as input and returns an object containing information about the debt.
- *
- * @function getDebtWithFriend
- * @memberof module:splitdb
- * @param {string} friendId - The ID of the friend with whom the debt is to be calculated. It must be a non-empty string.
- * @returns {Promise<Object>} A promise that resolves to an object containing the following properties:
- * @property {boolean} isInDebt - A boolean indicating whether the current user is in debt to the friend.
- * @property {string|null} displayAmountText - A string representing the amount of debt in a displayable format. If there is no debt, this property is null.
- * @property {number} amount - The total amount of debt. It is a positive number if the user owes the friend, and a negative number if the friend owes the user.
- *
- * @throws {TRPCError} Throws a TRPCError with code "INTERNAL_SERVER_ERROR" if there is an error during the execution of the function.
- *
- * @description
- * The function first checks if the friend exists in the database. If the friend does not exist, it returns an object indicating that there is no debt.
- * If the friend exists, it fetches all the credit and debt records between the user and the friend.
- * It then calculates the total credit and debt amounts, and the balance amount (credit - debt).
- * If the balance amount is positive, it means the user owes the friend. If it's negative, the friend owes the user.
- * The function then returns an object containing the debt information.
- */
 export const getDebtWithFriend = privateProcedure
   .input(z.string().min(1, { message: "Friend ID cannot be empty" }))
   .query(async ({ ctx, input: friendId }) => {
