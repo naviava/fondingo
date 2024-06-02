@@ -59,8 +59,9 @@ export const createGroup = privateProcedure
       const groupLog = await db.log.create({
         data: {
           type: "GROUP",
+          userId: user.id,
           groupId: group.id,
-          message: `${group.name} was created.`,
+          message: `${group.name} was created by ${user.name}.`,
         },
       });
       if (!groupLog)
@@ -72,8 +73,9 @@ export const createGroup = privateProcedure
       const members = await db.log.createMany({
         data: group.members.map((member) => ({
           type: "GROUP",
+          userId: user.id,
           groupId: group.id,
-          message: `${member.name} was added to the group.`,
+          message: `${member.name} was added to the group by ${user.id}.`,
         })),
       });
       if (!members)
@@ -151,6 +153,7 @@ export const editGroup = privateProcedure
         const groupLog = await db.log.create({
           data: {
             type: "GROUP",
+            userId: user.id,
             groupId: updatedGroup.id,
             message: `Group details were updated by ${user.name || user.email}.`,
           },
@@ -390,7 +393,8 @@ export const addMember = privateProcedure
           data: {
             type: "GROUP",
             groupId,
-            message: `${addedUser.name} was added back to the group.`,
+            userId: user.id,
+            message: `${addedUser.name} was added back to the group by ${user.name}.`,
           },
         });
         if (!log)
@@ -461,7 +465,8 @@ export const addMember = privateProcedure
           data: {
             type: "GROUP",
             groupId,
-            message: `${newGroupMember.name} was added to the group.`,
+            userId: user.id,
+            message: `${newGroupMember.name} was added to the group by ${user.name}.`,
           },
         });
         if (!log)
@@ -497,7 +502,8 @@ export const addMember = privateProcedure
         data: {
           type: "GROUP",
           groupId,
-          message: `${newGroupMember.name} was added to the group.`,
+          userId: user.id,
+          message: `${newGroupMember.name} was added to the group by ${user.name}.`,
         },
       });
       if (!newMemberLog)
@@ -613,7 +619,8 @@ export const addMultipleMembers = privateProcedure
             data: {
               type: "GROUP",
               groupId,
-              message: `${addedUser.name} was added back to the group.`,
+              userId: user.id,
+              message: `${addedUser.name} was added back to the group by ${user.name}.`,
             },
           });
           return addedUser;
@@ -668,7 +675,8 @@ export const addMultipleMembers = privateProcedure
             data: {
               type: "GROUP",
               groupId,
-              message: `${newGroupMember.name} was added to the group.`,
+              userId: user.id,
+              message: `${newGroupMember.name} was added to the group by ${user.name}.`,
             },
           });
           return newGroupMember;
@@ -688,7 +696,8 @@ export const addMultipleMembers = privateProcedure
           data: {
             type: "GROUP",
             groupId,
-            message: `${newGroupMember.name} was added to the group.`,
+            userId: user.id,
+            message: `${newGroupMember.name} was added to the group by ${user.name}.`,
           },
         });
 
@@ -874,7 +883,10 @@ export const removeMemberFromGroup = privateProcedure
         data: {
           type: "GROUP",
           groupId,
-          message: `${member.name} left the group.`,
+          userId: user.id,
+          message: isSelf
+            ? `${member.name} left the group.`
+            : `${member.name} was removed by ${user.name}.`,
         },
       });
       if (!log)
@@ -1206,6 +1218,7 @@ export const calculateGroupDebts = privateProcedure
       data: {
         type: "GROUP",
         groupId: group.id,
+        userId: user.id,
         message: `Manual debts calculation request by ${user.name || user.email}.`,
       },
     });

@@ -175,6 +175,7 @@ export const addExpense = privateProcedure
           data: {
             type: "EXPENSE",
             groupId,
+            userId: user.id,
             expenseId: expense.id,
             message: `${user.name} added an expense of ${(expense.amount / 100).toFixed(2)}`,
           },
@@ -390,6 +391,7 @@ export const updateExpense = privateProcedure
           data: {
             type: "EXPENSE",
             groupId,
+            userId: user.id,
             expenseId: updatedExpense.id,
             message: `${user.name} updated the name to ${updatedExpense.name}`,
           },
@@ -405,6 +407,7 @@ export const updateExpense = privateProcedure
           data: {
             type: "EXPENSE",
             groupId,
+            userId: user.id,
             expenseId: updatedExpense.id,
             message: `${user.name} updated the amount to ${(updatedExpense.amount / 100).toFixed(2)}`,
           },
@@ -576,6 +579,7 @@ export const deleteExpenseById = privateProcedure
         data: {
           type: "GROUP",
           groupId,
+          userId: user.id,
           message: `${user.name} deleted an expense of ${(deletedExpense.amount / 100).toFixed(2)}`,
         },
       });
@@ -705,6 +709,7 @@ export const addSettlement = privateProcedure
         data: {
           type: "SETTLEMENT",
           groupId,
+          userId: user.id,
           message: `${user.name} added a payment of ${(settlement.amount / 100).toFixed(2)}, from ${settlement.from.name} to ${settlement.to.name}`,
         },
       });
@@ -817,6 +822,7 @@ export const updateSettlement = privateProcedure
           data: {
             type: "SETTLEMENT",
             groupId,
+            userId: user.id,
             message: `${user.name} updated the payment to ${updatedSettlement.amount / 100}, from ${updatedSettlement.from.name} to ${updatedSettlement.to.name}.`,
           },
         });
@@ -982,8 +988,8 @@ export const deleteSettlementById = privateProcedure
       const log = await db.log.create({
         data: {
           type: "GROUP",
-          userId: user.id,
           groupId,
+          userId: user.id,
           message: `${user.name} deleted a payment of ${(deletedSettlement.amount / 100).toFixed(2)}.`,
         },
       });

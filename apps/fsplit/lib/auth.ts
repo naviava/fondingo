@@ -3,11 +3,10 @@ import DiscordProvider from "next-auth/providers/discord";
 import TwitterProvider from "next-auth/providers/twitter";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
-import FacebookProvider from "next-auth/providers/facebook";
-import { AuthOptions } from "next-auth";
 
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { Adapter } from "next-auth/adapters";
+import { AuthOptions } from "next-auth";
 
 import { sign } from "@fondingo/utils/jwt";
 import splitdb from "@fondingo/db-split";

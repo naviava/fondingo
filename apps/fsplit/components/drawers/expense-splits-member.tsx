@@ -3,8 +3,8 @@
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 
 import { useExpenseDetails } from "@fondingo/store/fsplit";
-import { Check, IndianRupee } from "@fondingo/ui/lucide";
 import { Avatar } from "@fondingo/ui/avatar";
+import { Check } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 
 import { currencyIconMap } from "@fondingo/ui/constants";

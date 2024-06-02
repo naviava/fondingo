@@ -16,9 +16,7 @@ interface IProps {
 
 export function ExpenseDetails({ user, group, expense }: IProps) {
   const topDivRef = useRef<HTMLDivElement>(null);
-  const { panelHeight, topRef, bottomRef, setTopRef } = usePanelHeight(
-    (state) => state,
-  );
+  const { panelHeight, setTopRef } = usePanelHeight((state) => state);
 
   const height = useMemo(
     () => (!!panelHeight ? `${panelHeight - 32}px` : "default"),

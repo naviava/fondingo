@@ -98,7 +98,7 @@ export function EditUserModal() {
       }
       handleEditProfile(values);
     },
-    [handleEditProfile],
+    [handleEditProfile, onClose, user, form],
   );
 
   useEffect(() => {
