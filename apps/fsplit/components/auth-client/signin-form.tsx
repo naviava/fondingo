@@ -28,9 +28,7 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "Password too short" }),
 });
 
-interface IProps {}
-
-export function SigninForm({}: IProps) {
+export function SigninForm() {
   const router = useRouter();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
@@ -42,20 +40,23 @@ export function SigninForm({}: IProps) {
     },
   });
 
-  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
-    await signIn("credentials", {
-      ...values,
-      redirect: false,
-    }).then((res) => {
-      if (res?.ok) router.refresh();
-      else
-        toast({
-          title: "Sign in failed",
-          description: "Invalid credentials. Please try again.",
-          variant: "destructive",
-        });
-    });
-  }, []);
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof formSchema>) => {
+      await signIn("credentials", {
+        ...values,
+        redirect: false,
+      }).then((res) => {
+        if (res?.ok) router.refresh();
+        else
+          toast({
+            title: "Sign in failed",
+            description: "Invalid credentials. Please try again.",
+            variant: "destructive",
+          });
+      });
+    },
+    [router],
+  );
 
   return (
     <Form {...form}>

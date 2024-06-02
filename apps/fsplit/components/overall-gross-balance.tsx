@@ -1,6 +1,5 @@
 import { RefreshButton } from "@fondingo/ui/refresh-button";
 import { serverClient } from "~/lib/trpc/server-client";
-import { IndianRupee } from "@fondingo/ui/lucide";
 import { cn } from "@fondingo/ui/utils";
 import { DisplayAmount } from "./display-amount";
 

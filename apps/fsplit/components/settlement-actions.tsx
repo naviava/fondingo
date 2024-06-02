@@ -24,26 +24,6 @@ export function SettlementActions({ groupId, settlement }: IProps) {
   const { onOpen, onClose } = useConfirmModal();
 
   const utils = trpc.useUtils();
-  const { mutate: handleUpdateSettlement, isPending: isPendingUpdate } =
-    trpc.expense.updateSettlement.useMutation({
-      onError: ({ message }) =>
-        toast({
-          title: "Something went wrong",
-          description: message,
-        }),
-      onSuccess: ({ toastTitle, toastDescription }) => {
-        toast({
-          title: toastTitle,
-          description: toastDescription,
-        });
-        utils.group.getGroupTotals.invalidate();
-        invalidateAll();
-        onClose();
-        router.push(`/groups/${groupId}`);
-        router.refresh();
-      },
-    });
-
   const { mutate: handleDeleteSettlement, isPending: isPendingDelete } =
     trpc.expense.deleteSettlementById.useMutation({
       onError: ({ message }) =>
@@ -69,7 +49,7 @@ export function SettlementActions({ groupId, settlement }: IProps) {
       <Button
         size="sm"
         variant="ghost"
-        disabled={isPendingDelete || isPendingUpdate}
+        disabled={isPendingDelete}
         onClick={() =>
           onOpen({
             title: "Delete payment?",
@@ -86,7 +66,7 @@ export function SettlementActions({ groupId, settlement }: IProps) {
       <Button
         size="sm"
         variant="ghost"
-        disabled={isPendingDelete || isPendingUpdate}
+        disabled={isPendingDelete}
         onClick={() =>
           router.push(
             `/groups/${groupId}/settlement?settlementId=${settlement.id}&from=${settlement.fromId}&to=${settlement.toId}&amount=${settlement.amount}`,
