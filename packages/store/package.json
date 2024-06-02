@@ -1,6 +1,9 @@
 {
   "name": "@fondingo/store",
   "version": "0.0.0",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
   "exports": {
     "./fsplit": "./src/fsplit/index.ts",
     "./use-confirm-modal": "./src/use-confirm-modal.ts",
