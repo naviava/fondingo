@@ -1,32 +1,11 @@
+"use server";
+
 import splitdb from "@fondingo/db-split";
 
-/**
- * This function is used to calculate and store the simplified debts for a group. It takes a string input representing the group ID.
- *
- * The function performs the following steps:
- * - It starts a transaction on the database.
- * - It deletes all existing simplified debts for the group.
- * - It retrieves all payments and splits associated with the group from the database.
- * - It retrieves all settlements associated with the group from the database.
- * - It calculates the net balance for each member of the group by adding the amounts they have paid and subtracting the amounts they owe.
- * - It subtracts the settled amounts from the balances.
- * - It simplifies the debts by repeatedly finding the member who owes the most and the member who is owed the most, and creating a debt from the former to the latter for the smaller of the two amounts. It updates the balances accordingly and removes any balances that have become zero.
- * - It stores the simplified debts in the database.
- * - If all operations are successful, it returns an object with a 'success' property and a message indicating that the simplified debts were calculated and stored.
- * - If any operation fails, it catches the error, logs it to the console, and returns an object with an 'error' property and a message indicating that there was an error calculating the simplified debts.
- *
- * @async
- * @function
- * @param {string} groupId - The ID of the group.
- * @returns {Promise<{ success: string } | { error: string }>} A promise that resolves to an object with either a 'success' or 'error' property.
- * @throws {Error} If there is an error calculating the simplified debts.
- */
 export async function calculateDebts(
   groupId: string,
   isManualUpdate: boolean = false,
 ): Promise<{ success: string } | { error: string }> {
-  "use server";
-
   try {
     return splitdb.$transaction(async (db) => {
       // Delete existing simplified debts for the group
