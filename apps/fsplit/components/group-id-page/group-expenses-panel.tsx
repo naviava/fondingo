@@ -9,6 +9,7 @@ import { Button } from "@fondingo/ui/button";
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { linearGradientWithAlpha } from "~/utils";
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 
 interface IProps {
   children: React.ReactNode;
@@ -93,6 +94,6 @@ function _GroupExpensesPanel({
 
   return (
     // <ScrollArea className="h-[55vh] md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
-    <ScrollArea style={{ height }}>{children}</ScrollArea>
+    <DynamicScrollArea>{children}</DynamicScrollArea>
   );
 }

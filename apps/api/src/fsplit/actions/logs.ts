@@ -7,7 +7,11 @@ export const userLogs = privateProcedure.query(async ({ ctx }) => {
 
   try {
     const logs = await splitdb.log.findMany({
-      where: { userId: user.id },
+      where: {
+        type: "USER",
+        userId: user.id,
+      },
+      orderBy: { createdAt: "desc" },
     });
     return logs;
   } catch (err) {
