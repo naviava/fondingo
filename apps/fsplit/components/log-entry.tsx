@@ -19,8 +19,8 @@ export function LogEntry({ message, createdAt }: IProps) {
           <span>{formatDate(createdAt, "MMM")}</span>
         </div>
         <div className="space-y-1">
-          <p className="text-sm md:text-base">{message}</p>
-          <p className="text-xs text-neutral-500 md:text-sm">
+          <p className="line-clamp-2 text-sm md:text-base">{message}</p>
+          <p className="text-xs text-neutral-500">
             {formatDate(createdAt, "h:mm a")}
           </p>
         </div>

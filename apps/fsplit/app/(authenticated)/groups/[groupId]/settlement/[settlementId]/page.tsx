@@ -9,6 +9,9 @@ import { Button } from "@fondingo/ui/button";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { format } from "@fondingo/utils/date-fns";
+import { SettlementDetails } from "~/components/settlement-id-page/settlement-details";
+import { LogEntry } from "~/components/log-entry";
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 
 interface IProps {
   params: {
@@ -25,6 +28,8 @@ export default async function SettlementIdPage({ params }: IProps) {
     settlementId: params.settlementId,
   });
   if (!settlement) return redirect(`/groups/${params.groupId}`);
+
+  const logs = await serverClient.logs.settlementByIdLogs(params.settlementId);
 
   const groupMemberIds = group.members.map((member) => member.id);
   const isCreditorInGroup = groupMemberIds.includes(settlement.from.id);
@@ -69,30 +74,29 @@ export default async function SettlementIdPage({ params }: IProps) {
         </Button>
         <SettlementActions groupId={params.groupId} settlement={settlement} />
       </div>
-      <div className="mt-16 flex flex-col items-center justify-center gap-y-4">
-        <FcMoneyTransfer size={80} />
-        <h2 className="text-xl font-medium">{`${creditorName} paid ${debtorName}`}</h2>
-        <h1 className="flex items-center font-bold">
-          <DisplayAmount
-            variant="xl"
-            amount={settlement.amount}
-            currency={group.currency}
-          />
-        </h1>
-        <div className="space-y-1 text-center text-sm font-medium text-neutral-400">
-          <p>
-            Added by {creatorName} on{" "}
-            {format(new Date(settlement.createdAt), "LLL d yyyy")}
-          </p>
-          <p>
-            Last updated by {lastUpdatedByName} on{" "}
-            {format(new Date(settlement.updatedAt), "LLL d yyyy")}
-          </p>
-        </div>
-      </div>
-      <div className="mt-16 px-8">
-        <h3 className="font-semibold">Activity</h3>
-        <p>Logs go here</p>
+      <SettlementDetails
+        debtorName={debtorName}
+        currency={group.currency}
+        creatorName={creatorName}
+        amount={settlement.amount}
+        creditorName={creditorName}
+        updatedAt={settlement.updatedAt}
+        createdAt={settlement.createdAt}
+        lastUpdatedByName={lastUpdatedByName}
+      />
+      <div className="mt-12">
+        <DynamicScrollArea crop={60}>
+          <h4 className="px-6 text-xl font-semibold">Activity</h4>
+          <div className="mt-4">
+            {logs.map((log) => (
+              <LogEntry
+                key={log.id}
+                message={log.message}
+                createdAt={log.createdAt}
+              />
+            ))}
+          </div>
+        </DynamicScrollArea>
       </div>
     </div>
   );
