@@ -65,7 +65,7 @@ export function ExpenseDetails({ user, group, expense, logs }: IProps) {
         </div>
         <Separator className="my-4" />
         <h4 className="px-6 text-xl font-semibold">Activity</h4>
-        <div className="mt-4">
+        <ul className="mt-4">
           {logs.map((log) => (
             <LogEntry
               key={log.id}
@@ -73,7 +73,7 @@ export function ExpenseDetails({ user, group, expense, logs }: IProps) {
               createdAt={log.createdAt}
             />
           ))}
-        </div>
+        </ul>
       </DynamicScrollArea>
     </>
   );

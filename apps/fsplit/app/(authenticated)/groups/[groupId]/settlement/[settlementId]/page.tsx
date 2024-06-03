@@ -1,17 +1,14 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
+import { SettlementDetails } from "~/components/settlement-id-page/settlement-details";
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 import { SettlementActions } from "~/components/settlement-actions";
-import { DisplayAmount } from "~/components/display-amount";
 import { ChevronLeft } from "@fondingo/ui/lucide";
-import { FcMoneyTransfer } from "react-icons/fc";
+import { LogEntry } from "~/components/log-entry";
 import { Button } from "@fondingo/ui/button";
 
 import { serverClient } from "~/lib/trpc/server-client";
-import { format } from "@fondingo/utils/date-fns";
-import { SettlementDetails } from "~/components/settlement-id-page/settlement-details";
-import { LogEntry } from "~/components/log-entry";
-import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 
 interface IProps {
   params: {
@@ -87,7 +84,7 @@ export default async function SettlementIdPage({ params }: IProps) {
       <div className="mt-12">
         <DynamicScrollArea crop={60}>
           <h4 className="px-6 text-xl font-semibold">Activity</h4>
-          <div className="mt-4">
+          <ul className="mt-4">
             {logs.map((log) => (
               <LogEntry
                 key={log.id}
@@ -95,7 +92,7 @@ export default async function SettlementIdPage({ params }: IProps) {
                 createdAt={log.createdAt}
               />
             ))}
-          </div>
+          </ul>
         </DynamicScrollArea>
       </div>
     </div>

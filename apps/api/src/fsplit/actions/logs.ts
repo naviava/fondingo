@@ -2,6 +2,7 @@ import { privateProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import splitdb from "@fondingo/db-split";
 import { z } from "@fondingo/utils/zod";
+import exp from "constants";
 
 export const userLogs = privateProcedure.query(async ({ ctx }) => {
   const { user } = ctx;
@@ -23,6 +24,44 @@ export const userLogs = privateProcedure.query(async ({ ctx }) => {
     });
   }
 });
+
+export const groupByIdLogs = privateProcedure
+  .input(z.string().min(1, { message: "Group ID is required" }))
+  .query(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+    try {
+      const existingGroup = await splitdb.group.findUnique({
+        where: {
+          id: groupId,
+          members: {
+            some: {
+              userId: user.id,
+            },
+          },
+        },
+      });
+      if (!existingGroup)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Group not found",
+        });
+
+      const logs = await splitdb.log.findMany({
+        where: {
+          type: "GROUP",
+          groupId,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      return logs || [];
+    } catch (err) {
+      console.error(err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to get group logs.",
+      });
+    }
+  });
 
 export const expenseByIdLogs = privateProcedure
   .input(z.string().min(1, { message: "Expense ID isrequired" }))

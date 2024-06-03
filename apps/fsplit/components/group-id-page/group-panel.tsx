@@ -2,34 +2,29 @@ import { GroupExpensesPanel } from "~/components/group-id-page/group-expenses-pa
 import { UtilityButtons } from "~/components/group-id-page/utility-buttons";
 import { GroupActions } from "~/components/group-id-page/group-actions";
 import { GroupHeader } from "~/components/group-id-page/group-header";
-import { GroupBalanceEntry } from "~/components/group-id-page/group-balance-entry";
-import { GroupLog } from "~/components/group-id-page/group-log";
-import { GroupTotals } from "~/components/group-id-page/group-totals";
 import { GroupAvatar } from "~/components/group-avatar";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { linearGradientWithAlpha } from "~/utils";
-import { Suspense } from "react";
-import { LoadingState } from "~/components/group-id-page/loading-state";
 
 interface IProps {
+  children: React.ReactNode;
   params: {
     groupId: string;
   };
   searchParams: {
     showBalances: boolean;
     showTotals: boolean;
+    showActivity: boolean;
   };
 }
 
-export default async function GroupIdPage({ params, searchParams }: IProps) {
+export async function GroupPanel({ children, params, searchParams }: IProps) {
   const currentUser = await serverClient.user.getAuthProfile();
   const group = await serverClient.group.getGroupById(params.groupId);
   const currentUserRole = group.members.find(
     (member) => member.userId === currentUser?.id,
   )?.role;
-
-  const groupMemberIds = group.members.map((member) => member.id);
 
   return (
     <article className="flex flex-col">
@@ -43,6 +38,7 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
           groupId={params.groupId}
           showTotals={searchParams.showTotals}
           showBalances={searchParams.showBalances}
+          showActivity={searchParams.showActivity}
         />
         <GroupAvatar
           groupType={group.type}
@@ -50,7 +46,7 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
           className="absolute -bottom-8 left-20"
         />
       </div>
-      <section className="pb-24 pt-12">
+      <section className="pt-12">
         <GroupHeader
           userId={currentUser?.id}
           groupName={group.name}
@@ -70,38 +66,12 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
           userId={currentUser?.id}
           groupId={group.id}
           groupColor={group.color}
-          isGroupManager={currentUserRole === "MANAGER"}
-          hasMembers={group.members.length > 1}
           hasExpenses={!!group.expenses.length}
+          hasMembers={group.members.length > 1}
           hasPayments={!!group.settlements.length}
+          isGroupManager={currentUserRole === "MANAGER"}
         >
-          {searchParams.showBalances && !searchParams.showTotals && (
-            <ul>
-              {groupMemberIds.map((id, idx) => (
-                <GroupBalanceEntry
-                  key={id}
-                  index={idx}
-                  groupId={group.id}
-                  memberId={id}
-                  currency={group.currency}
-                />
-              ))}
-            </ul>
-          )}
-          {searchParams.showTotals && !searchParams.showBalances && (
-            <Suspense fallback={<LoadingState />}>
-              <GroupTotals groupId={group.id} />
-            </Suspense>
-          )}
-          {((!searchParams.showBalances && !searchParams.showTotals) ||
-            (searchParams.showBalances && searchParams.showTotals)) && (
-            <GroupLog
-              userId={currentUser?.id}
-              groupId={group.id}
-              groupColor={group.color}
-              currency={group.currency}
-            />
-          )}
+          {children}
         </GroupExpensesPanel>
       </section>
     </article>

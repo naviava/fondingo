@@ -6,9 +6,15 @@ interface IProps {
   groupId: string;
   showTotals: boolean;
   showBalances: boolean;
+  showActivity: boolean;
 }
 
-export function UtilityButtons({ groupId, showBalances, showTotals }: IProps) {
+export function UtilityButtons({
+  groupId,
+  showTotals,
+  showBalances,
+  showActivity,
+}: IProps) {
   return (
     <>
       <Button
@@ -17,7 +23,11 @@ export function UtilityButtons({ groupId, showBalances, showTotals }: IProps) {
         className="absolute left-4 top-4 text-white"
       >
         <Link
-          href={showBalances || showTotals ? `/groups/${groupId}` : "/groups"}
+          href={
+            showBalances || showTotals || showActivity
+              ? `/groups/${groupId}`
+              : "/groups"
+          }
         >
           <ChevronLeft />
         </Link>

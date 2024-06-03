@@ -1,9 +1,15 @@
 import { router } from "../trpc";
 
-import { expenseByIdLogs, settlementByIdLogs, userLogs } from "../actions/logs";
+import {
+  userLogs,
+  groupByIdLogs,
+  expenseByIdLogs,
+  settlementByIdLogs,
+} from "../actions/logs";
 
 export const logsRouter = router({
   userLogs,
+  groupByIdLogs,
   expenseByIdLogs,
   settlementByIdLogs,
 });

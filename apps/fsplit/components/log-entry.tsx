@@ -8,7 +8,7 @@ interface IProps {
 
 export function LogEntry({ message, createdAt }: IProps) {
   return (
-    <>
+    <li>
       <Separator />
       <div className="flex items-center gap-x-6 p-4">
         <div className="flex flex-col items-center justify-center text-xs font-medium text-neutral-500">
@@ -25,6 +25,6 @@ export function LogEntry({ message, createdAt }: IProps) {
           </p>
         </div>
       </div>
-    </>
+    </li>
   );
 }
