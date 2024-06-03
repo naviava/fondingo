@@ -56,12 +56,26 @@ export const createGroup = privateProcedure
           message: "Failed to create group. Try again later.",
         });
 
+      const groupMemberLog = await db.log.createMany({
+        data: group.members.map((member) => ({
+          type: "GROUP",
+          userId: user.id,
+          groupId: group.id,
+          message: `${member.name} joined the group.`,
+        })),
+      });
+      if (!groupMemberLog)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create group member log. Couldn't create group.",
+        });
+
       const groupLog = await db.log.create({
         data: {
           type: "GROUP",
           userId: user.id,
           groupId: group.id,
-          message: `${group.name} was created by ${user.name}.`,
+          message: `Group "${group.name}" was created by ${user.name}.`,
         },
       });
       if (!groupLog)
@@ -69,19 +83,17 @@ export const createGroup = privateProcedure
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create group log. Couldn't create group.",
         });
-
-      const members = await db.log.createMany({
-        data: group.members.map((member) => ({
-          type: "GROUP",
+      const userLog = await db.log.create({
+        data: {
+          type: "USER",
           userId: user.id,
-          groupId: group.id,
-          message: `${member.name} was added to the group by ${user.id}.`,
-        })),
+          message: `You created the group, "${group.name}".`,
+        },
       });
-      if (!members)
+      if (!userLog)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create group members log. Couldn't create group.",
+          message: "Failed to create user log. Couldn't create group.",
         });
 
       return {
@@ -117,11 +129,21 @@ export const editGroup = privateProcedure
             some: { userId: user.id },
           },
         },
+        include: { members: true },
       });
       if (!existingGroup)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
+        });
+
+      const userInGroup = existingGroup.members.find(
+        (member) => member.userId === user.id,
+      );
+      if (!userInGroup)
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to edit this group",
         });
 
       const updatedGroup = await splitdb.group.update({
@@ -144,18 +166,58 @@ export const editGroup = privateProcedure
           message: "Failed to update group. Try again later.",
         });
 
-      if (
-        existingGroup.name !== updatedGroup.name ||
-        existingGroup.color !== updatedGroup.color ||
-        existingGroup.type !== updatedGroup.type ||
-        existingGroup.currency !== updatedGroup.currency
-      ) {
+      if (existingGroup.name !== updatedGroup.name) {
         const groupLog = await db.log.create({
           data: {
             type: "GROUP",
             userId: user.id,
             groupId: updatedGroup.id,
-            message: `Group details were updated by ${user.name || user.email}.`,
+            message: `Group name was changed from "${existingGroup.name}" to "${updatedGroup.name}" by ${userInGroup.name || userInGroup.email}.`,
+          },
+        });
+        if (!groupLog)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create group log. Couldn't update group.",
+          });
+      }
+      if (existingGroup.color !== updatedGroup.color) {
+        const groupLog = await db.log.create({
+          data: {
+            type: "GROUP",
+            userId: user.id,
+            groupId: updatedGroup.id,
+            message: `Group color was changed by ${userInGroup.name || userInGroup.email}.`,
+          },
+        });
+        if (!groupLog)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create group log. Couldn't update group.",
+          });
+      }
+      if (existingGroup.type !== updatedGroup.type) {
+        const groupLog = await db.log.create({
+          data: {
+            type: "GROUP",
+            userId: user.id,
+            groupId: updatedGroup.id,
+            message: `Group type was changed from "${existingGroup.type}" to "${updatedGroup.type}", by ${userInGroup.name || userInGroup.email}.`,
+          },
+        });
+        if (!groupLog)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create group log. Couldn't update group.",
+          });
+      }
+      if (existingGroup.currency !== updatedGroup.currency) {
+        const groupLog = await db.log.create({
+          data: {
+            type: "GROUP",
+            userId: user.id,
+            groupId: updatedGroup.id,
+            message: `Group currency was changed from "${existingGroup.currency}" to "${updatedGroup.currency}", by ${userInGroup.name || userInGroup.email}.`,
           },
         });
         if (!groupLog)
@@ -235,7 +297,7 @@ export const deleteGroupById = privateProcedure
         data: {
           type: "USER",
           userId: user.id,
-          message: `You deleted the group, ${deletedGroup.name}.`,
+          message: `You deleted the group, "${deletedGroup.name}".`,
         },
       });
       if (!log)
@@ -345,11 +407,20 @@ export const addMember = privateProcedure
           some: { userId: user.id },
         },
       },
+      include: { members: true },
     });
     if (!group)
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Group not found",
+      });
+    const userInGroup = group.members.find(
+      (member) => member.userId === user.id,
+    );
+    if (!userInGroup)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to find user in the group",
       });
 
     // Check if the user is trying to add themselves to the group.
@@ -394,7 +465,7 @@ export const addMember = privateProcedure
             type: "GROUP",
             groupId,
             userId: user.id,
-            message: `${addedUser.name} was added back to the group by ${user.name}.`,
+            message: `${addedUser.name} was added back to the group, by ${userInGroup.name}.`,
           },
         });
         if (!log)
@@ -466,7 +537,7 @@ export const addMember = privateProcedure
             type: "GROUP",
             groupId,
             userId: user.id,
-            message: `${newGroupMember.name} was added to the group by ${user.name}.`,
+            message: `${newGroupMember.name} was added to the group by ${userInGroup.name}.`,
           },
         });
         if (!log)
@@ -503,7 +574,7 @@ export const addMember = privateProcedure
           type: "GROUP",
           groupId,
           userId: user.id,
-          message: `${newGroupMember.name} was added to the group by ${user.name}.`,
+          message: `${newGroupMember.name} was added to the group by ${userInGroup.name}.`,
         },
       });
       if (!newMemberLog)
@@ -554,7 +625,7 @@ export const addMember = privateProcedure
         });
       return {
         toastTitle: `${newGroupMember.name} added to the group.`,
-        toastDescription: `You can now split expenses with them. ${newTempFriend.email} has been added to your friends list.`,
+        toastDescription: `You can now split expenses with them. ${newTempFriend.name} has been added to your friends list.`,
       };
     });
   });
@@ -583,11 +654,20 @@ export const addMultipleMembers = privateProcedure
           some: { userId: user.id },
         },
       },
+      include: { members: true },
     });
     if (!group)
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Group not found",
+      });
+    const userInGroup = group.members.find(
+      (member) => member.userId === user.id,
+    );
+    if (!userInGroup)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to find user in the group",
       });
 
     const updates = await splitdb.$transaction(async (db) => {
@@ -620,7 +700,7 @@ export const addMultipleMembers = privateProcedure
               type: "GROUP",
               groupId,
               userId: user.id,
-              message: `${addedUser.name} was added back to the group by ${user.name}.`,
+              message: `${addedUser.name} was added back to the group by ${userInGroup.name}.`,
             },
           });
           return addedUser;
@@ -676,7 +756,7 @@ export const addMultipleMembers = privateProcedure
               type: "GROUP",
               groupId,
               userId: user.id,
-              message: `${newGroupMember.name} was added to the group by ${user.name}.`,
+              message: `${newGroupMember.name} was added to the group by ${userInGroup.name}.`,
             },
           });
           return newGroupMember;
@@ -697,7 +777,7 @@ export const addMultipleMembers = privateProcedure
             type: "GROUP",
             groupId,
             userId: user.id,
-            message: `${newGroupMember.name} was added to the group by ${user.name}.`,
+            message: `${newGroupMember.name} was added to the group by ${userInGroup.name}.`,
           },
         });
 
@@ -845,6 +925,11 @@ export const removeMemberFromGroup = privateProcedure
       const currentUserInGroup = group.members.find(
         (m) => m.userId === user.id,
       );
+      if (!currentUserInGroup)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to find user in the group",
+        });
       if (member.email !== user.email && currentUserInGroup?.role !== "MANAGER")
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -886,7 +971,7 @@ export const removeMemberFromGroup = privateProcedure
           userId: user.id,
           message: isSelf
             ? `${member.name} left the group.`
-            : `${member.name} was removed by ${user.name}.`,
+            : `${member.name} was removed by ${currentUserInGroup.name}.`,
         },
       });
       if (!log)
@@ -1191,6 +1276,7 @@ export const calculateGroupDebts = privateProcedure
           some: { userId: user.id },
         },
       },
+      include: { members: true },
     });
     if (!group)
       throw new TRPCError({
@@ -1207,6 +1293,14 @@ export const calculateGroupDebts = privateProcedure
         message:
           "Debts can be manually calculated every 5 minutes. Try again later.",
       });
+    const userInGroup = group.members.find(
+      (member) => member.userId === user.id,
+    );
+    if (!userInGroup)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to find user in the group",
+      });
 
     const res = await calculateDebts(groupId, true);
     if (!("success" in res) || !res.success)
@@ -1219,11 +1313,11 @@ export const calculateGroupDebts = privateProcedure
         type: "GROUP",
         groupId: group.id,
         userId: user.id,
-        message: `Manual debts calculation request by ${user.name || user.email}.`,
+        message: `Manual debts calculation requested by ${userInGroup.name || userInGroup.email}.`,
       },
     });
     return {
-      toastTitle: `${group.name} debts calculated.`,
+      toastTitle: `${group.name}`,
       toastDescription: "Debts have been calculated and stored",
     };
   });

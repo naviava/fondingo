@@ -66,14 +66,16 @@ export const createNewUser = publicProcedure
         message: "User with that email already exists.",
       });
 
-    const existingPhoneNumber = await splitdb.user.findFirst({
-      where: { phone },
-    });
-    if (!!existingPhoneNumber)
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Phone number is already in use.",
-      });
+    // if (!!phone) {
+    //   const existingPhoneNumber = await splitdb.user.findFirst({
+    //     where: { phone },
+    //   });
+    //   if (!!existingPhoneNumber)
+    //     throw new TRPCError({
+    //       code: "BAD_REQUEST",
+    //       message: "Phone number is already in use.",
+    //     });
+    // }
 
     return splitdb.$transaction(async (db) => {
       const hashedPassword = await hash(password, 10);
@@ -144,8 +146,14 @@ export const editProfile = privateProcedure
       const existingUser = await db.user.findUnique({
         where: { id: user.id },
       });
+      if (!existingUser)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found.",
+        });
+
       const updatedUser = await db.user.update({
-        where: { id: existingUser?.id },
+        where: { id: existingUser.id },
         data: {
           name: displayName,
           firstName,
@@ -159,32 +167,122 @@ export const editProfile = privateProcedure
           message: "Failed to update profile.",
         });
 
+      if (existingUser?.name !== updatedUser.name) {
+        const log = await db.log.create({
+          data: {
+            userId: user.id,
+            type: "USER",
+            message: `You changed your display name from "${existingUser.name}" to "${updatedUser.name}".`,
+          },
+        });
+        if (!log) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to updated name log. Profile update failed.",
+          });
+        }
+      }
+      if (!!updatedUser.phone && existingUser?.phone !== updatedUser.phone) {
+        const log = await db.log.create({
+          data: {
+            userId: user.id,
+            type: "USER",
+            message: `You changed your phone number from "${existingUser.phone}" to "${updatedUser.phone}".`,
+          },
+        });
+        if (!log) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to updated phone log. Profile update failed.",
+          });
+        }
+      }
+      if (!!updatedUser.image && existingUser?.image !== updatedUser.image) {
+        const log = await db.log.create({
+          data: {
+            userId: user.id,
+            type: "USER",
+            message: `You changed your profile picture.`,
+          },
+        });
+        if (!log) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to updated image log. Profile update failed.",
+          });
+        }
+      }
+      if (existingUser?.email !== updatedUser.email) {
+        const log = await db.log.create({
+          data: {
+            userId: user.id,
+            type: "USER",
+            message: `You changed your email from "${existingUser.email}" to "${updatedUser.email}".`,
+          },
+        });
+        if (!log) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to updated email log. Profile update failed.",
+          });
+        }
+      }
+      if (existingUser?.disabled !== updatedUser.disabled) {
+        const log = await db.log.create({
+          data: {
+            userId: user.id,
+            type: "USER",
+            message: `You changed your account status to ${updatedUser.disabled ? "disabled" : "enabled"}.`,
+          },
+        });
+        if (!log) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message:
+              "Failed to updated account status log. Profile update failed.",
+          });
+        }
+      }
       if (
-        existingUser?.name !== updatedUser.name ||
-        existingUser?.phone !== updatedUser.phone ||
-        existingUser?.image !== updatedUser.image ||
-        existingUser?.email !== updatedUser.email ||
-        existingUser?.disabled !== updatedUser.disabled ||
-        existingUser?.lastName !== updatedUser.lastName ||
+        !!updatedUser.lastName &&
+        existingUser?.lastName !== updatedUser.lastName
+      ) {
+        const log = await db.log.create({
+          data: {
+            userId: user.id,
+            type: "USER",
+            message: `You changed your last name from "${existingUser.lastName}" to "${updatedUser.lastName}".`,
+          },
+        });
+        if (!log) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to updated last name log. Profile update failed.",
+          });
+        }
+      }
+      if (
+        !!updatedUser.firstName &&
         existingUser?.firstName !== updatedUser.firstName
       ) {
         const log = await db.log.create({
           data: {
             userId: user.id,
             type: "USER",
-            message: `${user.name} updated their profile.`,
+            message: `You changed your first name from "${existingUser.firstName}" to "${updatedUser.firstName}".`,
           },
         });
         if (!log) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create log. Profile update failed.",
+            message: "Failed to updated first name log. Profile update failed.",
           });
         }
       }
+
       return {
         toastTitle: "Profile updated",
-        toastDescription: "Come back and customize any time.",
+        toastDescription: "Your profile has been successfully updated.",
       };
     });
   });

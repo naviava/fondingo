@@ -11,6 +11,7 @@ import { AuthOptions } from "next-auth";
 import { sign } from "@fondingo/utils/jwt";
 import splitdb from "@fondingo/db-split";
 import { compare } from "bcrypt";
+import { mergeUserAccountById } from "~/utils/merge-user-account-by-id";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(splitdb) as Adapter,
@@ -47,7 +48,7 @@ export const authOptions: AuthOptions = {
         if (!credentials?.email || !credentials?.password)
           throw new Error("Invalid credentials");
         const user = await splitdb.user.findUnique({
-          where: { email: credentials.email, disabled: false },
+          where: { email: credentials.email.toLowerCase(), disabled: false },
         });
         if (!user || !user?.hashedPassword)
           throw new Error("Invalid credentials");
@@ -56,6 +57,7 @@ export const authOptions: AuthOptions = {
           user.hashedPassword,
         );
         if (!isCorrectPassword) throw new Error("Invalid credentials");
+        if (!user.isMerged) await mergeUserAccountById(user.id);
         return user;
       },
     }),

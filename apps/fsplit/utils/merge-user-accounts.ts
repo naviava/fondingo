@@ -1,8 +1,10 @@
+"use server";
+
 import { getServerSession } from "next-auth";
 import splitdb from "@fondingo/db-split";
 import { authOptions } from "~/lib/auth";
 
-export async function mergeUserAccounts() {
+export async function mergeUserAccounts(id?: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user || !session.user.email) {
     return null;
@@ -50,8 +52,8 @@ export async function mergeUserAccounts() {
     });
     await db.log.create({
       data: {
-        userId: existingUser.id,
         type: "USER",
+        userId: existingUser.id,
         message: `${existingUser.name} joined FSplit.`,
       },
     });
