@@ -28,11 +28,21 @@ function _GroupActions({
   groupColor,
   hasDebts,
   hasExpenses,
-  isGroupManager = false,
 }: IProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const topDivRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (
+      (searchParams.get("showBalances") && searchParams.get("showTotals")) ||
+      (searchParams.get("showActivity") && searchParams.get("showBalances")) ||
+      (searchParams.get("showActivity") && searchParams.get("showTotals"))
+    ) {
+      router.push(`/groups/${groupId}`);
+      router.refresh();
+    }
+  }, [groupId, router, searchParams]);
 
   const { onOpen } = useAddMemberModal((state) => state);
   const { setTopRef } = usePanelHeight((state) => state);
@@ -74,6 +84,14 @@ function _GroupActions({
           router.refresh();
         },
       },
+      {
+        label: "Activity",
+        isActive: searchParams.get("showActivity"),
+        onClick: () => {
+          router.push(`/groups/${groupId}?showActivity=true`);
+          router.refresh();
+        },
+      },
     ],
     [handleAddMember, groupId, router, hasExpenses, hasDebts, searchParams],
   );
@@ -95,14 +113,16 @@ function _GroupActions({
           {options.map((option) => {
             if (
               option.label === "Settle up" &&
-              (!!searchParams.get("showBalances") ||
-                !!searchParams.get("showTotals"))
+              (searchParams.get("showBalances") ||
+                searchParams.get("showTotals") ||
+                searchParams.get("showActivity"))
             )
               return null;
             if (
               option.label === "Group Log" &&
               !searchParams.get("showBalances") &&
-              !searchParams.get("showTotals")
+              !searchParams.get("showTotals") &&
+              !searchParams.get("showActivity")
             )
               return null;
             return (

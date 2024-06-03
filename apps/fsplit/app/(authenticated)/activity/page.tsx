@@ -12,13 +12,15 @@ export default async function ActivityPage() {
     <div className="h-full pb-24">
       <SimpleTitleTopRef title="Recent activity" />
       <DynamicScrollArea>
-        {logs.map((log) => (
-          <LogEntry
-            key={log.id}
-            message={log.message}
-            createdAt={log.createdAt}
-          />
-        ))}
+        <ul>
+          {logs.map((log) => (
+            <LogEntry
+              key={log.id}
+              message={log.message}
+              createdAt={log.createdAt}
+            />
+          ))}
+        </ul>
         <Separator />
       </DynamicScrollArea>
     </div>

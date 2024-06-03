@@ -186,7 +186,7 @@ export const addExpense = privateProcedure
             groupId,
             userId: user.id,
             expenseId: expense.id,
-            message: `${userInGroup.name} added an expense "${expense.name}", of ${group.currency}${(expense.amount / 100).toFixed(2)}`,
+            message: `${userInGroup.name} added an expense "${expense.name}", of ${group.currency} ${(expense.amount / 100).toFixed(2)}`,
           },
         });
         if (!log)
@@ -436,7 +436,7 @@ export const updateExpense = privateProcedure
             groupId,
             userId: user.id,
             expenseId: updatedExpense.id,
-            message: `${userInGroup.name} updated the amount of "${updatedExpense.name}", to ${updatedExpense.group.currency}${(updatedExpense.amount / 100).toFixed(2)}`,
+            message: `${userInGroup.name} updated the amount of "${updatedExpense.name}", to ${updatedExpense.group.currency} ${(updatedExpense.amount / 100).toFixed(2)}`,
           },
         });
         if (!log)
@@ -620,7 +620,7 @@ export const deleteExpenseById = privateProcedure
           type: "GROUP",
           groupId,
           userId: user.id,
-          message: `${userInGroup.name} deleted an expense "${deletedExpense.name}", of ${existingExpense.group.currency}${(deletedExpense.amount / 100).toFixed(2)}`,
+          message: `${userInGroup.name} deleted an expense "${deletedExpense.name}", of ${existingExpense.group.currency} ${(deletedExpense.amount / 100).toFixed(2)}`,
         },
       });
       if (!log)
@@ -732,7 +732,8 @@ export const addSettlement = privateProcedure
           type: "SETTLEMENT",
           groupId,
           userId: user.id,
-          message: `${userInGroup.name} added a payment of ${group.currency}${(settlement.amount / 100).toFixed(2)}, from ${settlement.from.name} to ${settlement.to.name}`,
+          settlementId: settlement.id,
+          message: `${userInGroup.name} added a payment of ${group.currency} ${(settlement.amount / 100).toFixed(2)}, from ${settlement.from.name} to ${settlement.to.name}`,
         },
       });
       if (!log)
@@ -857,6 +858,7 @@ export const updateSettlement = privateProcedure
             type: "SETTLEMENT",
             groupId,
             userId: user.id,
+            settlementId: updatedSettlement.id,
             message: `${userInGroup.name} updated the payment to ${updatedSettlement.group.currency}${updatedSettlement.amount / 100}, from ${updatedSettlement.from.name} to ${updatedSettlement.to.name}.`,
           },
         });

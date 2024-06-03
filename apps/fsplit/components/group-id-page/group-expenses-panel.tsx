@@ -92,8 +92,5 @@ function _GroupExpensesPanel({
     );
   }
 
-  return (
-    // <ScrollArea className="h-[55vh] md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
-    <DynamicScrollArea>{children}</DynamicScrollArea>
-  );
+  return <DynamicScrollArea>{children}</DynamicScrollArea>;
 }

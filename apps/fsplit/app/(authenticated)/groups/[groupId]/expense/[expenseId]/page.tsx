@@ -25,6 +25,7 @@ export default async function ExpenseIdPage({ params }: IProps) {
     groupId: params.groupId,
     expenseId: params.expenseId,
   });
+  const logs = await serverClient.logs.expenseByIdLogs(params.expenseId);
 
   const groupMemberUserIds = group.members.map((member) => member.user?.id);
   const isExpenseCreatorInGroup = groupMemberUserIds.includes(
@@ -73,7 +74,7 @@ export default async function ExpenseIdPage({ params }: IProps) {
         expenseCreator={expenseCreator || "Unknown"}
         expenseUpdatedBy={expenseUpdatedBy || "Unknown"}
       />
-      <ExpenseDetails user={user} group={group} expense={expense} />
+      <ExpenseDetails user={user} group={group} expense={expense} logs={logs} />
     </div>
   );
 }

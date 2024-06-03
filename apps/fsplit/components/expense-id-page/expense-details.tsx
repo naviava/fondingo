@@ -2,26 +2,23 @@
 
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { serverClient } from "~/lib/trpc/server-client";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { PaymentSplitEntry } from "./payment-split-entry";
-import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
+import { LogEntry } from "../log-entry";
 
 interface IProps {
   user: Awaited<ReturnType<typeof serverClient.user.getAuthProfile>>;
   group: Awaited<ReturnType<typeof serverClient.group.getGroupById>>;
+  logs: Awaited<ReturnType<typeof serverClient.logs.expenseByIdLogs>>;
   expense: Awaited<ReturnType<typeof serverClient.expense.getExpenseById>>;
 }
 
-export function ExpenseDetails({ user, group, expense }: IProps) {
+export function ExpenseDetails({ user, group, expense, logs }: IProps) {
   const topDivRef = useRef<HTMLDivElement>(null);
-  const { panelHeight, setTopRef } = usePanelHeight((state) => state);
-
-  const height = useMemo(
-    () => (!!panelHeight ? `${panelHeight - 32}px` : "default"),
-    [panelHeight],
-  );
+  const { setTopRef } = usePanelHeight((state) => state);
 
   useEffect(() => {
     function updateTopDivPosition() {
@@ -36,7 +33,7 @@ export function ExpenseDetails({ user, group, expense }: IProps) {
   return (
     <>
       <Separator ref={topDivRef} className="my-4" />
-      <ScrollArea style={{ height }}>
+      <DynamicScrollArea>
         <div className="px-6">
           <ul>
             {expense.payments.map((payment) => (
@@ -67,12 +64,17 @@ export function ExpenseDetails({ user, group, expense }: IProps) {
           </ul>
         </div>
         <Separator className="my-4" />
-        {/* TODO: Add expense activity */}
-        <div className="px-6">
-          <h4 className="text-xl font-semibold">Activity</h4>
-          <div className="mt-4 font-medium">Ticket log goes here.</div>
-        </div>
-      </ScrollArea>
+        <h4 className="px-6 text-xl font-semibold">Activity</h4>
+        <ul className="mt-4">
+          {logs.map((log) => (
+            <LogEntry
+              key={log.id}
+              message={log.message}
+              createdAt={log.createdAt}
+            />
+          ))}
+        </ul>
+      </DynamicScrollArea>
     </>
   );
 }
