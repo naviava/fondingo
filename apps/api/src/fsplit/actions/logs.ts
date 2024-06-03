@@ -2,7 +2,6 @@ import { privateProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import splitdb from "@fondingo/db-split";
 import { z } from "@fondingo/utils/zod";
-import exp from "constants";
 
 export const userLogs = privateProcedure.query(async ({ ctx }) => {
   const { user } = ctx;

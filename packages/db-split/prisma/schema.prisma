@@ -62,6 +62,7 @@ model User {
   lastName               String?
   hashedPassword         String?
   image                  String?
+  preferredCurrency      CurrencyCode    @default(USD)
   role                   Role            @default(USER)
   disabled               Boolean         @default(false)
   emailVerified          DateTime?       @map("email_verified")

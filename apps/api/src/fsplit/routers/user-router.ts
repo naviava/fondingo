@@ -1,9 +1,9 @@
 import { router } from "../trpc";
 
 import {
+  getAuthProfile,
   declineFriendRequest,
   sendFriendRequest,
-  getAuthProfile,
   acceptFriendRequest,
   getGrossBalance,
   getFriends,
@@ -13,19 +13,23 @@ import {
   findFriends,
   editProfile,
   createNewUser,
+  changePassword,
+  changePreferredCurrency,
 } from "../actions/user";
 
 export const userRouter = router({
   getAuthProfile,
-  editProfile,
-  sendFriendRequest,
-  getFriendRequests,
-  declineFriendRequest,
-  acceptFriendRequest,
-  getGrossBalance,
   getFriends,
+  getFriendRequests,
+  getGrossBalance,
   getDebtWithFriend,
-  findUsers,
-  findFriends,
+  acceptFriendRequest,
   createNewUser,
+  changePassword,
+  changePreferredCurrency,
+  declineFriendRequest,
+  editProfile,
+  findFriends,
+  findUsers,
+  sendFriendRequest,
 });
