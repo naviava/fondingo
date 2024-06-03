@@ -56,20 +56,6 @@ export const createGroup = privateProcedure
           message: "Failed to create group. Try again later.",
         });
 
-      const groupMemberLog = await db.log.createMany({
-        data: group.members.map((member) => ({
-          type: "GROUP",
-          userId: user.id,
-          groupId: group.id,
-          message: `${member.name} joined the group.`,
-        })),
-      });
-      if (!groupMemberLog)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create group member log. Couldn't create group.",
-        });
-
       const groupLog = await db.log.create({
         data: {
           type: "GROUP",
@@ -94,6 +80,20 @@ export const createGroup = privateProcedure
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create user log. Couldn't create group.",
+        });
+
+      const groupMemberLog = await db.log.createMany({
+        data: group.members.map((member) => ({
+          type: "GROUP",
+          userId: user.id,
+          groupId: group.id,
+          message: `${member.name} joined the group.`,
+        })),
+      });
+      if (!groupMemberLog)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create group member log. Couldn't create group.",
         });
 
       return {
@@ -362,6 +362,7 @@ export const getGroupById = privateProcedure
           include: { user: true },
         },
         expenses: true,
+        settlements: true,
         simplifiedDebts: {
           include: {
             from: {

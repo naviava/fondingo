@@ -17,6 +17,7 @@ interface IProps {
   groupColor: string;
   hasMembers: boolean;
   hasExpenses: boolean;
+  hasPayments: boolean;
   isGroupManager: boolean;
 }
 export const GroupExpensesPanel = memo(_GroupExpensesPanel);
@@ -27,6 +28,7 @@ function _GroupExpensesPanel({
   groupColor,
   hasMembers,
   hasExpenses,
+  hasPayments,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
   const { panelHeight, topRef, bottomRef } = usePanelHeight((state) => state);
@@ -60,7 +62,7 @@ function _GroupExpensesPanel({
     );
   }
 
-  if (hasMembers && !hasExpenses) {
+  if (hasMembers && !hasExpenses && !hasPayments) {
     return (
       <div
         className="flex h-[55vh] flex-col items-center justify-center px-4 text-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"

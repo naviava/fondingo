@@ -449,19 +449,39 @@ export const declineFriendRequest = privateProcedure
         message: "You are not authorized to decline this friend request.",
       });
 
-    const deletedFriendRequest = await splitdb.friendRequest.delete({
-      where: { id: friendRequest.id },
-    });
-    if (!deletedFriendRequest)
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to delete friend request.",
+    return splitdb.$transaction(async (db) => {
+      const deletedFriendRequest = await db.friendRequest.delete({
+        where: { id: friendRequest.id },
+        include: {
+          from: {
+            select: { name: true },
+          },
+        },
       });
+      if (!deletedFriendRequest)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete friend request.",
+        });
 
-    return {
-      toastTitle: "Friend request removed",
-      toastDescription: "Friend request has been successfully deleted.",
-    };
+      const log = await db.log.create({
+        data: {
+          userId: user.id,
+          type: "USER",
+          message: `You declined friend request from ${deletedFriendRequest.from.name}.`,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Couldn't decline friend request.",
+        });
+
+      return {
+        toastTitle: "Friend request removed",
+        toastDescription: "Friend request has been successfully deleted.",
+      };
+    });
   });
 
 export const acceptFriendRequest = privateProcedure
