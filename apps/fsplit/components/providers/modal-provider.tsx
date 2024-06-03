@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { ChangePasswordModal } from "../modals/change-password-modal";
 import { AddFriendModal } from "../modals/add-friend-modal";
 import { AddMemberModal } from "../modals/add-member-modal";
 import { EditUserModal } from "../modals/edit-user-modal";
@@ -18,6 +19,7 @@ export function ModalProvider() {
       <AddMemberModal />
       <AddFriendModal />
       <EditUserModal />
+      <ChangePasswordModal />
     </>
   );
 }

@@ -15,6 +15,7 @@ interface IProps {
   fieldName: "phone" | "firstName" | "lastName" | "displayName" | "email";
   value?: string;
   disabled?: boolean;
+  className?: string;
   showError?: boolean;
   isOptional?: boolean;
   placeholder?: string;
@@ -37,6 +38,7 @@ export function FormInput({
   label,
   value,
   fieldName,
+  className,
   description,
   placeholder,
   disabled = false,
@@ -72,7 +74,10 @@ export function FormInput({
               <Input
                 value={value}
                 disabled
-                className="form-input text-base placeholder:text-neutral-300"
+                className={cn(
+                  "form-input text-base placeholder:text-neutral-300",
+                  className,
+                )}
               />
             )}
           </FormControl>
