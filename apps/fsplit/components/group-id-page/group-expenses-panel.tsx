@@ -9,6 +9,7 @@ import { Button } from "@fondingo/ui/button";
 import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { linearGradientWithAlpha } from "~/utils";
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 
 interface IProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ interface IProps {
   groupColor: string;
   hasMembers: boolean;
   hasExpenses: boolean;
+  hasPayments: boolean;
   isGroupManager: boolean;
 }
 export const GroupExpensesPanel = memo(_GroupExpensesPanel);
@@ -27,6 +29,7 @@ function _GroupExpensesPanel({
   groupColor,
   hasMembers,
   hasExpenses,
+  hasPayments,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
   const { panelHeight, topRef, bottomRef } = usePanelHeight((state) => state);
@@ -60,7 +63,7 @@ function _GroupExpensesPanel({
     );
   }
 
-  if (hasMembers && !hasExpenses) {
+  if (hasMembers && !hasExpenses && !hasPayments) {
     return (
       <div
         className="flex h-[55vh] flex-col items-center justify-center px-4 text-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"
@@ -91,6 +94,6 @@ function _GroupExpensesPanel({
 
   return (
     // <ScrollArea className="h-[55vh] md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
-    <ScrollArea style={{ height }}>{children}</ScrollArea>
+    <DynamicScrollArea>{children}</DynamicScrollArea>
   );
 }

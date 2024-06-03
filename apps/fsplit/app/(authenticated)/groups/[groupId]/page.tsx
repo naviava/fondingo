@@ -73,6 +73,7 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
           isGroupManager={currentUserRole === "MANAGER"}
           hasMembers={group.members.length > 1}
           hasExpenses={!!group.expenses.length}
+          hasPayments={!!group.settlements.length}
         >
           {searchParams.showBalances && !searchParams.showTotals && (
             <ul>

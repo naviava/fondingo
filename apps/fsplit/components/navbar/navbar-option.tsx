@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 import { IconType } from "react-icons";
 import { trpc } from "~/lib/trpc/client";
@@ -29,7 +29,10 @@ function _NavbarOption({
   const { data: currentUser } = trpc.user.getAuthProfile.useQuery();
   const { data } = trpc.user.getFriendRequests.useQuery();
 
-  const incomingFriendRequestCount = data?.receivedFriendRequests.length || 0;
+  const incomingFriendRequestCount = useMemo(
+    () => data?.receivedFriendRequests.length || 0,
+    [data?.receivedFriendRequests.length],
+  );
 
   if (label === "Account") {
     return (

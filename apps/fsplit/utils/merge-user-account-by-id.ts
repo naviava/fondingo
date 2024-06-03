@@ -1,19 +1,14 @@
-import { getServerSession } from "next-auth";
+"use server";
 import splitdb from "@fondingo/db-split";
 
-export async function mergeUserAccounts() {
-  const session = await getServerSession();
-  if (!session || !session.user || !session.user.email) {
-    return null;
-  }
-
+export async function mergeUserAccountById(id: string) {
   const existingUser = await splitdb.user.findUnique({
     where: {
-      email: session.user.email,
+      id,
       isMerged: false,
     },
   });
-  if (!existingUser) return null;
+  if (!existingUser) return true;
 
   return splitdb.$transaction(async (db) => {
     await db.groupMember.updateMany({
@@ -46,6 +41,13 @@ export async function mergeUserAccounts() {
     await db.user.update({
       where: { id: existingUser.id },
       data: { isMerged: true },
+    });
+    await db.log.create({
+      data: {
+        type: "USER",
+        userId: existingUser.id,
+        message: `${existingUser.name} joined FSplit.`,
+      },
     });
   });
 }

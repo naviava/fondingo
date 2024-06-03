@@ -1,11 +1,11 @@
 import { FriendEntry } from "~/components/friends-page/friend-entry";
 import { SocialHeader } from "~/components/social-header";
-import { ScrollArea } from "@fondingo/ui/scroll-area";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { OverallGrossBalance } from "~/components/overall-gross-balance";
 import { FcRating } from "react-icons/fc";
 import { IncomingFriendRequest } from "~/components/friends-page/incoming-friend-request";
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 
 export default async function FriendsPage() {
   const { friends: friendsInApp, tempFriends: friendsInGroups } =
@@ -18,9 +18,9 @@ export default async function FriendsPage() {
     // TODO: Add UI when there are no friends
     <>
       <SocialHeader />
-      <OverallGrossBalance />
-      <ScrollArea className="h-[80vh] md:h-[82vh] lg:h-[79vh]">
-        <section className="flex flex-1 flex-col gap-y-12 px-4 pb-24">
+      <DynamicScrollArea>
+        <OverallGrossBalance />
+        <section className="flex flex-1 flex-col gap-y-12 px-4">
           {!!friendsInApp.length && (
             <ul className="space-y-6">
               {friendsInApp.map((friend) => (
@@ -69,7 +69,7 @@ export default async function FriendsPage() {
             </div>
           )}
         </section>
-      </ScrollArea>
+      </DynamicScrollArea>
     </>
   );
 }

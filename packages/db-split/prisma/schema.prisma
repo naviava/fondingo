@@ -54,7 +54,7 @@ model VerificationToken {
 model User {
   id                     String          @id @default(cuid())
   email                  String          @unique
-  phone                  String?         @unique
+  phone                  String?
   isMerged               Boolean         @default(false)
   name                   String?
   firstName              String?
@@ -235,15 +235,15 @@ model Log {
   type            LogType
   message         String
   userId          String
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User           @relation(fields: [userId], references: [id])
   groupId         String?
   group           Group?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
   expenseId       String?
-  expense         Expense?       @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expense         Expense?       @relation(fields: [expenseId], references: [id])
   settlementId    String?
-  settlement      Settlement?    @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  settlement      Settlement?    @relation(fields: [settlementId], references: [id])
   friendRequestId String?
-  friendRequest   FriendRequest? @relation(fields: [friendRequestId], references: [id], onDelete: Cascade)
+  friendRequest   FriendRequest? @relation(fields: [friendRequestId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

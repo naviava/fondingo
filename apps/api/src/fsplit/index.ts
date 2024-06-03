@@ -1,15 +1,16 @@
 import { router } from "./trpc";
 
-import { userRouter } from "./routers/user-router";
-import { groupRouter } from "./routers/group-router";
 import { expenseRouter } from "./routers/expense-router";
+import { groupRouter } from "./routers/group-router";
+import { userRouter } from "./routers/user-router";
+import { logsRouter } from "./routers/logs-router";
 
+export { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+export { createCallerFactory } from "./trpc";
+export type AppRouter = typeof appRouter;
 export const appRouter = router({
   user: userRouter,
   group: groupRouter,
   expense: expenseRouter,
+  logs: logsRouter,
 });
-
-export type AppRouter = typeof appRouter;
-export { createCallerFactory } from "./trpc";
-export { fetchRequestHandler } from "@trpc/server/adapters/fetch";

@@ -88,7 +88,7 @@ export function Navbar() {
   return (
     <nav
       ref={navbarRef}
-      className="absolute bottom-6 z-50 flex h-14 w-full items-center justify-between border-t bg-[#F4F4F4] px-4 pt-2 md:px-6"
+      className="absolute bottom-0 z-50 flex h-20 w-full items-center justify-between border-t bg-[#F4F4F4] px-4 pb-6 pt-2 md:px-6"
     >
       {optionsLeft.map((option) => (
         <Link key={option.id} href={option.href}>

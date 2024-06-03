@@ -13,6 +13,7 @@
     "./confirm-modal": "./src/confirm-modal.tsx",
     "./refresh-button": "./src/refresh-button.tsx",
     "./skeleton-wrapper": "./src/skeleton-wrapper.tsx",
+    "./dynamic-scroll-area": "./src/dynamic-scroll-area.tsx",
     "./form": "./src/shadcn/form.tsx",
     "./input": "./src/shadcn/input.tsx",
     "./label": "./src/shadcn/label.tsx",

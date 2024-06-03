@@ -76,11 +76,20 @@ export const addExpense = privateProcedure
             some: { userId: user.id, isDeleted: false },
           },
         },
+        include: { members: true },
       });
       if (!group)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
+        });
+      const userInGroup = group.members.find(
+        (member) => member.userId === user.id,
+      );
+      if (!userInGroup)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "User not in group",
         });
 
       const totalPaymentsAmount = payments.reduce(
@@ -177,7 +186,7 @@ export const addExpense = privateProcedure
             groupId,
             userId: user.id,
             expenseId: expense.id,
-            message: `${user.name} added an expense of ${(expense.amount / 100).toFixed(2)}`,
+            message: `${userInGroup.name} added an expense "${expense.name}", of ${group.currency}${(expense.amount / 100).toFixed(2)}`,
           },
         });
         if (!log)
@@ -284,11 +293,24 @@ export const updateExpense = privateProcedure
           },
         },
       },
+      include: {
+        group: {
+          include: { members: true },
+        },
+      },
     });
     if (!existingExpense)
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Expense not found",
+      });
+    const userInGroup = existingExpense.group.members.find(
+      (m) => m.userId === user.id,
+    );
+    if (!userInGroup)
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "User not in group",
       });
 
     const totalPaymentsAmount = payments.reduce(
@@ -379,6 +401,11 @@ export const updateExpense = privateProcedure
           lastModifiedById: user.id,
           groupId,
         },
+        include: {
+          group: {
+            select: { currency: true },
+          },
+        },
       });
       if (!updatedExpense)
         throw new TRPCError({
@@ -393,7 +420,7 @@ export const updateExpense = privateProcedure
             groupId,
             userId: user.id,
             expenseId: updatedExpense.id,
-            message: `${user.name} updated the name to ${updatedExpense.name}`,
+            message: `${userInGroup.name} updated the name to "${updatedExpense.name}"`,
           },
         });
         if (!log)
@@ -409,7 +436,7 @@ export const updateExpense = privateProcedure
             groupId,
             userId: user.id,
             expenseId: updatedExpense.id,
-            message: `${user.name} updated the amount to ${(updatedExpense.amount / 100).toFixed(2)}`,
+            message: `${userInGroup.name} updated the amount of "${updatedExpense.name}", to ${updatedExpense.group.currency}${(updatedExpense.amount / 100).toFixed(2)}`,
           },
         });
         if (!log)
@@ -558,11 +585,24 @@ export const deleteExpenseById = privateProcedure
           },
         },
       },
+      include: {
+        group: {
+          include: { members: true },
+        },
+      },
     });
     if (!existingExpense)
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Expense not found",
+      });
+    const userInGroup = existingExpense.group.members.find(
+      (m) => m.userId === user.id,
+    );
+    if (!userInGroup)
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "User not in group",
       });
 
     const deletedExpense = await splitdb.$transaction(async (db) => {
@@ -580,7 +620,7 @@ export const deleteExpenseById = privateProcedure
           type: "GROUP",
           groupId,
           userId: user.id,
-          message: `${user.name} deleted an expense of ${(deletedExpense.amount / 100).toFixed(2)}`,
+          message: `${userInGroup.name} deleted an expense "${deletedExpense.name}", of ${existingExpense.group.currency}${(deletedExpense.amount / 100).toFixed(2)}`,
         },
       });
       if (!log)
@@ -668,6 +708,9 @@ export const addSettlement = privateProcedure
         include: {
           from: true,
           to: true,
+          group: {
+            include: { members: true },
+          },
         },
       });
       if (!settlement)
@@ -675,13 +718,21 @@ export const addSettlement = privateProcedure
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create settlement",
         });
+      const userInGroup = settlement.group.members.find(
+        (m) => m.userId === user.id,
+      );
+      if (!userInGroup)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "User not in group",
+        });
 
       const log = await db.log.create({
         data: {
           type: "SETTLEMENT",
           groupId,
           userId: user.id,
-          message: `${user.name} added a payment of ${(settlement.amount / 100).toFixed(2)}, from ${settlement.from.name} to ${settlement.to.name}`,
+          message: `${userInGroup.name} added a payment of ${group.currency}${(settlement.amount / 100).toFixed(2)}, from ${settlement.from.name} to ${settlement.to.name}`,
         },
       });
       if (!log)
@@ -701,7 +752,7 @@ export const addSettlement = privateProcedure
     }
     return {
       toastTitle: "Settlement added",
-      toastDescription: `${settlement.from.name} paid ${settlement.to.name} $${settlement.amount / 100}`,
+      toastDescription: `${settlement.from.name} paid ${settlement.to.name} ${group.currency}${settlement.amount / 100}`,
     };
   });
 
@@ -775,12 +826,23 @@ export const updateSettlement = privateProcedure
         include: {
           from: true,
           to: true,
+          group: {
+            include: { members: true },
+          },
         },
       });
       if (!updatedSettlement)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to update settlement",
+        });
+      const userInGroup = updatedSettlement.group.members.find(
+        (m) => m.userId === user.id,
+      );
+      if (!userInGroup)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "User not in group",
         });
 
       const isDebtorSame =
@@ -795,7 +857,7 @@ export const updateSettlement = privateProcedure
             type: "SETTLEMENT",
             groupId,
             userId: user.id,
-            message: `${user.name} updated the payment to ${updatedSettlement.amount / 100}, from ${updatedSettlement.from.name} to ${updatedSettlement.to.name}.`,
+            message: `${userInGroup.name} updated the payment to ${updatedSettlement.group.currency}${updatedSettlement.amount / 100}, from ${updatedSettlement.from.name} to ${updatedSettlement.to.name}.`,
           },
         });
         if (!log)
@@ -941,16 +1003,37 @@ export const deleteSettlementById = privateProcedure
           },
         },
       },
+      include: {
+        group: {
+          include: { members: true },
+        },
+      },
     });
     if (!existingSettlement)
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Settlement not found",
       });
+    const userInGroup = existingSettlement.group.members.find(
+      (m) => m.userId === user.id,
+    );
+    if (!userInGroup)
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "User not in group",
+      });
 
     const deletedSettlement = await splitdb.$transaction(async (db) => {
       const deletedSettlement = await db.settlement.delete({
         where: { id: existingSettlement.id },
+        include: {
+          from: {
+            select: { name: true },
+          },
+          to: {
+            select: { name: true },
+          },
+        },
       });
       if (!deletedSettlement)
         throw new TRPCError({
@@ -963,7 +1046,7 @@ export const deleteSettlementById = privateProcedure
           type: "GROUP",
           groupId,
           userId: user.id,
-          message: `${user.name} deleted a payment of ${(deletedSettlement.amount / 100).toFixed(2)}.`,
+          message: `${userInGroup.name} deleted a payment of ${existingSettlement.group.currency}${(deletedSettlement.amount / 100).toFixed(2)}, from ${deletedSettlement.from.name} to ${deletedSettlement.to.name}`,
         },
       });
       if (!log)
