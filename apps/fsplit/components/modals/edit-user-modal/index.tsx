@@ -23,6 +23,9 @@ import {
   DialogTitle,
 } from "@fondingo/ui/dialog";
 
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
+
 const formSchema = z.object({
   displayName: z
     .string()
@@ -80,13 +83,6 @@ export function EditUserModal() {
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
-      console.log(
-        form.getValues("displayName") === user?.name &&
-          form.getValues("email") === user.email &&
-          form.getValues("firstName") === user.firstName &&
-          form.getValues("lastName") === user.lastName &&
-          form.getValues("phone") === user.phone,
-      );
       if (
         form.getValues("displayName") === user?.name &&
         form.getValues("email") === user.email &&
@@ -138,11 +134,15 @@ export function EditUserModal() {
                 onClose();
               }}
               disabled={isPending}
-              className="min-w-[5rem]"
+              className="min-w-[5rem] text-sm md:text-base"
             >
               Close
             </Button>
-            <DialogTitle>Edit account details</DialogTitle>
+            <DialogTitle
+              className={cn("text-base md:text-lg", hfont.className)}
+            >
+              Edit account details
+            </DialogTitle>
             <Button
               size="sm"
               variant="ctaGhost"
@@ -150,20 +150,19 @@ export function EditUserModal() {
               onClick={() => {
                 submitButtonRef.current?.click();
               }}
-              className="min-w-[5rem]"
+              className="min-w-[5rem] text-sm md:text-base"
             >
               Save
             </Button>
           </div>
         </DialogHeader>
         <Separator />
-        {/* <ScrollArea className="h-[40vh]"> */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8 px-4"
           >
-            <div className="relative">
+            <div className="flex items-center justify-between">
               <FormInput
                 form={form}
                 fieldName="displayName"
@@ -185,7 +184,7 @@ export function EditUserModal() {
                     phone: user?.phone || "",
                   })
                 }
-                className="absolute right-0 top-6 z-[5] text-rose-600 hover:bg-transparent hover:text-rose-600"
+                className="text-rose-600 hover:bg-transparent hover:text-rose-600"
               >
                 <X className="mr-1 h-4 w-4" />
                 Reset
@@ -228,7 +227,6 @@ export function EditUserModal() {
             </button>
           </form>
         </Form>
-        {/* </ScrollArea> */}
       </DialogContent>
     </Dialog>
   );

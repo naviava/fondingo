@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth";
 import { TRPCError } from "@trpc/server";
-import splitdb from "@fondingo/db-split";
+import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
 
 import { privateProcedure, publicProcedure } from "../trpc";
 import { z } from "@fondingo/utils/zod";
-import { hash } from "bcrypt";
+import { compare, hash } from "bcrypt";
 
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
@@ -66,17 +66,6 @@ export const createNewUser = publicProcedure
         message: "User with that email already exists.",
       });
 
-    // if (!!phone) {
-    //   const existingPhoneNumber = await splitdb.user.findFirst({
-    //     where: { phone },
-    //   });
-    //   if (!!existingPhoneNumber)
-    //     throw new TRPCError({
-    //       code: "BAD_REQUEST",
-    //       message: "Phone number is already in use.",
-    //     });
-    // }
-
     return splitdb.$transaction(async (db) => {
       const hashedPassword = await hash(password, 10);
       const newUser = await db.user.create({
@@ -99,6 +88,86 @@ export const createNewUser = publicProcedure
         toastTitle: "Account created",
         toastDescription:
           "Welcome to FSplit! Start splitting bills with friends.",
+      };
+    });
+  });
+
+export const changePassword = privateProcedure
+  .input(
+    z.object({
+      currentPassword: z.string().min(6, { message: "Password too short" }),
+      newPassword: z.string().min(6, { message: "Password too short" }),
+      confirmPassword: z.string(),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { currentPassword, newPassword, confirmPassword } = input;
+
+    if (newPassword !== confirmPassword)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Passwords do not match.",
+      });
+
+    if (currentPassword === newPassword)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "New password cannot be the same as the current password.",
+      });
+
+    const existingUser = await splitdb.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+    if (!existingUser.hashedPassword)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User has no password.",
+      });
+
+    const isCorrectPassword = await compare(
+      currentPassword,
+      existingUser.hashedPassword,
+    );
+    if (!isCorrectPassword)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Current password is incorrect.",
+      });
+
+    return splitdb.$transaction(async (db) => {
+      const hashedPassword = await hash(newPassword, 10);
+      const newUser = await db.user.update({
+        where: { id: existingUser.id },
+        data: { hashedPassword },
+      });
+      if (!newUser)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create user.",
+        });
+
+      const log = await db.log.create({
+        data: {
+          userId: user.id,
+          type: "USER",
+          message: "You changed your password.",
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Password change failed.",
+        });
+
+      return {
+        toastTitle: "Password updated",
+        toastDescription: "You changed your password.",
       };
     });
   });
@@ -283,6 +352,56 @@ export const editProfile = privateProcedure
       return {
         toastTitle: "Profile updated",
         toastDescription: "Your profile has been successfully updated.",
+      };
+    });
+  });
+
+export const changePreferredCurrency = privateProcedure
+  .input(z.nativeEnum(ZCurrencyCode, { message: "Invalid currency type" }))
+  .mutation(async ({ ctx, input: newCurrency }) => {
+    const { user } = ctx;
+
+    const existingUser = await splitdb.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+    if (existingUser.preferredCurrency === newCurrency)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Preferred currency is already set to that currency.",
+      });
+
+    return splitdb.$transaction(async (db) => {
+      const updatedUser = await db.user.update({
+        where: { id: existingUser.id },
+        data: { preferredCurrency: newCurrency },
+      });
+      if (!updatedUser)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update preferred currency.",
+        });
+
+      const log = await db.log.create({
+        data: {
+          userId: user.id,
+          type: "USER",
+          message: `You changed your preferred currency from "${existingUser.preferredCurrency}" to "${updatedUser.preferredCurrency}".`,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create log. Preferred currency update failed.",
+        });
+
+      return {
+        toastTitle: "Preferred currency updated",
+        toastDescription: `Your preferred currency has been updated to "${newCurrency}".`,
       };
     });
   });

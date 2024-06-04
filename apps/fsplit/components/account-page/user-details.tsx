@@ -20,7 +20,9 @@ export function UserDetails({ userName, email, imageUrl }: IProps) {
         <Avatar variant="2xl" userName={userName} userImageUrl={imageUrl} />
       </div>
       <div className="relative flex items-center">
-        <h2 className="text-2xl font-medium">{userName}</h2>
+        <h2 className="max-w-[12rem] truncate text-2xl font-medium md:max-w-none">
+          {userName}
+        </h2>
         <div className="absolute -right-12 top-1/2 flex -translate-y-1/2 items-center justify-center">
           <Button
             size="sm"

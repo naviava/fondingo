@@ -84,8 +84,8 @@ export default async function RootLayout({
             <Toaster />
           </Providers>
         </SessionProvider>
-        {/* <SpeedInsights />
-        <Analytics /> */}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

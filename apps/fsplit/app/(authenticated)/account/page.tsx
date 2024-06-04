@@ -22,7 +22,7 @@ export default async function AccountPage() {
           imageUrl={user.image || ""}
         />
         <div className="mt-10 space-y-8">
-          <Preferences />
+          <Preferences preferredCurrency={user.preferredCurrency} />
           <Feedback />
         </div>
         <Logout />

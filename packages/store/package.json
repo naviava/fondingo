@@ -6,6 +6,7 @@
   },
   "exports": {
     "./fsplit": "./src/fsplit/index.ts",
+    "./use-change-password-modal": "./src/use-change-password-modal.ts",
     "./use-confirm-modal": "./src/use-confirm-modal.ts",
     "./use-panel-height": "./src/use-panel-height.ts",
     "./use-auth-form": "./src/use-auth-form.ts"
