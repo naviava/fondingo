@@ -17,6 +17,6 @@ export const useChangeCurrencyModal = create<ChangeCurrencyModalStore>(
 
     isOpen: false,
     onOpen: (currency) => set({ isOpen: true, currency }),
-    onClose: () => set({ isOpen: false, currency: "USD" }),
+    onClose: () => set({ isOpen: false }),
   }),
 );
