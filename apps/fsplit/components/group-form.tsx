@@ -220,9 +220,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           disabled={isPendingCreate || isPendingEdit}
           className={cn("w-20", hfont.className)}
           onClick={() => {
-            if (submitButtonRef.current) {
-              submitButtonRef.current.click();
-            }
+            if (!!submitButtonRef.current) submitButtonRef.current.click();
           }}
         >
           {isPendingCreate || isPendingEdit ? (
