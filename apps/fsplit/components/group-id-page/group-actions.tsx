@@ -11,6 +11,7 @@ import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/utils";
+import { useTopRef } from "~/hooks/use-top-ref";
 
 interface IProps {
   userId?: string;
@@ -30,8 +31,8 @@ function _GroupActions({
   hasExpenses,
 }: IProps) {
   const router = useRouter();
+  const { topDivRef } = useTopRef();
   const searchParams = useSearchParams();
-  const topDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (
@@ -45,7 +46,6 @@ function _GroupActions({
   }, [groupId, router, searchParams]);
 
   const { onOpen } = useAddMemberModal((state) => state);
-  const { setTopRef } = usePanelHeight((state) => state);
 
   const handleAddMember = useCallback(() => {
     onOpen({ groupId, userId });
@@ -95,16 +95,6 @@ function _GroupActions({
     ],
     [handleAddMember, groupId, router, hasExpenses, hasDebts, searchParams],
   );
-
-  useEffect(() => {
-    function updateTopDivPosition() {
-      const topDiv = topDivRef.current?.getBoundingClientRect();
-      setTopRef(topDiv?.bottom);
-    }
-    updateTopDivPosition();
-    window.addEventListener("resize", updateTopDivPosition);
-    return () => window.removeEventListener("resize", updateTopDivPosition);
-  }, [setTopRef]);
 
   return (
     <div ref={topDivRef}>

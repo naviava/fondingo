@@ -8,6 +8,7 @@ import { PaymentSplitEntry } from "./payment-split-entry";
 import { Separator } from "@fondingo/ui/separator";
 import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 import { LogEntry } from "../log-entry";
+import { useTopRef } from "~/hooks/use-top-ref";
 
 interface IProps {
   user: Awaited<ReturnType<typeof serverClient.user.getAuthProfile>>;
@@ -17,18 +18,7 @@ interface IProps {
 }
 
 export function ExpenseDetails({ user, group, expense, logs }: IProps) {
-  const topDivRef = useRef<HTMLDivElement>(null);
-  const { setTopRef } = usePanelHeight((state) => state);
-
-  useEffect(() => {
-    function updateTopDivPosition() {
-      const topDiv = topDivRef.current?.getBoundingClientRect();
-      setTopRef(topDiv?.bottom);
-    }
-    updateTopDivPosition();
-    window.addEventListener("resize", updateTopDivPosition);
-    return () => window.removeEventListener("resize", updateTopDivPosition);
-  }, [setTopRef, topDivRef]);
+  const { topDivRef } = useTopRef();
 
   return (
     <>
