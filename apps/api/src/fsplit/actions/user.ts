@@ -1,10 +1,12 @@
 import { getServerSession } from "next-auth";
+import { uuid } from "@fondingo/utils/uuid";
 import { TRPCError } from "@trpc/server";
-import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
-
-import { privateProcedure, publicProcedure } from "../trpc";
 import { z } from "@fondingo/utils/zod";
 import { compare, hash } from "bcrypt";
+
+import { sendVerificationEmail } from "../../utils";
+import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
+import { privateProcedure, publicProcedure } from "../trpc";
 
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
@@ -21,6 +23,115 @@ export const getAuthProfile = publicProcedure.query(async () => {
 
   return userWithoutPassword;
 });
+
+export const resendVerificationEmail = privateProcedure.mutation(
+  async ({ ctx }) => {
+    const { user } = ctx;
+    const existingUser = await splitdb.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+
+    const existingToken = await splitdb.confirmEmailToken.findUnique({
+      where: { userId: existingUser.id },
+    });
+    if (!existingToken)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "No verification token found.",
+      });
+
+    if (Date.now() - new Date(existingToken.createdAt).getTime() < 90 * 1000)
+      return {
+        toastTitle: "Verification email sent",
+        toastDescription: `Email has been sent to ${existingUser.email} less than 90 seconds back.`,
+        createdAt: existingToken.createdAt,
+      };
+
+    return splitdb.$transaction(async (db) => {
+      const deletedToken = await db.confirmEmailToken.delete({
+        where: { id: existingToken.id },
+      });
+      if (!deletedToken)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete token. Email not sent.",
+        });
+
+      const newToken = await db.confirmEmailToken.create({
+        data: {
+          token: uuid(),
+          userId: existingUser.id,
+          expires: new Date(Date.now() + 1000 * 60 * 15),
+        },
+      });
+      const sent = await sendVerificationEmail({
+        email: existingUser.email,
+        token: newToken.token,
+        pathname: "/verify",
+      });
+      if (!sent)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send email.",
+        });
+      return {
+        toastTitle: "Verification email sent",
+        toastDescription: `Email has been sent to ${existingUser.email}.`,
+        createdAt: newToken.createdAt,
+      };
+    });
+  },
+);
+
+export const completeVerification = privateProcedure
+  .input(z.string().min(1, { message: "Token cannot be empty." }))
+  .mutation(({ ctx, input: token }) => {
+    const { user } = ctx;
+    return splitdb.$transaction(async (db) => {
+      const existingUser = await db.user.findUnique({
+        where: { id: user.id },
+      });
+      if (!existingUser)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found.",
+        });
+
+      const existingToken = await db.confirmEmailToken.findUnique({
+        where: { userId: existingUser.id, token },
+      });
+      if (!existingToken)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No verification token found.",
+        });
+
+      const completedVerification = await db.accountVerification.create({
+        data: { userId: user.id },
+      });
+      if (!completedVerification)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to complete verification.",
+        });
+
+      const deletedToken = await db.confirmEmailToken.delete({
+        where: { id: existingToken.id },
+      });
+      if (!deletedToken)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete token.",
+        });
+
+      return true;
+    });
+  });
 
 export const createNewUser = publicProcedure
   .input(

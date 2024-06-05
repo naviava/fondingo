@@ -14,7 +14,8 @@
     "AUTH_TWITTER_SECRET",
     "AUTH_FACEBOOK_ID",
     "AUTH_FACEBOOK_SECRET",
-    "NEXT_PUBLIC_SITE_URL"
+    "NEXT_PUBLIC_SITE_URL",
+    "RESEND_API_KEY"
   ],
   "pipeline": {
     "build": {

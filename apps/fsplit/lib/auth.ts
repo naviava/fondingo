@@ -1,66 +1,18 @@
-import CredentialsProvider from "next-auth/providers/credentials";
-import DiscordProvider from "next-auth/providers/discord";
-import TwitterProvider from "next-auth/providers/twitter";
-import GoogleProvider from "next-auth/providers/google";
-import GithubProvider from "next-auth/providers/github";
-
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { Adapter } from "next-auth/adapters";
 import { AuthOptions } from "next-auth";
 
 import { mergeUserAccountById } from "~/utils/merge-user-account-by-id";
-import splitdb, { TAccountVerification, TUserRole } from "@fondingo/db-split";
-import { compare } from "bcrypt";
+import { sendVerificationEmail } from "@fondingo/api/utils";
+import splitdb, { TUserRole } from "@fondingo/db-split";
+import { providers } from "./auth-providers";
+import { uuid } from "@fondingo/utils/uuid";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(splitdb) as Adapter,
   session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
-  providers: [
-    GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID ?? "",
-      clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
-    }),
-    GithubProvider({
-      clientId: process.env.AUTH_GITHUB_ID ?? "",
-      clientSecret: process.env.AUTH_GITHUB_SECRET ?? "",
-    }),
-    DiscordProvider({
-      clientId: process.env.AUTH_DISCORD_ID ?? "",
-      clientSecret: process.env.AUTH_DISCORD_SECRET ?? "",
-    }),
-    TwitterProvider({
-      clientId: process.env.AUTH_TWITTER_ID ?? "",
-      clientSecret: process.env.AUTH_TWITTER_SECRET ?? "",
-    }),
-    TwitterProvider({
-      clientId: process.env.AUTH_FACEBOOK_ID ?? "",
-      clientSecret: process.env.AUTH_FACEBOOK_SECRET ?? "",
-    }),
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "email", type: "text" },
-        password: { label: "password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password)
-          throw new Error("Invalid credentials");
-        const user = await splitdb.user.findUnique({
-          where: { email: credentials.email.toLowerCase(), disabled: false },
-        });
-        if (!user || !user?.hashedPassword)
-          throw new Error("Invalid credentials");
-        const isCorrectPassword = await compare(
-          credentials.password,
-          user.hashedPassword,
-        );
-        if (!isCorrectPassword) throw new Error("Invalid credentials");
-        if (!user.isMerged) await mergeUserAccountById(user.id);
-        return user;
-      },
-    }),
-  ],
+  providers,
   events: {
     linkAccount: async ({ user }) => {
       await mergeUserAccountById(user.id);
@@ -86,20 +38,36 @@ export const authOptions: AuthOptions = {
       if (!token.sub) return token;
       const existingUser = await splitdb.user.findUnique({
         where: { id: token.sub },
+        include: {
+          accounts: true,
+          accountVerification: true,
+          confirmEmailToken: true,
+        },
       });
       if (!existingUser) return token;
 
-      const existingAccount = await splitdb.account.findFirst({
-        where: { userId: existingUser.id },
-      });
+      const isOAuth = !!existingUser.accounts.length;
 
-      let isVerified = false;
-      if (!!existingAccount) {
-        isVerified = !!(await splitdb.accountVerification.upsert({
-          where: { userId: existingUser.id },
-          update: {},
-          create: { userId: existingUser.id },
+      let isVerified = !!existingUser.accountVerification;
+      if (isOAuth && !isVerified) {
+        isVerified = !!(await splitdb.accountVerification.create({
+          data: { userId: existingUser.id },
         }));
+      }
+
+      if (!isOAuth && !isVerified && !existingUser.confirmEmailToken) {
+        const newVerificationToken = await splitdb.confirmEmailToken.create({
+          data: {
+            token: uuid(),
+            userId: existingUser.id,
+            expires: new Date(Date.now() + 1000 * 60 * 15),
+          },
+        });
+        await sendVerificationEmail({
+          email: existingUser.email,
+          token: newVerificationToken.token,
+          pathname: "/verify",
+        });
       }
 
       token.name = existingUser.name;
@@ -107,7 +75,7 @@ export const authOptions: AuthOptions = {
       token.image = existingUser.image;
       token.role = existingUser.role;
       token.disabled = existingUser.disabled;
-      token.isOAuth = !!existingAccount;
+      token.isOAuth = isOAuth;
       token.isVerified = isVerified;
       return token;
     },
