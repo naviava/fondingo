@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export default withAuth(async (req: NextRequest) => {
   const token = await getToken({ req });
-  console.log(req);
   if (
     req.nextUrl.pathname !== "/account" &&
     req.nextUrl.pathname !== "/verify" &&

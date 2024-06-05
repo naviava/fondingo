@@ -12,10 +12,10 @@ interface IProps {
   params: {
     groupId: string;
   };
-  searchParams: {
-    showBalances: boolean;
-    showTotals: boolean;
-    showActivity: boolean;
+  searchParams?: {
+    showBalances?: boolean;
+    showTotals?: boolean;
+    showActivity?: boolean;
   };
 }
 
@@ -36,9 +36,9 @@ export async function GroupPanel({ children, params, searchParams }: IProps) {
       >
         <UtilityButtons
           groupId={params.groupId}
-          showTotals={searchParams.showTotals}
-          showBalances={searchParams.showBalances}
-          showActivity={searchParams.showActivity}
+          showTotals={searchParams?.showTotals}
+          showBalances={searchParams?.showBalances}
+          showActivity={searchParams?.showActivity}
         />
         <GroupAvatar
           groupType={group.type}

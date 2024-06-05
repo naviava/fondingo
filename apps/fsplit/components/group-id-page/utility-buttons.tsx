@@ -4,9 +4,9 @@ import Link from "next/link";
 
 interface IProps {
   groupId: string;
-  showTotals: boolean;
-  showBalances: boolean;
-  showActivity: boolean;
+  showTotals?: boolean;
+  showBalances?: boolean;
+  showActivity?: boolean;
 }
 
 export function UtilityButtons({
