@@ -8,10 +8,9 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { Adapter } from "next-auth/adapters";
 import { AuthOptions } from "next-auth";
 
-import { sign } from "@fondingo/utils/jwt";
-import splitdb from "@fondingo/db-split";
-import { compare } from "bcrypt";
 import { mergeUserAccountById } from "~/utils/merge-user-account-by-id";
+import splitdb, { TUserRole } from "@fondingo/db-split";
+import { compare } from "bcrypt";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(splitdb) as Adapter,
@@ -62,28 +61,49 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user, account }) {
-      if (!!account) {
-        const tokenObject = {
-          id: user.id,
-          email: user.email,
-        };
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
-        token.image = user.image;
-        token.apiToken = sign(tokenObject, process.env.NEXTAUTH_SECRET!);
-      }
-      return { ...token };
+  events: {
+    linkAccount: async ({ user }) => {
+      await mergeUserAccountById(user.id);
     },
-    async session({ session, token }) {
-      session.user = token;
+  },
+  callbacks: {
+    session: async ({ session, token }) => {
+      if (!!token.sub && !!session.user) {
+        session.user.id = token.sub;
+      }
+      if (!!token.role && !!session.user) {
+        session.user.role = token.role as TUserRole;
+      }
+      if (!!token.image && !!session.user) {
+        session.user.image = token.image as string;
+      }
+      if (!!session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.disabled = token.disabled as boolean;
+      }
       return session;
+    },
+    jwt: async ({ token }) => {
+      if (!token.sub) return token;
+      const existingUser = await splitdb.user.findUnique({
+        where: { id: token.sub },
+      });
+      if (!existingUser) return token;
+      const existingAccount = await splitdb.account.findFirst({
+        where: { id: existingUser.id },
+      });
+
+      token.name = existingUser.name;
+      token.email = existingUser.email;
+      token.image = existingUser.image;
+      token.role = existingUser.role;
+      token.isOAuth = !!existingAccount;
+      token.disabled = existingUser.disabled;
+      return token;
     },
   },
   pages: {
     signIn: "/signin",
-    newUser: "/new-user",
   },
 };

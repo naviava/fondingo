@@ -30,6 +30,7 @@ export type SimplifiedDebt = SimplifiedDebtPrisma;
 export type CurrencyCode = CurrencyCodePrisma;
 export type GroupMember = GroupMemberPrisma;
 export type TGroupRole = GroupRolePrisma;
+export type TUserRole = RolePrisma;
 export type User = UserPrisma;
 export default prisma;
 

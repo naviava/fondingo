@@ -10,7 +10,7 @@ export function EmptyState() {
           height={300}
           width={300}
         />
-        <p className="-mt-7 mr-4 text-right text-xs">
+        <p className="-mt-7 mr-4 text-right text-[10px]">
           <a
             target="_blank"
             href="https://www.freepik.com/free-vector/shrug-concept-illustration_24488080.htm#query=nothing&position=0&from_view=keyword&track=sph&uuid=cd8a18b9-0346-4a07-aca9-cbc4fdd5d47a"

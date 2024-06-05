@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import splitdb from "@fondingo/db-split";
 import { authOptions } from "~/lib/auth";
 
-export async function mergeUserAccounts(id?: string) {
+export async function mergeUserAccounts() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user || !session.user.email) {
     return null;
