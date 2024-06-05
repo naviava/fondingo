@@ -15,6 +15,8 @@ import {
   createNewUser,
   changePassword,
   changePreferredCurrency,
+  resendVerificationEmail,
+  completeVerification,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -32,4 +34,6 @@ export const userRouter = router({
   findFriends,
   findUsers,
   sendFriendRequest,
+  resendVerificationEmail,
+  completeVerification,
 });

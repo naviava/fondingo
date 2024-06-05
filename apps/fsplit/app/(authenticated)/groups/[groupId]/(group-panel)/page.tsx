@@ -13,10 +13,10 @@ interface IProps {
   params: {
     groupId: string;
   };
-  searchParams: {
-    showTotals: boolean;
-    showBalances: boolean;
-    showActivity: boolean;
+  searchParams?: {
+    showTotals?: boolean;
+    showBalances?: boolean;
+    showActivity?: boolean;
   };
 }
 
@@ -28,7 +28,7 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
 
   return (
     <GroupPanel params={params} searchParams={searchParams}>
-      {searchParams.showBalances &&
+      {searchParams?.showBalances &&
         !searchParams.showTotals &&
         !searchParams.showActivity && (
           <ul>
@@ -43,14 +43,14 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
             ))}
           </ul>
         )}
-      {searchParams.showTotals &&
+      {searchParams?.showTotals &&
         !searchParams.showBalances &&
         !searchParams.showActivity && (
           <Suspense fallback={<LoadingState />}>
             <GroupTotals groupId={group.id} />
           </Suspense>
         )}
-      {searchParams.showActivity &&
+      {searchParams?.showActivity &&
         !searchParams.showBalances &&
         !searchParams.showTotals && (
           <Suspense fallback={<LoadingState />}>
@@ -65,9 +65,9 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
             </ul>
           </Suspense>
         )}
-      {!searchParams.showBalances &&
-        !searchParams.showTotals &&
-        !searchParams.showActivity && (
+      {!searchParams?.showBalances &&
+        !searchParams?.showTotals &&
+        !searchParams?.showActivity && (
           <GroupLog
             userId={currentUser?.id}
             groupId={group.id}

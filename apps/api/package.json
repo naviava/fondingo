@@ -6,7 +6,8 @@
     "lint": "eslint . --max-warnings 0"
   },
   "exports": {
-    "./fsplit": "./src/fsplit/index.ts"
+    "./fsplit": "./src/fsplit/index.ts",
+    "./utils": "./src/utils/index.ts"
   },
   "devDependencies": {
     "@fondingo/eslint-config": "workspace:*",

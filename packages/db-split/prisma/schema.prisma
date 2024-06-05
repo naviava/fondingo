@@ -51,34 +51,56 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
+model ConfirmEmailToken {
+  id      String   @id @default(cuid())
+  token   String   @unique
+  expires DateTime
+  userId  String   @unique
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
-  id                     String          @id @default(cuid())
-  email                  String          @unique
+  id                     String               @id @default(cuid())
+  email                  String               @unique
   phone                  String?
-  isMerged               Boolean         @default(false)
+  isMerged               Boolean              @default(false)
   name                   String?
   firstName              String?
   middleName             String?
   lastName               String?
   hashedPassword         String?
   image                  String?
-  preferredCurrency      CurrencyCode    @default(USD)
-  role                   Role            @default(USER)
-  disabled               Boolean         @default(false)
-  emailVerified          DateTime?       @map("email_verified")
+  preferredCurrency      CurrencyCode         @default(USD)
+  role                   Role                 @default(USER)
+  disabled               Boolean              @default(false)
+  emailVerified          DateTime?            @map("email_verified")
+  confirmEmailToken      ConfirmEmailToken?
+  accountVerification    AccountVerification?
   accounts               Account[]
   sessions               Session[]
   groups                 GroupMember[]
   tempfriends            TempFriend[]
-  createdExpenses        Expense[]       @relation("CreatedBy")
-  modifiedExpenses       Expense[]       @relation("LastModifiedBy")
-  createdSettlements     Settlement[]    @relation("SettlementCreatedBy")
-  modifiedSettlements    Settlement[]    @relation("SettlementLastModifiedBy")
-  friends1               Friend[]        @relation("Friend1")
-  friends2               Friend[]        @relation("Friend2")
-  friendRequestsSent     FriendRequest[] @relation("FriendRequestFrom")
-  friendRequestsReceived FriendRequest[] @relation("FriendRequestTo")
+  createdExpenses        Expense[]            @relation("CreatedBy")
+  modifiedExpenses       Expense[]            @relation("LastModifiedBy")
+  createdSettlements     Settlement[]         @relation("SettlementCreatedBy")
+  modifiedSettlements    Settlement[]         @relation("SettlementLastModifiedBy")
+  friends1               Friend[]             @relation("Friend1")
+  friends2               Friend[]             @relation("Friend2")
+  friendRequestsSent     FriendRequest[]      @relation("FriendRequestFrom")
+  friendRequestsReceived FriendRequest[]      @relation("FriendRequestTo")
   logs                   Log[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AccountVerification {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
