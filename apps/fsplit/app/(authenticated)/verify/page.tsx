@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
-export default function VerifyPage() {
-  return redirect("/groups");
+export default async function VerifyPage() {
+  return <div>Verify Page</div>;
 }

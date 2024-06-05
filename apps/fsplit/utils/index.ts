@@ -1,4 +1,3 @@
-import { format } from "@fondingo/utils/date-fns";
 import { Montserrat } from "next/font/google";
 
 export const hfont = Montserrat({

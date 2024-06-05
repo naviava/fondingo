@@ -1,7 +1,22 @@
+import { getToken } from "next-auth/jwt";
 import { withAuth } from "next-auth/middleware";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export default withAuth(async (req: NextRequest) => {});
+export default withAuth(async (req: NextRequest) => {
+  const token = await getToken({ req });
+  console.log(req);
+  if (
+    req.nextUrl.pathname !== "/account" &&
+    req.nextUrl.pathname !== "/verify" &&
+    !token?.isVerified
+  ) {
+    return NextResponse.redirect(new URL("/verify", req.url));
+  }
+
+  if (req.nextUrl.pathname === "/verify" && token?.isVerified) {
+    return NextResponse.redirect(new URL("/groups", req.url));
+  }
+});
 
 export const config = {
   matcher: [
@@ -10,6 +25,6 @@ export const config = {
     "/create-group/:path*",
     "/friends/:path*",
     "/groups/:path*",
-    "/new-user/:path*",
+    "/verify/:path*",
   ],
 };

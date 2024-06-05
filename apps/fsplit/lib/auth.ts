@@ -9,7 +9,7 @@ import { Adapter } from "next-auth/adapters";
 import { AuthOptions } from "next-auth";
 
 import { mergeUserAccountById } from "~/utils/merge-user-account-by-id";
-import splitdb, { TUserRole } from "@fondingo/db-split";
+import splitdb, { TAccountVerification, TUserRole } from "@fondingo/db-split";
 import { compare } from "bcrypt";
 
 export const authOptions: AuthOptions = {
@@ -71,16 +71,14 @@ export const authOptions: AuthOptions = {
       if (!!token.sub && !!session.user) {
         session.user.id = token.sub;
       }
-      if (!!token.role && !!session.user) {
-        session.user.role = token.role as TUserRole;
-      }
-      if (!!token.image && !!session.user) {
-        session.user.image = token.image as string;
-      }
       if (!!session.user) {
         session.user.name = token.name;
         session.user.email = token.email;
+        session.user.image = token.image as string;
+        session.user.role = token.role as TUserRole;
+        session.user.isOAuth = token.isOAuth as boolean;
         session.user.disabled = token.disabled as boolean;
+        session.user.isVerified = token.isVerified as boolean;
       }
       return session;
     },
@@ -90,16 +88,27 @@ export const authOptions: AuthOptions = {
         where: { id: token.sub },
       });
       if (!existingUser) return token;
+
       const existingAccount = await splitdb.account.findFirst({
-        where: { id: existingUser.id },
+        where: { userId: existingUser.id },
       });
+
+      let isVerified = false;
+      if (!!existingAccount) {
+        isVerified = !!(await splitdb.accountVerification.upsert({
+          where: { userId: existingUser.id },
+          update: {},
+          create: { userId: existingUser.id },
+        }));
+      }
 
       token.name = existingUser.name;
       token.email = existingUser.email;
       token.image = existingUser.image;
       token.role = existingUser.role;
-      token.isOAuth = !!existingAccount;
       token.disabled = existingUser.disabled;
+      token.isOAuth = !!existingAccount;
+      token.isVerified = isVerified;
       return token;
     },
   },

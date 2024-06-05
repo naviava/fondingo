@@ -15,7 +15,6 @@ export const getAuthProfile = publicProcedure.query(async () => {
   const user = await splitdb.user.findUnique({
     where: { email: session.user.email },
   });
-
   if (!user) return null;
   // eslint-disable-next-line no-unused-vars
   const { hashedPassword, ...userWithoutPassword } = user;
