@@ -31,14 +31,10 @@ function _GroupExpensesPanel({
   hasPayments,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
-  const { panelHeight } = usePanel();
 
   if (!hasMembers) {
     return (
-      <div
-        className="flex flex-col items-center justify-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"
-        style={{ height: panelHeight }}
-      >
+      <Wrapper>
         <div className="flex -translate-y-1/2 flex-col items-center justify-center">
           <h2 className="mb-10 text-center text-gray-500">
             You're the only one here!
@@ -53,16 +49,13 @@ function _GroupExpensesPanel({
             Add members
           </Button>
         </div>
-      </div>
+      </Wrapper>
     );
   }
 
   if (hasMembers && !hasExpenses && !hasPayments) {
     return (
-      <div
-        className="flex h-[55vh] flex-col items-center justify-center px-4 text-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"
-        style={{ height: panelHeight }}
-      >
+      <Wrapper>
         <h2 className="mb-2 text-center font-semibold tracking-wide">
           No expenses here yet.
         </h2>
@@ -82,9 +75,17 @@ function _GroupExpensesPanel({
             borderLeft: "30px solid transparent",
           }}
         />
-      </div>
+      </Wrapper>
     );
   }
 
   return <DynamicScrollArea>{children}</DynamicScrollArea>;
+}
+
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-[55vh] flex-col items-center justify-center px-4 text-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]">
+      {children}
+    </div>
+  );
 }
