@@ -958,6 +958,8 @@ export const findFriends = privateProcedure
       (friend) =>
         friend.name?.toLowerCase().includes(searchTerm) ||
         friend.email?.toLowerCase().includes(searchTerm) ||
+        friend.firstName?.toLowerCase().includes(searchTerm) ||
+        friend.lastName?.toLowerCase().includes(searchTerm) ||
         friend.phone?.includes(searchTerm),
     );
     const tempFriendsSearchResults = tempFriends.filter(
@@ -991,8 +993,30 @@ export const findUsers = privateProcedure
               mode: "insensitive",
             },
           },
-          { name: { contains: searchTerm, mode: "insensitive" } },
-          { phone: { contains: searchTerm, mode: "insensitive" } },
+          {
+            name: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          {
+            phone: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          {
+            firstName: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          {
+            lastName: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
         ],
       },
       orderBy: { name: "asc" },
