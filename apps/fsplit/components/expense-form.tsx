@@ -10,7 +10,13 @@ import { useUtils } from "~/hooks/use-utils";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
 
-import { Form, FormControl, FormField, FormItem } from "@fondingo/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@fondingo/ui/form";
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { LayoutList, X } from "@fondingo/ui/lucide";
 import { Separator } from "@fondingo/ui/separator";
@@ -25,7 +31,10 @@ import { hexToRgb } from "~/utils";
 
 const formSchema = z.object({
   groupId: z.string().min(1, { message: "Group ID is required" }),
-  expenseName: z.string().min(1, { message: "Expense name is required" }),
+  expenseName: z
+    .string()
+    .min(1, { message: "Expense name is required" })
+    .max(50, { message: "Expense name must be less than 50 characters" }),
   expenseAmount: z
     .string()
     .min(1, { message: "Amount must be greater than 0" }),
@@ -228,12 +237,12 @@ export default function ExpenseForm({
           Save
         </Button>
       </div>
-      <div className="flex items-center px-6 pt-2 text-sm font-medium">
+      <div className="line-clamp-1 flex items-center px-6 pt-2 text-sm font-medium ">
         <p>
           With <span className="font-bold">you</span> and:
         </p>
         <div
-          className="ml-2 rounded-full border-2 px-2 py-1"
+          className="ml-2 line-clamp-1 max-w-[10rem] rounded-full border-2 px-2 py-1"
           style={{
             borderColor: group?.color,
             backgroundColor: hexToRgb(group?.color || "#000000", 0.1),
@@ -274,6 +283,7 @@ export default function ExpenseForm({
                       )}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />

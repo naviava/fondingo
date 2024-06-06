@@ -27,7 +27,7 @@ export function ExpenseHeader({
     <div className="mt-6 flex items-start gap-x-4 px-6">
       <ExpenseAvatar groupColor={groupColor} />
       <div className="space-y-1">
-        <p className="text-lg font-medium">{expenseName}</p>
+        <p className="line-clamp-2 text-lg font-medium">{expenseName}</p>
         <DisplayAmount
           variant="xl"
           amount={expenseAmount}
