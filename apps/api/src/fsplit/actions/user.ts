@@ -163,22 +163,23 @@ export const completeVerification = privateProcedure
     });
   });
 
-export const isVerified = privateProcedure.query(async ({ ctx }) => {
-  const { user } = ctx;
-  const existingUser = await splitdb.user.findUnique({
-    where: { id: user.id },
-  });
-  if (!existingUser)
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "User not found.",
+export const isVerified = publicProcedure
+  .input(z.string().email({ message: "Invalid email" }))
+  .query(async ({ input: email }) => {
+    const existingUser = await splitdb.user.findUnique({
+      where: { email },
     });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
 
-  const isVerified = !!(await splitdb.accountVerification.findFirst({
-    where: { userId: existingUser.id },
-  }));
-  return isVerified;
-});
+    const isVerified = !!(await splitdb.accountVerification.findFirst({
+      where: { userId: existingUser.id },
+    }));
+    return isVerified;
+  });
 
 export const createNewUser = publicProcedure
   .input(

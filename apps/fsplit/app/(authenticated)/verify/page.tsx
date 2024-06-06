@@ -15,10 +15,13 @@ export default async function VerifyPage({ searchParams }: IProps) {
   if (!session || !session.user || !session.user.email)
     return redirect("/signin");
 
-  if (!searchParams?.token) return <TokenState email={session.user.email} />;
+  const isVerified = await serverClient.user.isVerified(session.user.email);
+  if (isVerified) return redirect("/groups");
+  if (!searchParams?.token && !isVerified)
+    return <TokenState email={session.user.email} />;
 
   const tokenExists = await serverClient.user.getVerificationToken(
-    searchParams.token,
+    searchParams?.token || "",
   );
   if (!tokenExists)
     return (
@@ -30,7 +33,7 @@ export default async function VerifyPage({ searchParams }: IProps) {
     );
 
   const response = await serverClient.user.completeVerification(
-    searchParams.token,
+    searchParams?.token || "",
   );
   if (response) return redirect("/groups");
 
