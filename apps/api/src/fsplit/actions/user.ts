@@ -7,6 +7,7 @@ import { compare, hash } from "bcrypt";
 import { sendVerificationEmail } from "../../utils";
 import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
 import { privateProcedure, publicProcedure } from "../trpc";
+import { getToken } from "next-auth/jwt";
 
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
@@ -88,10 +89,34 @@ export const resendVerificationEmail = privateProcedure.mutation(
   },
 );
 
+export const getVerificationToken = privateProcedure
+  .input(z.string().min(1, { message: "Token cannot be empty." }))
+  .query(async ({ ctx, input: token }) => {
+    const { user } = ctx;
+    const existingUser = await splitdb.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+
+    const existingToken = await splitdb.confirmEmailToken.findUnique({
+      where: {
+        userId: existingUser.id,
+        token,
+      },
+    });
+
+    return existingToken;
+  });
+
 export const completeVerification = privateProcedure
   .input(z.string().min(1, { message: "Token cannot be empty." }))
-  .mutation(({ ctx, input: token }) => {
+  .mutation(async ({ ctx, input: token }) => {
     const { user } = ctx;
+
     return splitdb.$transaction(async (db) => {
       const existingUser = await db.user.findUnique({
         where: { id: user.id },
@@ -109,6 +134,11 @@ export const completeVerification = privateProcedure
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "No verification token found.",
+        });
+      if (Date.now() > new Date(existingToken.expires).getTime())
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Verification token has expired.",
         });
 
       const completedVerification = await db.accountVerification.create({
@@ -132,6 +162,23 @@ export const completeVerification = privateProcedure
       return true;
     });
   });
+
+export const isVerified = privateProcedure.query(async ({ ctx }) => {
+  const { user } = ctx;
+  const existingUser = await splitdb.user.findUnique({
+    where: { id: user.id },
+  });
+  if (!existingUser)
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "User not found.",
+    });
+
+  const isVerified = !!(await splitdb.accountVerification.findFirst({
+    where: { userId: existingUser.id },
+  }));
+  return isVerified;
+});
 
 export const createNewUser = publicProcedure
   .input(

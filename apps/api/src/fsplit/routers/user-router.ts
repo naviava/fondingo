@@ -17,6 +17,8 @@ import {
   changePreferredCurrency,
   resendVerificationEmail,
   completeVerification,
+  isVerified,
+  getVerificationToken,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -36,4 +38,6 @@ export const userRouter = router({
   sendFriendRequest,
   resendVerificationEmail,
   completeVerification,
+  isVerified,
+  getVerificationToken,
 });

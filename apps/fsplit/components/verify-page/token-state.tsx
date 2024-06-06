@@ -6,10 +6,19 @@ import { hfont } from "~/utils";
 
 interface IProps {
   email: string;
+  title?: string;
+  isError?: boolean;
   isExpired?: boolean;
+  isInvalid?: boolean;
 }
 
-export function NoToken({ email, isExpired }: IProps) {
+export function TokenState({
+  email,
+  isError,
+  isExpired,
+  isInvalid,
+  title = "Verify your email",
+}: IProps) {
   return (
     <div className="flex h-full flex-col items-center justify-center space-y-6 pb-24">
       <h1
@@ -18,7 +27,7 @@ export function NoToken({ email, isExpired }: IProps) {
           hfont.className,
         )}
       >
-        Verify your email
+        {title}
       </h1>
       <p
         className={cn(
@@ -31,17 +40,30 @@ export function NoToken({ email, isExpired }: IProps) {
       <Image
         src="images/mail-sent.svg"
         alt="No groups yet"
-        height={500}
-        width={500}
+        height={400}
+        width={400}
         className="object-cover"
       />
       <p className="text-balance px-2 text-center text-sm tracking-wide text-neutral-500 md:text-base">
-        {isExpired ? (
+        {isExpired && (
           <span>
             That token has expired. Please click on the "Resend Email" button
             below to generate a new confirmation token for your account.
           </span>
-        ) : (
+        )}
+        {isInvalid && (
+          <span>
+            That token is invalid! Please check your email inbox for a message
+            from FSplit. Click on the link in the email to verify your account.
+          </span>
+        )}
+        {isError && (
+          <span>
+            An unexpected error occurred. Please try again later or contact
+            support.
+          </span>
+        )}
+        {!isExpired && !isInvalid && (
           <span>
             An email has been sent to <span className="font-bold">{email}</span>{" "}
             with a link to verify your account. If you have not received the

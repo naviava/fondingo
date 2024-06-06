@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { NoToken } from "~/components/verify-page/no-token";
+import { TokenState } from "~/components/verify-page/token-state";
 import { serverClient } from "~/lib/trpc/server-client";
 
 interface IProps {
@@ -15,11 +15,26 @@ export default async function VerifyPage({ searchParams }: IProps) {
   if (!session || !session.user || !session.user.email)
     return redirect("/signin");
 
-  if (!searchParams?.token) return <NoToken email={session.user.email} />;
+  if (!searchParams?.token) return <TokenState email={session.user.email} />;
+
+  const tokenExists = await serverClient.user.getVerificationToken(
+    searchParams.token,
+  );
+  if (!tokenExists)
+    return (
+      <TokenState title="Invalid token" email={session.user.email} isInvalid />
+    );
+  if (Date.now() > new Date(tokenExists.expires).getTime())
+    return (
+      <TokenState title="Expired token" email={session.user.email} isExpired />
+    );
 
   const response = await serverClient.user.completeVerification(
     searchParams.token,
   );
   if (response) return redirect("/groups");
-  return <NoToken email={session.user.email} isExpired />;
+
+  return (
+    <TokenState title="Unexpected error" email={session.user.email} isError />
+  );
 }
