@@ -2,14 +2,13 @@
 
 import { memo, useMemo } from "react";
 
-import { ScrollArea } from "@fondingo/ui/scroll-area";
+import { useAddMemberModal } from "@fondingo/store/fsplit";
+import { usePanel } from "@fondingo/ui/use-panel";
+import { linearGradientWithAlpha } from "~/utils";
+
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 import { UserPlus } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
-
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
-import { useAddMemberModal } from "@fondingo/store/fsplit";
-import { linearGradientWithAlpha } from "~/utils";
-import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 
 interface IProps {
   children: React.ReactNode;
@@ -32,18 +31,13 @@ function _GroupExpensesPanel({
   hasPayments,
 }: IProps) {
   const { onOpen } = useAddMemberModal();
-  const { panelHeight, topRef, bottomRef } = usePanelHeight((state) => state);
-
-  const height = useMemo(
-    () => (!!topRef && !!bottomRef ? `${panelHeight - 16}px` : "default"),
-    [topRef, bottomRef, panelHeight],
-  );
+  const { panelHeight } = usePanel();
 
   if (!hasMembers) {
     return (
       <div
         className="flex flex-col items-center justify-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"
-        style={{ height }}
+        style={{ height: panelHeight }}
       >
         <div className="flex -translate-y-1/2 flex-col items-center justify-center">
           <h2 className="mb-10 text-center text-gray-500">
@@ -67,7 +61,7 @@ function _GroupExpensesPanel({
     return (
       <div
         className="flex h-[55vh] flex-col items-center justify-center px-4 text-center md:h-[58vh] lg:h-[68vh] xl:h-[67vh]"
-        style={{ height }}
+        style={{ height: panelHeight }}
       >
         <h2 className="mb-2 text-center font-semibold tracking-wide">
           No expenses here yet.

@@ -1,17 +1,17 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { useAddMemberModal } from "@fondingo/store/fsplit";
+import { usePanel } from "@fondingo/ui/use-panel";
 
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
+
 import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/utils";
-import { useTopRef } from "~/hooks/use-top-ref";
 
 interface IProps {
   userId?: string;
@@ -31,7 +31,7 @@ function _GroupActions({
   hasExpenses,
 }: IProps) {
   const router = useRouter();
-  const { topDivRef } = useTopRef();
+  const { topDivRef } = usePanel();
   const searchParams = useSearchParams();
 
   useEffect(() => {

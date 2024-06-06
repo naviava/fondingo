@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { formatDate } from "@fondingo/utils/date-fns";
 import { CurrencyCode } from "@fondingo/db-split";
+import { usePanel } from "@fondingo/ui/use-panel";
 
 import { DisplayAmount } from "~/components/display-amount";
 import { FcMoneyTransfer } from "react-icons/fc";
-import { useTopRef } from "~/hooks/use-top-ref";
 
 interface IProps {
   amount: number;
@@ -31,7 +28,7 @@ export function SettlementDetails({
   creatorName = "",
   lastUpdatedByName = "",
 }: IProps) {
-  const { topDivRef } = useTopRef();
+  const { topDivRef } = usePanel();
 
   return (
     <div

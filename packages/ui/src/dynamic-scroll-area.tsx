@@ -1,8 +1,8 @@
 "use client";
 
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { ScrollArea } from "./shadcn/scroll-area";
 import { useMemo } from "react";
+import { usePanel } from "./hooks/use-panel";
 
 interface IProps {
   children: React.ReactNode;
@@ -11,7 +11,7 @@ interface IProps {
 }
 
 export function DynamicScrollArea({ children, className, crop = 32 }: IProps) {
-  const { panelHeight } = usePanelHeight((state) => state);
+  const { panelHeight } = usePanel();
   const height = useMemo(() => `${panelHeight - crop}px`, [panelHeight, crop]);
 
   return (

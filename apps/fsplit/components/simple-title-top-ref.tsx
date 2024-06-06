@@ -1,6 +1,6 @@
 "use client";
 
-import { useTopRef } from "~/hooks/use-top-ref";
+import { usePanel } from "@fondingo/ui/use-panel";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 
@@ -10,7 +10,7 @@ interface IProps {
 }
 
 export function SimpleTitleTopRef({ title, className }: IProps) {
-  const { topDivRef } = useTopRef();
+  const { topDivRef } = usePanel();
 
   return (
     <div ref={topDivRef}>

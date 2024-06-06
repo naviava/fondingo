@@ -1,14 +1,12 @@
 "use client";
 
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { serverClient } from "~/lib/trpc/server-client";
-import { useEffect, useRef } from "react";
+import { usePanel } from "@fondingo/ui/use-panel";
 
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 import { PaymentSplitEntry } from "./payment-split-entry";
 import { Separator } from "@fondingo/ui/separator";
-import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
-import { LogEntry } from "../log-entry";
-import { useTopRef } from "~/hooks/use-top-ref";
+import { LogEntry } from "~/components/log-entry";
 
 interface IProps {
   user: Awaited<ReturnType<typeof serverClient.user.getAuthProfile>>;
@@ -18,7 +16,7 @@ interface IProps {
 }
 
 export function ExpenseDetails({ user, group, expense, logs }: IProps) {
-  const { topDivRef } = useTopRef();
+  const { topDivRef } = usePanel();
 
   return (
     <>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 
-import { useTopRef } from "~/hooks/use-top-ref";
+import { usePanel } from "@fondingo/ui/use-panel";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 
@@ -14,7 +14,7 @@ interface IProps {
 }
 
 export function PageHeader({ groupId }: IProps) {
-  const { topDivRef } = useTopRef();
+  const { topDivRef } = usePanel();
 
   return (
     <section

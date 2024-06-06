@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { useAddFriendModal } from "@fondingo/store/fsplit";
 import { SearchBar } from "~/components/search-bar";
-import { useTopRef } from "~/hooks/use-top-ref";
+import { usePanel } from "@fondingo/ui/use-panel";
 import { Button } from "@fondingo/ui/button";
 
 import { cn } from "@fondingo/ui/utils";
@@ -13,8 +13,8 @@ import { hfont } from "~/utils";
 
 export function SocialHeader() {
   const pathname = usePathname();
+  const { topDivRef } = usePanel();
   const { onOpen } = useAddFriendModal();
-  const { topDivRef } = useTopRef();
 
   return (
     <div
