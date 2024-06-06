@@ -36,9 +36,9 @@ import {
   DialogTitle,
 } from "@fondingo/ui/dialog";
 
+import { useUtils } from "~/hooks/use-utils";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
-import { useUtils } from "~/hooks/use-utils";
 
 const formSchema = z.object({
   selectedCurrency: z.nativeEnum(ZCurrencyCode),
@@ -91,7 +91,13 @@ export function ChangeCurrencyModal() {
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        form.setValue("selectedCurrency", user?.preferredCurrency || currency);
+        onClose();
+      }}
+    >
       <DialogContent hideDefaultCloseButton className="px-0 py-4">
         <DialogHeader>
           <div className="flex items-center justify-between">
