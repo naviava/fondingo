@@ -8,8 +8,8 @@ import { Check } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { cn } from "@fondingo/ui/utils";
 import { adjustMinorAmount } from "~/utils";
+import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   userId: string;
@@ -33,7 +33,7 @@ export function ExpenseSplitsMember({
   setSplitsState,
 }: IProps) {
   const { splitType, splits, expenseAmount, setSplits, currency } =
-    useExpenseDetails();
+    useExpenseDetails((state) => state);
 
   const CurrencyIcon = useMemo(
     () => currencyIconMap[currency].icon,

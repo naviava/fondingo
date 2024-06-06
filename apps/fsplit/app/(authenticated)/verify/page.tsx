@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { NoToken } from "~/components/verify-page/no-token";
+import { TokenState } from "~/components/verify-page/token-state";
 import { serverClient } from "~/lib/trpc/server-client";
 
 interface IProps {
@@ -12,14 +12,22 @@ interface IProps {
 
 export default async function VerifyPage({ searchParams }: IProps) {
   const session = await getServerSession();
-  if (!session || !session.user || !session.user.email)
-    return redirect("/signin");
+  const isLoggedIn = !!session && !!session.user && !!session.user.email;
 
-  if (!searchParams?.token) return <NoToken email={session.user.email} />;
+  const token = searchParams?.token ?? "";
+  if (!token && !isLoggedIn) return redirect("/signin");
+  if (!token) return <TokenState />;
+
+  const existingToken = await serverClient.user.getVerificationToken(token);
+
+  if (!existingToken) return <TokenState title="Invalid token" isInvalid />;
+  if (Date.now() > new Date(existingToken.expires).getTime())
+    return <TokenState title="Expired token" isExpired />;
 
   const response = await serverClient.user.completeVerification(
-    searchParams.token,
+    searchParams?.token || "",
   );
-  if (response) return redirect("/groups");
-  return null;
+  if (response) return redirect("/signin");
+
+  return <TokenState />;
 }

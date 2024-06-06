@@ -1,6 +1,11 @@
+"use client";
+
+import Link from "next/link";
+
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
-import Link from "next/link";
+
+import { usePanel } from "@fondingo/ui/use-panel";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 
@@ -9,8 +14,13 @@ interface IProps {
 }
 
 export function PageHeader({ groupId }: IProps) {
+  const { topDivRef } = usePanel();
+
   return (
-    <section className="relative flex items-center justify-center px-2 pt-6">
+    <section
+      ref={topDivRef}
+      className="relative flex items-center justify-center px-2 pt-6"
+    >
       <h1 className={cn("text-lg font-semibold", hfont.className)}>
         Group Settings
       </h1>

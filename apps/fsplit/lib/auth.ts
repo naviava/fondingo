@@ -3,10 +3,8 @@ import { Adapter } from "next-auth/adapters";
 import { AuthOptions } from "next-auth";
 
 import { mergeUserAccountById } from "~/utils/merge-user-account-by-id";
-import { sendVerificationEmail } from "@fondingo/api/utils";
 import splitdb, { TUserRole } from "@fondingo/db-split";
 import { providers } from "./auth-providers";
-import { uuid } from "@fondingo/utils/uuid";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(splitdb) as Adapter,
@@ -53,21 +51,6 @@ export const authOptions: AuthOptions = {
         isVerified = !!(await splitdb.accountVerification.create({
           data: { userId: existingUser.id },
         }));
-      }
-
-      if (!isOAuth && !isVerified && !existingUser.confirmEmailToken) {
-        const newVerificationToken = await splitdb.confirmEmailToken.create({
-          data: {
-            token: uuid(),
-            userId: existingUser.id,
-            expires: new Date(Date.now() + 1000 * 60 * 15),
-          },
-        });
-        await sendVerificationEmail({
-          email: existingUser.email,
-          token: newVerificationToken.token,
-          pathname: "/verify",
-        });
       }
 
       token.name = existingUser.name;

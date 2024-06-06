@@ -74,6 +74,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
   const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
+  const [disableUI, setDisableUI] = useState(false);
   const [color, setColor] = useState(initialData?.color || "#00968a");
   const [currency, setCurrency] = useState<CurrencyCode>(
     initialData?.currency || "USD",
@@ -87,7 +88,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
     defaultValues: {
       groupName: initialData?.groupName || "",
       color,
-      type: ZGroupType.TRIP,
+      type: initialData?.type || ZGroupType.TRIP,
       currency: initialData?.currency || ZCurrencyCode.USD,
     },
   });
@@ -178,7 +179,12 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           title: toastTitle,
           description: toastDescription,
         });
-        form.reset();
+        form.reset({
+          groupName: initialData?.groupName,
+          color: initialData?.color,
+          type: initialData?.type,
+          currency: initialData?.currency,
+        });
         utils.group.getGroupById.invalidate();
         utils.group.getGroups.invalidate();
         router.push(`/groups/${groupId}/settings`);
@@ -252,6 +258,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
                       className="form-input"
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />

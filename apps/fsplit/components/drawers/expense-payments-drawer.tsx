@@ -22,6 +22,7 @@ import {
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
 
 export function ExpensePaymentsDrawer() {
   const {
@@ -97,7 +98,9 @@ export function ExpensePaymentsDrawer() {
             >
               Cancel
             </Button>
-            Choose payer
+            <span className={cn("text-base md:text-lg", hfont.className)}>
+              Choose payer
+            </span>
             <Button
               size="sm"
               variant="ctaGhost"

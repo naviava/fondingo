@@ -39,7 +39,11 @@ export const providers = [
       if (!credentials?.email || !credentials?.password)
         throw new Error("Invalid credentials");
       const user = await splitdb.user.findUnique({
-        where: { email: credentials.email.toLowerCase(), disabled: false },
+        where: {
+          email: credentials.email.toLowerCase(),
+          disabled: false,
+        },
+        include: { accountVerification: true },
       });
       if (!user || !user?.hashedPassword)
         throw new Error("Invalid credentials");
@@ -48,6 +52,7 @@ export const providers = [
         user.hashedPassword,
       );
       if (!isCorrectPassword) throw new Error("Invalid credentials");
+      if (!user.accountVerification) throw new Error("Email not verified");
       if (!user.isMerged) await mergeUserAccountById(user.id);
       return user;
     },

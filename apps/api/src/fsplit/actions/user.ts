@@ -4,9 +4,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 import { compare, hash } from "bcrypt";
 
-import { sendVerificationEmail } from "../../utils";
-import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
 import { privateProcedure, publicProcedure } from "../trpc";
+import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
+import { sendVerificationEmail } from "../../utils";
 
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
@@ -24,20 +24,12 @@ export const getAuthProfile = publicProcedure.query(async () => {
   return userWithoutPassword;
 });
 
-export const resendVerificationEmail = privateProcedure.mutation(
-  async ({ ctx }) => {
-    const { user } = ctx;
-    const existingUser = await splitdb.user.findUnique({
-      where: { id: user.id },
-    });
-    if (!existingUser)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found.",
-      });
-
+export const resendVerificationEmailByToken = publicProcedure
+  .input(z.string().min(1, { message: "Token cannot be empty." }))
+  .mutation(async ({ input: token }) => {
     const existingToken = await splitdb.confirmEmailToken.findUnique({
-      where: { userId: existingUser.id },
+      where: { token },
+      include: { user: true },
     });
     if (!existingToken)
       throw new TRPCError({
@@ -48,7 +40,7 @@ export const resendVerificationEmail = privateProcedure.mutation(
     if (Date.now() - new Date(existingToken.createdAt).getTime() < 90 * 1000)
       return {
         toastTitle: "Verification email sent",
-        toastDescription: `Email has been sent to ${existingUser.email} less than 90 seconds back.`,
+        toastDescription: `Email has been sent to ${existingToken.user.email} less than 90 seconds back.`,
         createdAt: existingToken.createdAt,
       };
 
@@ -65,12 +57,12 @@ export const resendVerificationEmail = privateProcedure.mutation(
       const newToken = await db.confirmEmailToken.create({
         data: {
           token: uuid(),
-          userId: existingUser.id,
+          userId: existingToken.user.id,
           expires: new Date(Date.now() + 1000 * 60 * 15),
         },
       });
       const sent = await sendVerificationEmail({
-        email: existingUser.email,
+        email: existingToken.user.email,
         token: newToken.token,
         pathname: "/verify",
       });
@@ -81,38 +73,42 @@ export const resendVerificationEmail = privateProcedure.mutation(
         });
       return {
         toastTitle: "Verification email sent",
-        toastDescription: `Email has been sent to ${existingUser.email}.`,
+        toastDescription: `Email has been sent to ${existingToken.user.email}.`,
         createdAt: newToken.createdAt,
       };
     });
-  },
-);
+  });
 
-export const completeVerification = privateProcedure
+export const getVerificationToken = publicProcedure
   .input(z.string().min(1, { message: "Token cannot be empty." }))
-  .mutation(({ ctx, input: token }) => {
-    const { user } = ctx;
-    return splitdb.$transaction(async (db) => {
-      const existingUser = await db.user.findUnique({
-        where: { id: user.id },
-      });
-      if (!existingUser)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found.",
-        });
+  .query(async ({ input: token }) => {
+    const existingToken = await splitdb.confirmEmailToken.findUnique({
+      where: { token },
+    });
 
+    return existingToken;
+  });
+
+export const completeVerification = publicProcedure
+  .input(z.string().min(1, { message: "Token cannot be empty." }))
+  .mutation(async ({ input: token }) => {
+    return splitdb.$transaction(async (db) => {
       const existingToken = await db.confirmEmailToken.findUnique({
-        where: { userId: existingUser.id, token },
+        where: { token },
       });
       if (!existingToken)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "No verification token found.",
         });
+      if (Date.now() > new Date(existingToken.expires).getTime())
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Verification token has expired.",
+        });
 
       const completedVerification = await db.accountVerification.create({
-        data: { userId: user.id },
+        data: { userId: existingToken.userId },
       });
       if (!completedVerification)
         throw new TRPCError({
@@ -131,6 +127,24 @@ export const completeVerification = privateProcedure
 
       return true;
     });
+  });
+
+export const isVerified = privateProcedure
+  .input(z.string().email({ message: "Invalid email" }))
+  .query(async ({ input: email }) => {
+    const existingUser = await splitdb.user.findUnique({
+      where: { email },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+
+    const isVerified = !!(await splitdb.accountVerification.findFirst({
+      where: { userId: existingUser.id },
+    }));
+    return isVerified;
   });
 
 export const createNewUser = publicProcedure
@@ -176,30 +190,48 @@ export const createNewUser = publicProcedure
         message: "User with that email already exists.",
       });
 
-    return splitdb.$transaction(async (db) => {
-      const hashedPassword = await hash(password, 10);
-      const newUser = await db.user.create({
-        data: {
-          name: displayName,
-          email: email.toLowerCase(),
-          hashedPassword,
-          firstName,
-          lastName,
-          phone,
-        },
-      });
-      if (!newUser)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create user.",
-        });
-
-      return {
-        toastTitle: "Account created",
-        toastDescription:
-          "Welcome to FSplit! Start splitting bills with friends.",
-      };
+    // return splitdb.$transaction(async (db) => {
+    const hashedPassword = await hash(password, 10);
+    const newUser = await splitdb.user.create({
+      data: {
+        name: displayName,
+        email: email.toLowerCase(),
+        hashedPassword,
+        firstName,
+        lastName,
+        phone,
+      },
     });
+    if (!newUser)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to create user.",
+      });
+
+    const newVerificationToken = await splitdb.confirmEmailToken.create({
+      data: {
+        token: uuid(),
+        userId: newUser.id,
+        expires: new Date(Date.now() + 1000 * 60 * 15),
+      },
+    });
+    const response = await sendVerificationEmail({
+      email: newUser.email,
+      token: newVerificationToken.token,
+      pathname: "/verify",
+    });
+    if (!response)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to send verification email. User creation failed.",
+      });
+
+    return {
+      toastTitle: "Verification email sent",
+      toastDescription:
+        "Please check your email to verify your account. Email will expire in 15 minutes.",
+    };
+    // });
   });
 
 export const changePassword = privateProcedure
@@ -958,6 +990,8 @@ export const findFriends = privateProcedure
       (friend) =>
         friend.name?.toLowerCase().includes(searchTerm) ||
         friend.email?.toLowerCase().includes(searchTerm) ||
+        friend.firstName?.toLowerCase().includes(searchTerm) ||
+        friend.lastName?.toLowerCase().includes(searchTerm) ||
         friend.phone?.includes(searchTerm),
     );
     const tempFriendsSearchResults = tempFriends.filter(
@@ -991,8 +1025,30 @@ export const findUsers = privateProcedure
               mode: "insensitive",
             },
           },
-          { name: { contains: searchTerm, mode: "insensitive" } },
-          { phone: { contains: searchTerm, mode: "insensitive" } },
+          {
+            name: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          {
+            phone: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          {
+            firstName: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          {
+            lastName: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
         ],
       },
       orderBy: { name: "asc" },

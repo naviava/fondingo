@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -46,11 +46,13 @@ export function SigninForm() {
         ...values,
         redirect: false,
       }).then((res) => {
-        if (res?.ok) router.refresh();
-        else
+        if (res?.ok) {
+          router.refresh();
+        } else
           toast({
             title: "Sign in failed",
-            description: "Invalid credentials. Please try again.",
+            description:
+              "Invalid credentials or email not verified. Check your email for verification link.",
             variant: "destructive",
           });
       });

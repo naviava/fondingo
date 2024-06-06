@@ -1,13 +1,12 @@
 "use client";
 
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { serverClient } from "~/lib/trpc/server-client";
-import { useEffect, useRef } from "react";
+import { usePanel } from "@fondingo/ui/use-panel";
 
+import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 import { PaymentSplitEntry } from "./payment-split-entry";
 import { Separator } from "@fondingo/ui/separator";
-import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
-import { LogEntry } from "../log-entry";
+import { LogEntry } from "~/components/log-entry";
 
 interface IProps {
   user: Awaited<ReturnType<typeof serverClient.user.getAuthProfile>>;
@@ -17,18 +16,7 @@ interface IProps {
 }
 
 export function ExpenseDetails({ user, group, expense, logs }: IProps) {
-  const topDivRef = useRef<HTMLDivElement>(null);
-  const { setTopRef } = usePanelHeight((state) => state);
-
-  useEffect(() => {
-    function updateTopDivPosition() {
-      const topDiv = topDivRef.current?.getBoundingClientRect();
-      setTopRef(topDiv?.bottom);
-    }
-    updateTopDivPosition();
-    window.addEventListener("resize", updateTopDivPosition);
-    return () => window.removeEventListener("resize", updateTopDivPosition);
-  }, [setTopRef, topDivRef]);
+  const { topDivRef } = usePanel();
 
   return (
     <>

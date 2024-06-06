@@ -1,23 +1,28 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { differenceInSeconds } from "@fondingo/utils/date-fns";
-import { useIsMounted } from "~/hooks/use-is-mounted";
 import { toast } from "@fondingo/ui/use-toast";
 import { trpc } from "~/lib/trpc/client";
 
 import { Button } from "@fondingo/ui/button";
 import { Loader } from "@fondingo/ui/lucide";
 
-interface IProps {}
+interface IProps {
+  isInvalid?: boolean;
+}
 
-export function ActionButtons({}: IProps) {
+export function ActionButtons({ isInvalid }: IProps) {
+  const searchParams = useSearchParams();
   const [createdAt, setCreatedAt] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  const token = searchParams.get("token");
+
   const { mutate: handleResendEmail, isPending } =
-    trpc.user.resendVerificationEmail.useMutation({
+    trpc.user.resendVerificationEmailByToken.useMutation({
       onError: ({ message }) =>
         toast({
           title: "Something went wrong",
@@ -49,20 +54,22 @@ export function ActionButtons({}: IProps) {
 
   return (
     <div className="flex select-none items-center justify-center gap-x-6">
-      <Button
-        variant="cta"
-        disabled={isPending || !!timeRemaining}
-        onClick={() => handleResendEmail()}
-        className="w-[9rem]"
-      >
-        {isPending ? (
-          <Loader className="h-4 w-4 animate-spin" />
-        ) : !timeRemaining ? (
-          "Resend Email"
-        ) : (
-          `Wait for ${timeRemaining}s`
-        )}
-      </Button>
+      {!isInvalid && (
+        <Button
+          variant="cta"
+          disabled={isPending || !!timeRemaining}
+          onClick={() => handleResendEmail(token || "")}
+          className="w-[9rem]"
+        >
+          {isPending ? (
+            <Loader className="h-4 w-4 animate-spin" />
+          ) : !timeRemaining ? (
+            "Resend Email"
+          ) : (
+            `Wait for ${timeRemaining}s`
+          )}
+        </Button>
+      )}
       <Button variant="ctaOutline" disabled={isPending} className="w-[9rem]">
         Contact us
       </Button>

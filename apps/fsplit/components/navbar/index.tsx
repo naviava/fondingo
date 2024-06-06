@@ -1,12 +1,13 @@
 "use client";
 
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { uuid } from "@fondingo/utils/uuid";
+import { useCallback, useMemo } from "react";
 import Link from "next/link";
 
+import { usePanel } from "@fondingo/ui/use-panel";
+import { uuid } from "@fondingo/utils/uuid";
+
 import { MdOutlineLocalActivity, MdLocalActivity } from "react-icons/md";
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { NavbarOption } from "./navbar-option";
 import { Button } from "@fondingo/ui/button";
 import {
@@ -20,8 +21,7 @@ export function Navbar() {
   const router = useRouter();
   const params = useParams();
   const pathname = usePathname();
-  const navbarRef = useRef<HTMLDivElement>(null);
-  const { setBottomRef } = usePanelHeight((state) => state);
+  const { bottomDivRef } = usePanel();
 
   // TODO: Add global state for navbar links.
   const optionsLeft = useMemo(
@@ -75,19 +75,9 @@ export function Navbar() {
     return null;
   }, [params.groupId, router]);
 
-  useEffect(() => {
-    function updateNavbarPosition() {
-      const navbar = navbarRef.current?.getBoundingClientRect();
-      setBottomRef(navbar?.top);
-    }
-    updateNavbarPosition();
-    window.addEventListener("resize", updateNavbarPosition);
-    return () => window.removeEventListener("resize", updateNavbarPosition);
-  }, [setBottomRef, navbarRef]);
-
   return (
     <nav
-      ref={navbarRef}
+      ref={bottomDivRef}
       className="absolute bottom-0 z-50 flex h-20 w-full items-center justify-between border-t bg-[#F4F4F4] px-4 pb-6 pt-2 md:px-6"
     >
       {optionsLeft.map((option) => (

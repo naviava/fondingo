@@ -1,12 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { useAddFriendModal } from "@fondingo/store/fsplit";
 import { SearchBar } from "~/components/search-bar";
+import { usePanel } from "@fondingo/ui/use-panel";
 import { Button } from "@fondingo/ui/button";
 
 import { cn } from "@fondingo/ui/utils";
@@ -14,19 +13,8 @@ import { hfont } from "~/utils";
 
 export function SocialHeader() {
   const pathname = usePathname();
+  const { topDivRef } = usePanel();
   const { onOpen } = useAddFriendModal();
-  const topDivRef = useRef<HTMLHeadingElement>(null);
-  const { setTopRef } = usePanelHeight((state) => state);
-
-  useEffect(() => {
-    function updateTopDivPosition() {
-      const topDiv = topDivRef.current?.getBoundingClientRect();
-      setTopRef(topDiv?.bottom);
-    }
-    updateTopDivPosition();
-    window.addEventListener("resize", updateTopDivPosition);
-    return () => window.removeEventListener("resize", updateTopDivPosition);
-  }, [setTopRef]);
 
   return (
     <div

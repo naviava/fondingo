@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
-import { usePanelHeight } from "@fondingo/store/use-panel-height";
 import { formatDate } from "@fondingo/utils/date-fns";
 import { CurrencyCode } from "@fondingo/db-split";
+import { usePanel } from "@fondingo/ui/use-panel";
 
 import { DisplayAmount } from "~/components/display-amount";
 import { FcMoneyTransfer } from "react-icons/fc";
@@ -30,18 +28,7 @@ export function SettlementDetails({
   creatorName = "",
   lastUpdatedByName = "",
 }: IProps) {
-  const topDivRef = useRef<HTMLHeadingElement>(null);
-  const { setTopRef } = usePanelHeight((state) => state);
-
-  useEffect(() => {
-    function updateTopDivPosition() {
-      const topDiv = topDivRef.current?.getBoundingClientRect();
-      setTopRef(topDiv?.bottom);
-    }
-    updateTopDivPosition();
-    window.addEventListener("resize", updateTopDivPosition);
-    return () => window.removeEventListener("resize", updateTopDivPosition);
-  }, [setTopRef]);
+  const { topDivRef } = usePanel();
 
   return (
     <div
