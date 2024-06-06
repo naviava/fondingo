@@ -5,7 +5,7 @@ export function EmptyState() {
     <div className="flex flex-1 flex-col items-center justify-center gap-y-8 px-4 pb-24">
       <div>
         <Image
-          src="empty-illustration.svg"
+          src="images/empty-illustration.svg"
           alt="No groups yet"
           height={300}
           width={300}

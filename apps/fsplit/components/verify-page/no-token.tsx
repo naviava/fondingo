@@ -29,7 +29,7 @@ export function NoToken({ email, isExpired }: IProps) {
         You will need to verify your email to complete registration
       </p>
       <Image
-        src="mail-sent.svg"
+        src="images/mail-sent.svg"
         alt="No groups yet"
         height={500}
         width={500}
