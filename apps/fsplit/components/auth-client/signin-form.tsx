@@ -51,7 +51,8 @@ export function SigninForm() {
         } else
           toast({
             title: "Sign in failed",
-            description: "Invalid credentials. Please try again.",
+            description:
+              "Invalid credentials or email not verified. Check your email for verification link.",
             variant: "destructive",
           });
       });

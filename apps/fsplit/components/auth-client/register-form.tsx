@@ -43,7 +43,7 @@ const formSchema = z
   });
 
 export function RegisterForm() {
-  const router = useRouter();
+  const [emailSent, setEmailSent] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -70,19 +70,7 @@ export function RegisterForm() {
         title: toastTitle,
         description: toastDescription,
       });
-      await signIn("credentials", {
-        email: form.getValues("email"),
-        password: form.getValues("password"),
-        redirect: false,
-      }).then((res) => {
-        if (res?.ok) router.refresh();
-        else
-          toast({
-            title: "Sign in failed",
-            description: "Invalid credentials. Please try again.",
-            variant: "destructive",
-          });
-      });
+      setEmailSent(true);
     },
   });
 
@@ -94,77 +82,95 @@ export function RegisterForm() {
   );
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
-        <AuthFormInput
-          form={form}
-          fieldName="displayName"
-          label="Display name"
-          placeholder="ImAwesome123"
-          description="This will be your public name."
-          disabled={false}
-        />
-        <AuthFormInput
-          form={form}
-          fieldName="email"
-          label="Email address"
-          placeholder="yourname@email.com"
-          disabled={false}
-        />
-        <div className="flex items-center gap-x-2 md:gap-x-4">
-          <AuthFormInput
-            form={form}
-            fieldName="firstName"
-            label="First name"
-            disabled={false}
-            forceFullWidth
-            isOptional
-          />
-          <AuthFormInput
-            form={form}
-            fieldName="lastName"
-            label="Last name"
-            disabled={false}
-            forceFullWidth
-            isOptional
-          />
+    <>
+      {emailSent && (
+        <div className="space-y-4 text-center md:space-y-6">
+          <h2 className="text-2xl font-semibold md:text-3xl">
+            Verification email sent
+          </h2>
+          <p className="text-balance leading-7 text-neutral-600 md:text-lg">
+            Please check your email to verify your email address and start using
+            FSplit.
+          </p>
         </div>
-        <AuthFormInput
-          form={form}
-          fieldName="phone"
-          label="Phone number"
-          disabled={false}
-          isOptional
-        />
-        <AuthFormInput
-          form={form}
-          fieldName="password"
-          label="Password"
-          type="password"
-          disabled={false}
-          isPasswordShown={isPasswordShown}
-          setIsPasswordShown={setIsPasswordShown}
-        />
-        <AuthFormInput
-          form={form}
-          type="password"
-          fieldName="confirmPassword"
-          label="Confirm password"
-          disabled={false}
-        />
-        <div>
-          <Button
-            variant="cta"
-            type="submit"
-            className={cn(
-              "text mt-6 w-full transition focus:scale-[0.98]",
-              hfont.className,
-            )}
+      )}
+      {!emailSent && (
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-full space-y-4"
           >
-            Register & Sign in
-          </Button>
-        </div>
-      </form>
-    </Form>
+            <AuthFormInput
+              form={form}
+              fieldName="displayName"
+              label="Display name"
+              placeholder="ImAwesome123"
+              description="This will be your public name."
+              disabled={false}
+            />
+            <AuthFormInput
+              form={form}
+              fieldName="email"
+              label="Email address"
+              placeholder="yourname@email.com"
+              disabled={false}
+            />
+            <div className="flex items-center gap-x-2 md:gap-x-4">
+              <AuthFormInput
+                form={form}
+                fieldName="firstName"
+                label="First name"
+                disabled={false}
+                forceFullWidth
+                isOptional
+              />
+              <AuthFormInput
+                form={form}
+                fieldName="lastName"
+                label="Last name"
+                disabled={false}
+                forceFullWidth
+                isOptional
+              />
+            </div>
+            <AuthFormInput
+              form={form}
+              fieldName="phone"
+              label="Phone number"
+              disabled={false}
+              isOptional
+            />
+            <AuthFormInput
+              form={form}
+              fieldName="password"
+              label="Password"
+              type="password"
+              disabled={false}
+              isPasswordShown={isPasswordShown}
+              setIsPasswordShown={setIsPasswordShown}
+            />
+            <AuthFormInput
+              form={form}
+              type="password"
+              fieldName="confirmPassword"
+              label="Confirm password"
+              disabled={false}
+            />
+            <div>
+              <Button
+                variant="cta"
+                type="submit"
+                className={cn(
+                  "text mt-6 w-full transition focus:scale-[0.98]",
+                  hfont.className,
+                )}
+              >
+                Register & Sign in
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
+    </>
   );
 }

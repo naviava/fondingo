@@ -7,10 +7,6 @@ export default withAuth(async (req: NextRequest) => {
   if (req.nextUrl.pathname !== "/account" && !token?.isVerified) {
     return NextResponse.redirect(new URL("/verify", req.url));
   }
-
-  if (req.nextUrl.pathname === "/verify" && token?.isVerified) {
-    return NextResponse.redirect(new URL("/groups", req.url));
-  }
 });
 
 export const config = {

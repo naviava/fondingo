@@ -16,9 +16,10 @@ export default async function VerifyPage({ searchParams }: IProps) {
 
   const token = searchParams?.token ?? "";
   if (!token && !isLoggedIn) return redirect("/signin");
-  if (!token && isLoggedIn) return <TokenState />;
+  if (!token) return <TokenState />;
 
   const existingToken = await serverClient.user.getVerificationToken(token);
+
   if (!existingToken) return <TokenState title="Invalid token" isInvalid />;
   if (Date.now() > new Date(existingToken.expires).getTime())
     return <TokenState title="Expired token" isExpired />;
@@ -26,7 +27,7 @@ export default async function VerifyPage({ searchParams }: IProps) {
   const response = await serverClient.user.completeVerification(
     searchParams?.token || "",
   );
-  if (response) return redirect("/groups");
+  if (response) return redirect("/signin");
 
-  return <TokenState title="Unexpected error" isError />;
+  return <TokenState />;
 }

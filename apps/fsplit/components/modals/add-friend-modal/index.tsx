@@ -29,6 +29,7 @@ import {
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
 import { EmptyState } from "./empty-state";
+import { hfont } from "~/utils";
 
 export function AddFriendModal() {
   const router = useRouter();
@@ -85,7 +86,11 @@ export function AddFriendModal() {
             >
               Close
             </Button>
-            <DialogTitle>Add friend</DialogTitle>
+            <DialogTitle
+              className={cn("text-base md:text-lg", hfont.className)}
+            >
+              Add friend
+            </DialogTitle>
             <Button
               variant="ctaGhost"
               size="sm"

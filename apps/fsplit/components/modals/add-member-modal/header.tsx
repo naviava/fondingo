@@ -11,6 +11,8 @@ import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Loader } from "@fondingo/ui/lucide";
 import { trpc } from "~/lib/trpc/client";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
 
 interface IProps {
   groupId: string;
@@ -108,7 +110,9 @@ export function Header({
           Cancel
         </Button>
       )}
-      <DialogTitle>Add group members</DialogTitle>
+      <DialogTitle className={cn("text-base md:text-lg", hfont.className)}>
+        Add group members
+      </DialogTitle>
       {isAddingContact ? (
         <Button
           variant="ctaGhost"

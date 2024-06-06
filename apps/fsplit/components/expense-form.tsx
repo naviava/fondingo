@@ -27,7 +27,7 @@ import { Input } from "@fondingo/ui/input";
 import { serverClient } from "~/lib/trpc/server-client";
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
-import { hexToRgb } from "~/utils";
+import { hexToRgb, hfont } from "~/utils";
 
 const formSchema = z.object({
   groupId: z.string().min(1, { message: "Group ID is required" }),
@@ -222,7 +222,7 @@ export default function ExpenseForm({
             <X className="text-muted-foreground h-8 w-8" />
           </Link>
         </Button>
-        <h1 className="text-lg font-semibold">
+        <h1 className={cn("font-semibold md:text-lg", hfont.className)}>
           {isEditing ? "Edit expense" : "Add an expense"}
         </h1>
         <Button

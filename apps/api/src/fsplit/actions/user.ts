@@ -24,20 +24,12 @@ export const getAuthProfile = publicProcedure.query(async () => {
   return userWithoutPassword;
 });
 
-export const resendVerificationEmail = privateProcedure.mutation(
-  async ({ ctx }) => {
-    const { user } = ctx;
-    const existingUser = await splitdb.user.findUnique({
-      where: { id: user.id },
-    });
-    if (!existingUser)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found.",
-      });
-
+export const resendVerificationEmailByToken = publicProcedure
+  .input(z.string().min(1, { message: "Token cannot be empty." }))
+  .mutation(async ({ input: token }) => {
     const existingToken = await splitdb.confirmEmailToken.findUnique({
-      where: { userId: existingUser.id },
+      where: { token },
+      include: { user: true },
     });
     if (!existingToken)
       throw new TRPCError({
@@ -48,7 +40,7 @@ export const resendVerificationEmail = privateProcedure.mutation(
     if (Date.now() - new Date(existingToken.createdAt).getTime() < 90 * 1000)
       return {
         toastTitle: "Verification email sent",
-        toastDescription: `Email has been sent to ${existingUser.email} less than 90 seconds back.`,
+        toastDescription: `Email has been sent to ${existingToken.user.email} less than 90 seconds back.`,
         createdAt: existingToken.createdAt,
       };
 
@@ -65,12 +57,12 @@ export const resendVerificationEmail = privateProcedure.mutation(
       const newToken = await db.confirmEmailToken.create({
         data: {
           token: uuid(),
-          userId: existingUser.id,
+          userId: existingToken.user.id,
           expires: new Date(Date.now() + 1000 * 60 * 15),
         },
       });
       const sent = await sendVerificationEmail({
-        email: existingUser.email,
+        email: existingToken.user.email,
         token: newToken.token,
         pathname: "/verify",
       });
@@ -81,12 +73,11 @@ export const resendVerificationEmail = privateProcedure.mutation(
         });
       return {
         toastTitle: "Verification email sent",
-        toastDescription: `Email has been sent to ${existingUser.email}.`,
+        toastDescription: `Email has been sent to ${existingToken.user.email}.`,
         createdAt: newToken.createdAt,
       };
     });
-  },
-);
+  });
 
 export const getVerificationToken = publicProcedure
   .input(z.string().min(1, { message: "Token cannot be empty." }))
@@ -199,30 +190,48 @@ export const createNewUser = publicProcedure
         message: "User with that email already exists.",
       });
 
-    return splitdb.$transaction(async (db) => {
-      const hashedPassword = await hash(password, 10);
-      const newUser = await db.user.create({
-        data: {
-          name: displayName,
-          email: email.toLowerCase(),
-          hashedPassword,
-          firstName,
-          lastName,
-          phone,
-        },
-      });
-      if (!newUser)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create user.",
-        });
-
-      return {
-        toastTitle: "Account created",
-        toastDescription:
-          "Welcome to FSplit! Start splitting bills with friends.",
-      };
+    // return splitdb.$transaction(async (db) => {
+    const hashedPassword = await hash(password, 10);
+    const newUser = await splitdb.user.create({
+      data: {
+        name: displayName,
+        email: email.toLowerCase(),
+        hashedPassword,
+        firstName,
+        lastName,
+        phone,
+      },
     });
+    if (!newUser)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to create user.",
+      });
+
+    const newVerificationToken = await splitdb.confirmEmailToken.create({
+      data: {
+        token: uuid(),
+        userId: newUser.id,
+        expires: new Date(Date.now() + 1000 * 60 * 15),
+      },
+    });
+    const response = await sendVerificationEmail({
+      email: newUser.email,
+      token: newVerificationToken.token,
+      pathname: "/verify",
+    });
+    if (!response)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to send verification email. User creation failed.",
+      });
+
+    return {
+      toastTitle: "Verification email sent",
+      toastDescription:
+        "Please check your email to verify your account. Email will expire in 15 minutes.",
+    };
+    // });
   });
 
 export const changePassword = privateProcedure

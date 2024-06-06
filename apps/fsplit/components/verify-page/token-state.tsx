@@ -69,7 +69,7 @@ export function TokenState({
           </span>
         )}
       </p>
-      <ActionButtons />
+      <ActionButtons isInvalid={isInvalid} />
     </div>
   );
 }

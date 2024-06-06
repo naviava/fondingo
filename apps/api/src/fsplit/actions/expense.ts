@@ -6,37 +6,6 @@ import { hasDuplicates } from "../utils";
 import splitdb from "@fondingo/db-split";
 import { z } from "@fondingo/utils/zod";
 
-/**
- * This function is used to add an expense to a group. It is a private procedure that takes an input object with the following properties:
- * - groupId: A string representing the ID of the group. It must be at least 1 character long.
- * - expenseName: A string representing the name of the expense. It must be at least 1 character long.
- * - expenseAmount: A number representing the total amount of the expense.
- * - payments: An array of objects, each representing a payment. Each object should have a 'userId' property (a string of at least 1 character) and an 'amount' property (a number).
- * - splits: An array of objects, each representing a split. Each object should have a 'userId' property (a string of at least 1 character) and an 'amount' property (a number).
- *
- * The function performs several checks:
- * - It checks if the group exists and if the user is a member of the group.
- * - It checks if the total amount of payments and splits matches the total expense amount.
- * - It checks if the expense amount is greater than or equal to 1.
- * - It checks if there are duplicate users in payments or splits.
- * - It checks if the payment or split amount is greater than 0.
- * - It checks if the user making the payment or split is a member of the group.
- *
- * If any of these checks fail, it throws an error with a relevant message.
- *
- * If all checks pass, it creates a new expense in the database, creates the payments and splits associated with the expense, and calculates the debts for the group.
- *
- * If any of these operations fail, it throws an error with a relevant message.
- *
- * If all operations are successful, it returns an object with a 'toastTitle' and 'toastDescription' property, indicating that the expense was successfully added.
- *
- * @async
- * @function
- * @param {Object} ctx - The context object, which includes the user.
- * @param {Object} input - The input object, which includes the groupId, expenseName, expenseAmount, payments, and splits.
- * @returns {Promise<Object>} A promise that resolves to an object with a 'toastTitle' and 'toastDescription' property.
- * @throws {TRPCError} If any of the checks or operations fail.
- */
 export const addExpense = privateProcedure
   .input(
     z.object({

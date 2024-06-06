@@ -17,6 +17,7 @@ import {
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
 
 const textMap = {
   equally: {
@@ -102,7 +103,9 @@ export function ExpenseSplitsDrawer() {
             <Button size="sm" variant="ctaGhost" onClick={onSplitsDrawerClose}>
               Cancel
             </Button>
-            Split options
+            <span className={cn("text-base md:text-lg", hfont.className)}>
+              Split options
+            </span>
             <Button
               size="sm"
               variant="ctaGhost"
