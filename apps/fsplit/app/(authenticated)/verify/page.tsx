@@ -12,32 +12,21 @@ interface IProps {
 
 export default async function VerifyPage({ searchParams }: IProps) {
   const session = await getServerSession();
-  if (!session || !session.user || !session.user.email)
-    return redirect("/signin");
+  const isLoggedIn = !!session && !!session.user && !!session.user.email;
 
-  const isVerified = await serverClient.user.isVerified(session.user.email);
-  if (isVerified) return redirect("/groups");
-  if (!searchParams?.token && !isVerified)
-    return <TokenState email={session.user.email} />;
+  const token = searchParams?.token ?? "";
+  if (!token && !isLoggedIn) return redirect("/signin");
+  if (!token && isLoggedIn) return <TokenState />;
 
-  const tokenExists = await serverClient.user.getVerificationToken(
-    searchParams?.token || "",
-  );
-  if (!tokenExists)
-    return (
-      <TokenState title="Invalid token" email={session.user.email} isInvalid />
-    );
-  if (Date.now() > new Date(tokenExists.expires).getTime())
-    return (
-      <TokenState title="Expired token" email={session.user.email} isExpired />
-    );
+  const existingToken = await serverClient.user.getVerificationToken(token);
+  if (!existingToken) return <TokenState title="Invalid token" isInvalid />;
+  if (Date.now() > new Date(existingToken.expires).getTime())
+    return <TokenState title="Expired token" isExpired />;
 
   const response = await serverClient.user.completeVerification(
     searchParams?.token || "",
   );
   if (response) return redirect("/groups");
 
-  return (
-    <TokenState title="Unexpected error" email={session.user.email} isError />
-  );
+  return <TokenState title="Unexpected error" isError />;
 }

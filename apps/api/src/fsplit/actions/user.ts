@@ -4,10 +4,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 import { compare, hash } from "bcrypt";
 
-import { sendVerificationEmail } from "../../utils";
-import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
 import { privateProcedure, publicProcedure } from "../trpc";
-import { getToken } from "next-auth/jwt";
+import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
+import { sendVerificationEmail } from "../../utils";
 
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
@@ -89,46 +88,22 @@ export const resendVerificationEmail = privateProcedure.mutation(
   },
 );
 
-export const getVerificationToken = privateProcedure
+export const getVerificationToken = publicProcedure
   .input(z.string().min(1, { message: "Token cannot be empty." }))
-  .query(async ({ ctx, input: token }) => {
-    const { user } = ctx;
-    const existingUser = await splitdb.user.findUnique({
-      where: { id: user.id },
-    });
-    if (!existingUser)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found.",
-      });
-
+  .query(async ({ input: token }) => {
     const existingToken = await splitdb.confirmEmailToken.findUnique({
-      where: {
-        userId: existingUser.id,
-        token,
-      },
+      where: { token },
     });
 
     return existingToken;
   });
 
-export const completeVerification = privateProcedure
+export const completeVerification = publicProcedure
   .input(z.string().min(1, { message: "Token cannot be empty." }))
-  .mutation(async ({ ctx, input: token }) => {
-    const { user } = ctx;
-
+  .mutation(async ({ input: token }) => {
     return splitdb.$transaction(async (db) => {
-      const existingUser = await db.user.findUnique({
-        where: { id: user.id },
-      });
-      if (!existingUser)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found.",
-        });
-
       const existingToken = await db.confirmEmailToken.findUnique({
-        where: { userId: existingUser.id, token },
+        where: { token },
       });
       if (!existingToken)
         throw new TRPCError({
@@ -142,7 +117,7 @@ export const completeVerification = privateProcedure
         });
 
       const completedVerification = await db.accountVerification.create({
-        data: { userId: user.id },
+        data: { userId: existingToken.userId },
       });
       if (!completedVerification)
         throw new TRPCError({
@@ -163,7 +138,7 @@ export const completeVerification = privateProcedure
     });
   });
 
-export const isVerified = publicProcedure
+export const isVerified = privateProcedure
   .input(z.string().email({ message: "Invalid email" }))
   .query(async ({ input: email }) => {
     const existingUser = await splitdb.user.findUnique({

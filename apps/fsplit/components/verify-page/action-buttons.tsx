@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { differenceInSeconds } from "@fondingo/utils/date-fns";
 import { toast } from "@fondingo/ui/use-toast";
@@ -9,9 +11,9 @@ import { trpc } from "~/lib/trpc/client";
 import { Button } from "@fondingo/ui/button";
 import { Loader } from "@fondingo/ui/lucide";
 
-interface IProps {}
-
-export function ActionButtons({}: IProps) {
+export function ActionButtons() {
+  const router = useRouter();
+  const { data: session } = useSession();
   const [createdAt, setCreatedAt] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -46,12 +48,19 @@ export function ActionButtons({}: IProps) {
     return () => clearInterval(interval);
   }, [timeRemaining]);
 
+  useEffect(() => {
+    console.log(session?.user);
+  }, [session?.user]);
+
   return (
     <div className="flex select-none items-center justify-center gap-x-6">
       <Button
         variant="cta"
         disabled={isPending || !!timeRemaining}
-        onClick={() => handleResendEmail()}
+        onClick={() => {
+          if (!session?.user) return router.push("/signin");
+          handleResendEmail();
+        }}
         className="w-[9rem]"
       >
         {isPending ? (

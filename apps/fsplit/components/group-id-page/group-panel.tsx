@@ -29,7 +29,7 @@ export async function GroupPanel({ children, params, searchParams }: IProps) {
   return (
     <article className="flex flex-col">
       <div
-        className="relative h-[7.5rem]"
+        className="relative h-[4.5rem]"
         style={{
           backgroundImage: linearGradientWithAlpha(group.color, 0.5),
         }}
@@ -46,7 +46,7 @@ export async function GroupPanel({ children, params, searchParams }: IProps) {
           className="absolute -bottom-8 left-20"
         />
       </div>
-      <section className="pt-12">
+      <section className="pt-10">
         <GroupHeader
           userId={currentUser?.id}
           groupName={group.name}

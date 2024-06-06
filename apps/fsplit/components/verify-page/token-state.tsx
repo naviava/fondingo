@@ -5,7 +5,6 @@ import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 
 interface IProps {
-  email: string;
   title?: string;
   isError?: boolean;
   isExpired?: boolean;
@@ -13,7 +12,6 @@ interface IProps {
 }
 
 export function TokenState({
-  email,
   isError,
   isExpired,
   isInvalid,
@@ -65,9 +63,9 @@ export function TokenState({
         )}
         {!isExpired && !isInvalid && (
           <span>
-            An email has been sent to <span className="font-bold">{email}</span>{" "}
-            with a link to verify your account. If you have not received the
-            email after a few minutes, please check your spam folder.
+            An email has been sent to your registered email with a link to
+            verify your account. If you have not received the email after a few
+            minutes, please check your spam folder.
           </span>
         )}
       </p>

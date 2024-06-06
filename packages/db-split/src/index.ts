@@ -1,13 +1,14 @@
 import {
   PrismaClient,
-  AccountVerification as AccountVerificationPrisma,
+  AccountVerification,
   SimplifiedDebt as SimplifiedDebtPrisma,
   CurrencyCode as CurrencyCodePrisma,
   GroupMember as GroupMemberPrisma,
-  GroupRole as GroupRolePrisma,
-  GroupType as GroupTypePrisma,
-  Role as RolePrisma,
+  GroupRole,
+  GroupType,
+  Role,
   User as UserPrisma,
+  ConfirmEmailToken,
 } from "@prisma/client";
 
 const prismaClientSingleton = () => {
@@ -22,17 +23,18 @@ const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 
 // TODO: Prefix all with Z to mark them as Zod native enum.
 export const ZCurrencyCode = CurrencyCodePrisma;
-export const ZGroupRole = GroupRolePrisma;
-export const ZGroupType = GroupTypePrisma;
-export const ZRole = RolePrisma;
+export const ZGroupRole = GroupRole;
+export const ZGroupType = GroupType;
+export const ZRole = Role;
 
 // TODO: Prefix all with T to mark prisma types.
-export type TAccountVerification = AccountVerificationPrisma;
+export type TAccountVerification = AccountVerification;
+export type TConfirmEmailToken = ConfirmEmailToken;
 export type SimplifiedDebt = SimplifiedDebtPrisma;
 export type CurrencyCode = CurrencyCodePrisma;
 export type GroupMember = GroupMemberPrisma;
-export type TGroupRole = GroupRolePrisma;
-export type TUserRole = RolePrisma;
+export type TGroupRole = GroupRole;
+export type TUserRole = Role;
 export type User = UserPrisma;
 export default prisma;
 
