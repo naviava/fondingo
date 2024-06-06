@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { differenceInSeconds } from "@fondingo/utils/date-fns";
-import { useIsMounted } from "~/hooks/use-is-mounted";
 import { toast } from "@fondingo/ui/use-toast";
 import { trpc } from "~/lib/trpc/client";
 

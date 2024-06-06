@@ -6,9 +6,10 @@ import { hfont } from "~/utils";
 
 interface IProps {
   email: string;
+  isExpired?: boolean;
 }
 
-export function NoToken({ email }: IProps) {
+export function NoToken({ email, isExpired }: IProps) {
   return (
     <div className="flex h-full flex-col items-center justify-center space-y-6 pb-24">
       <h1
@@ -35,9 +36,18 @@ export function NoToken({ email }: IProps) {
         className="object-cover"
       />
       <p className="text-balance px-2 text-center text-sm tracking-wide text-neutral-500 md:text-base">
-        An email has been sent to <span className="font-bold">{email}</span>{" "}
-        with a link to verify your account. If you have not received the email
-        after a few minutes, please check your spam folder.
+        {isExpired ? (
+          <span>
+            That token has expired. Please click on the "Resend Email" button
+            below to generate a new confirmation token for your account.
+          </span>
+        ) : (
+          <span>
+            An email has been sent to <span className="font-bold">{email}</span>{" "}
+            with a link to verify your account. If you have not received the
+            email after a few minutes, please check your spam folder.
+          </span>
+        )}
       </p>
       <ActionButtons />
     </div>

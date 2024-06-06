@@ -17,7 +17,7 @@ export async function sendVerificationEmail({
     from: "fsplit-verify@fondingo.com",
     to: email,
     subject: "Confirm your email address to use FSplit",
-    html: `<p><a href="${confirmLink}">Click here</a> to confirm your email address.<br />If you have initiated this manually, any previous links received will not be functional. This is the link to rule them all.</p>`,
+    html: `<p><a href="${confirmLink}">Click here</a> to confirm your email address.<br />This link will be valid for 15 minutes. If you have initiated this manually, any previous links received will not be functional. This is the link to rule them all.</p>`,
   });
   if (error) {
     console.error("Failed to send verification email", error);

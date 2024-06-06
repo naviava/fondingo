@@ -21,5 +21,5 @@ export default async function VerifyPage({ searchParams }: IProps) {
     searchParams.token,
   );
   if (response) return redirect("/groups");
-  return null;
+  return <NoToken email={session.user.email} isExpired />;
 }
