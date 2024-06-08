@@ -53,17 +53,15 @@ export default async function GroupIdPage({ params, searchParams }: IProps) {
       {searchParams?.showActivity &&
         !searchParams.showBalances &&
         !searchParams.showTotals && (
-          <Suspense fallback={<LoadingState />}>
-            <ul>
-              {logs.map((log) => (
-                <LogEntry
-                  key={log.id}
-                  message={log.message}
-                  createdAt={log.createdAt}
-                />
-              ))}
-            </ul>
-          </Suspense>
+          <ul>
+            {logs.map((log) => (
+              <LogEntry
+                key={log.id}
+                message={log.message}
+                createdAt={log.createdAt}
+              />
+            ))}
+          </ul>
         )}
       {!searchParams?.showBalances &&
         !searchParams?.showTotals &&

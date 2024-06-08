@@ -1,9 +1,26 @@
 import { Montserrat } from "next/font/google";
+import { Archivo } from "next/font/google";
+import { Roboto } from "next/font/google";
+import localFont from "next/font/local";
+
+export const tfont = Roboto({
+  weight: ["100", "300", "400", "500", "700", "900"],
+  subsets: ["latin"],
+});
 
 export const hfont = Montserrat({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   // weight: ["100", "300", "400", "500", "700", "900"],
   subsets: ["latin"],
+});
+
+export const archivo = Archivo({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+});
+
+export const logoFont = localFont({
+  src: "../public/fonts/tac-one.ttf",
 });
 
 export function formatPrice(price: number): string {
