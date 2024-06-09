@@ -3,12 +3,12 @@ import { archivo, quoteFont } from "~/utils";
 
 export function Quote() {
   return (
-    <div className="my-28">
+    <div className="my-28 md:my-40">
       <div className="flex items-center justify-center px-4">
         <div className="max-w-[40rem]">
           <blockquote
             className={cn(
-              "text-[2rem] font-semibold italic text-neutral-700",
+              "text-[2rem] font-semibold italic text-neutral-700 md:text-[2.5rem] lg:text-[3rem]",
               quoteFont.className,
             )}
           >
@@ -22,7 +22,7 @@ export function Quote() {
           </blockquote>
           <p
             className={cn(
-              "mt-8 text-right text-neutral-500",
+              "mt-8 text-right text-neutral-500 md:text-lg lg:text-xl",
               archivo.className,
             )}
           >

@@ -42,7 +42,7 @@ export function KeyFeatures() {
   return (
     <div className={cn("mx-auto mt-52 max-w-screen-xl", archivo.className)}>
       <h2 className="lg:leading-tighter mx-auto text-center text-3xl font-bold tracking-tighter sm:text-4xl md:max-w-[70%] md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
-        What do you get?
+        What you get?
       </h2>
       <ul className="mx-auto mt-6 grid grid-cols-1 place-items-center gap-x-6 gap-y-8 p-6 md:mt-14 md:max-w-[90%] md:grid-cols-2 md:gap-y-14 md:p-0 lg:grid-cols-4">
         {FEATURES.map((feature) => (
