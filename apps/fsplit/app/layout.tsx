@@ -1,7 +1,6 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
-import { Roboto } from "next/font/google";
 import "./globals.css";
 
 import { getServerSession } from "next-auth";
@@ -13,12 +12,7 @@ import { cn } from "@fondingo/ui/utils";
 import SessionProvider from "~/components/providers/session-provider";
 import { Providers } from "~/components/providers";
 import { Toaster } from "@fondingo/ui/toaster";
-
-const font = Roboto({
-  // weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  weight: ["100", "300", "400", "500", "700", "900"],
-  subsets: ["latin"],
-});
+import { tfont } from "~/utils";
 
 const APP_NAME = "FSplit";
 const APP_DEFAULT_TITLE = "FSplit";
@@ -75,12 +69,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={cn("h-full text-neutral-700 antialiased", font.className)}
+        className={cn(
+          "h-full bg-neutral-200 text-neutral-700 antialiased",
+          tfont.className,
+        )}
       >
         <NextTopLoader color="#11998E" showSpinner={false} height={5} />
         <SessionProvider session={session}>
           <Providers>
-            <main className="h-full bg-black/20">{children}</main>
+            <main className="h-full">{children}</main>
             <Toaster />
           </Providers>
         </SessionProvider>

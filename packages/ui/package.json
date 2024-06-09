@@ -5,7 +5,6 @@
   "exports": {
     "./avatar": "./src/avatar.tsx",
     "./tooltip": "./src/tooltip.tsx",
-    "./rsc-wrapper": "./src/rsc-wrapper.tsx",
     "./confirm-modal": "./src/confirm-modal.tsx",
     "./refresh-button": "./src/refresh-button.tsx",
     "./skeleton-wrapper": "./src/skeleton-wrapper.tsx",
@@ -15,6 +14,7 @@
     "./utils": "./src/lib/utils.ts",
     "./lucide": "./src/lib/lucide.ts",
     "./loaders": "./src/lib/react-loader-spinner.ts",
+    "./flip-words": "./src/ace/flip-words.tsx",
     "./form": "./src/shadcn/form.tsx",
     "./input": "./src/shadcn/input.tsx",
     "./label": "./src/shadcn/label.tsx",
@@ -62,6 +62,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "framer-motion": "^11.2.10",
     "lucide-react": "^0.378.0",
     "react-hook-form": "^7.51.4",
     "react-loader-spinner": "^6.1.6",

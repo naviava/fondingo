@@ -1,9 +1,8 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo } from "react";
 
 import { useAddMemberModal } from "@fondingo/store/fsplit";
-import { usePanel } from "@fondingo/ui/use-panel";
 import { linearGradientWithAlpha } from "~/utils";
 
 import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";

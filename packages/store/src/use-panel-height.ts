@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 type PanelHeightStore = {
-  panelHeight: number;
   topRef: number;
   setTopRef: (ref: number | undefined) => void;
 
@@ -10,13 +9,11 @@ type PanelHeightStore = {
 };
 
 export const usePanelHeight = create<PanelHeightStore>((set) => ({
-  panelHeight: 0,
   topRef: 0,
   setTopRef: (ref) =>
     set((state) => ({
       ...state,
       topRef: ref,
-      panelHeight: !!ref ? state.bottomRef - ref : 0,
     })),
 
   bottomRef: 0,
@@ -24,6 +21,5 @@ export const usePanelHeight = create<PanelHeightStore>((set) => ({
     set((state) => ({
       ...state,
       bottomRef: ref,
-      panelHeight: !!ref ? ref - state.topRef : 0,
     })),
 }));

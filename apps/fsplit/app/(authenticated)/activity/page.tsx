@@ -11,7 +11,7 @@ export default async function ActivityPage() {
   return (
     <div className="h-full pb-24">
       <SimpleTitleTopRef title="Recent activity" />
-      <DynamicScrollArea>
+      <DynamicScrollArea crop={32}>
         <ul>
           {logs.map((log) => (
             <LogEntry
