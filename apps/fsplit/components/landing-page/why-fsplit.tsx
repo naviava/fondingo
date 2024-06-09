@@ -54,16 +54,18 @@ export function WhyFSplit() {
         Why <span className="text-cta">FS</span>plit?
       </h2>
       <div className="mx-auto flex flex-col md:mt-16 md:flex-row lg:mt-0 lg:items-center">
-        <div className="relative aspect-square w-full flex-1">
+        <div className="relative aspect-square w-full flex-1 ">
           <Image fill src="/images/tall-phone-banner.png" alt="FSPlit" />
         </div>
         <div className="mt-6 w-full flex-1">
-          <ul className="mx-auto flex h-16 w-full max-w-[500px] items-center justify-between gap-x-4 px-12">
+          <ul className="mx-auto flex h-16 w-full max-w-[500px] items-center justify-between gap-x-4 px-12 md:mx-0">
             {ENTRIES.map((entry, idx) => {
               const isActive = activeIndex === idx;
               return (
                 <li
                   key={entry.id}
+                  role="button"
+                  onClick={() => setActiveIndex(idx)}
                   className={cn(
                     "relative aspect-square w-10 transition-all duration-500 xl:w-14",
                     isActive && "w-16 xl:w-[80px]",
@@ -75,18 +77,21 @@ export function WhyFSplit() {
             })}
           </ul>
           <div className="mt-10 p-4 xl:mt-16">
-            <h3 className="text-center text-2xl font-bold lg:text-4xl xl:text-5xl">
+            <h3 className="text-center text-2xl font-bold md:text-left lg:text-4xl xl:text-5xl">
               {ENTRIES[activeIndex]?.title}
             </h3>
-            <p className="mx-auto mt-4 h-24 max-w-xl text-center text-neutral-500 lg:mt-8 xl:mt-12 xl:text-xl">
+            <p className="mx-auto mt-4 h-24 max-w-sm text-center text-neutral-500 md:mx-0 md:text-left lg:mt-8 xl:mt-12 xl:text-xl">
               {ENTRIES[activeIndex]?.description}
             </p>
           </div>
-          <div className="mx-auto w-fit px-4 xl:mt-12">
+          <div className="px-4 xl:mt-12">
             <Button
               asChild
               variant="cta"
-              className={cn("w-[10rem] rounded-full", hfont.className)}
+              className={cn(
+                "w-full rounded-full md:w-[10rem]",
+                hfont.className,
+              )}
             >
               <Link href="/signin">
                 Sign up
