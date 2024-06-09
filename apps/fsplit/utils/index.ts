@@ -1,4 +1,4 @@
-import { Montserrat } from "next/font/google";
+import { Montserrat, Tangerine } from "next/font/google";
 import { Archivo } from "next/font/google";
 import { Roboto } from "next/font/google";
 import localFont from "next/font/local";
@@ -21,6 +21,11 @@ export const archivo = Archivo({
 
 export const logoFont = localFont({
   src: "../public/fonts/tac-one.ttf",
+});
+
+export const quoteFont = Tangerine({
+  weight: ["400", "700"],
+  subsets: ["latin"],
 });
 
 export function formatPrice(price: number): string {
