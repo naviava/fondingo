@@ -9,7 +9,7 @@ import { hfont } from "~/utils";
 
 export function LandingPageNavbar() {
   return (
-    <header className="mx-auto flex h-14 max-w-screen-xl items-center px-4 lg:px-6">
+    <header className="mx-auto flex h-14 max-w-screen-xl items-center px-4 pt-6 lg:px-6">
       <Link
         href="#"
         className="flex items-center justify-center"
