@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import { uuid } from "@fondingo/utils/uuid";
 import { cn } from "@fondingo/ui/utils";
 import { archivo } from "~/utils";
+import { motion } from "framer-motion";
+import { useRef } from "react";
 
 const FEATURES = [
   {
@@ -39,12 +43,20 @@ const FEATURES = [
 ];
 
 export function KeyFeatures() {
+  const ref = useRef<HTMLUListElement>(null);
+
   return (
     <div className={cn("mx-auto mt-52 max-w-screen-xl", archivo.className)}>
       <h2 className="lg:leading-tighter mx-auto text-center text-3xl font-bold tracking-tighter sm:text-4xl md:max-w-[70%] md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
         What you get?
       </h2>
-      <ul className="mx-auto mt-6 grid grid-cols-1 place-items-center gap-x-6 gap-y-8 p-6 md:mt-14 md:max-w-[90%] md:grid-cols-2 md:gap-y-14 md:p-0 lg:grid-cols-4">
+      <motion.ul
+        ref={ref}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileInView={{ scale: 1, opacity: 1 }}
+        className="mx-auto mt-6 grid grid-cols-1 place-items-center gap-x-6 gap-y-8 p-6 md:mt-14 md:max-w-[90%] md:grid-cols-2 md:gap-y-14 md:p-0 lg:grid-cols-4"
+      >
         {FEATURES.map((feature) => (
           <li
             key={feature.id}
@@ -64,7 +76,7 @@ export function KeyFeatures() {
             <span className="text-neutral-500">{feature.title}</span>
           </li>
         ))}
-      </ul>
+      </motion.ul>
     </div>
   );
 }

@@ -1,13 +1,16 @@
 "use client";
 
-import { Button } from "@fondingo/ui/button";
-import { ArrowRight } from "@fondingo/ui/lucide";
-import { cn } from "@fondingo/ui/utils";
-import { uuid } from "@fondingo/utils/uuid";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+
+import { ArrowRight } from "@fondingo/ui/lucide";
+import { Button } from "@fondingo/ui/button";
+import { AnimatePresence, motion } from "framer-motion";
+
+import { uuid } from "@fondingo/utils/uuid";
 import { archivo, hfont } from "~/utils";
+import { cn } from "@fondingo/ui/utils";
 
 const ENTRIES = [
   {
@@ -44,12 +47,12 @@ export function WhyFSplit() {
         }
         return prev + 1;
       });
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className={cn("mt-52", archivo.className)}>
+    <div className={cn("mt-52  overflow-x-hidden", archivo.className)}>
       <h2 className="lg:leading-tighter mx-auto text-center text-3xl font-bold tracking-tighter sm:text-4xl md:max-w-[70%] md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
         Why <span className="text-cta">FS</span>plit?
       </h2>
@@ -76,14 +79,29 @@ export function WhyFSplit() {
               );
             })}
           </ul>
-          <div className="mt-10 p-4 xl:mt-16">
-            <h3 className="text-center text-2xl font-bold md:text-left lg:text-4xl xl:text-5xl">
-              {ENTRIES[activeIndex]?.title}
-            </h3>
-            <p className="mx-auto mt-4 h-24 max-w-sm text-center text-neutral-500 md:mx-0 md:text-left lg:mt-8 xl:mt-12 xl:text-xl">
-              {ENTRIES[activeIndex]?.description}
-            </p>
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ x: -100, opacity: 0 }}
+              animate={{
+                x: 0,
+                opacity: 1,
+              }}
+              exit={{
+                x: 100,
+                opacity: 0,
+              }}
+              transition={{ duration: 0.5 }}
+              className="mt-10 p-4 xl:mt-16"
+            >
+              <h3 className="text-center text-2xl font-bold md:text-left lg:text-4xl xl:text-5xl">
+                {ENTRIES[activeIndex]?.title}
+              </h3>
+              <p className="mx-auto mt-4 h-24 max-w-sm text-center text-neutral-500 md:mx-0 md:text-left lg:mt-8 xl:mt-12 xl:text-xl">
+                {ENTRIES[activeIndex]?.description}
+              </p>
+            </motion.div>
+          </AnimatePresence>
           <div className="px-4 xl:mt-12">
             <Button
               asChild

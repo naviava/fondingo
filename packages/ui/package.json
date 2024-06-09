@@ -15,6 +15,7 @@
     "./lucide": "./src/lib/lucide.ts",
     "./loaders": "./src/lib/react-loader-spinner.ts",
     "./flip-words": "./src/ace/flip-words.tsx",
+    "./text-generate-effect": "./src/ace/text-generate-effect.tsx",
     "./form": "./src/shadcn/form.tsx",
     "./input": "./src/shadcn/input.tsx",
     "./label": "./src/shadcn/label.tsx",
