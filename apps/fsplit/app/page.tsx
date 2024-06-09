@@ -1,39 +1,13 @@
-import Image from "next/image";
 import { LandingPageNavbar } from "~/components/landing-page/navbar";
+import { MainBanner } from "~/components/landing-page/main-banner";
 
-export default function Page() {
+export default function LandingPage() {
   return (
     <div className="flex min-h-full flex-col bg-[#F4F4F4]">
-      <div className="h-screen w-full">
+      <div className="min-h-screen w-full">
         <LandingPageNavbar />
-        <div className="relative aspect-square h-[calc(100vh-56px)]">
-          <Image
-            fill
-            src="/images/wide-phone-banner.png"
-            alt="Welcome to FSplit"
-            className="object-cover"
-          />
-        </div>
+        <MainBanner />
       </div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
-      <div>A</div>
     </div>
   );
 }

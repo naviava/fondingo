@@ -5,7 +5,6 @@
   "exports": {
     "./avatar": "./src/avatar.tsx",
     "./tooltip": "./src/tooltip.tsx",
-    "./rsc-wrapper": "./src/rsc-wrapper.tsx",
     "./confirm-modal": "./src/confirm-modal.tsx",
     "./refresh-button": "./src/refresh-button.tsx",
     "./skeleton-wrapper": "./src/skeleton-wrapper.tsx",
@@ -15,6 +14,7 @@
     "./utils": "./src/lib/utils.ts",
     "./lucide": "./src/lib/lucide.ts",
     "./loaders": "./src/lib/react-loader-spinner.ts",
+    "./background-gradient": "./src/ace/background-gradient.tsx",
     "./form": "./src/shadcn/form.tsx",
     "./input": "./src/shadcn/input.tsx",
     "./label": "./src/shadcn/label.tsx",

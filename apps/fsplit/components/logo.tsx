@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@fondingo/ui/utils";
+import { logoFont } from "~/utils";
 
 interface IProps {
   variant?: "wide" | "tall";
@@ -14,14 +15,22 @@ export function Logo({ variant = "wide", size = 40 }: IProps) {
         variant === "tall" && "flex-col",
       )}
     >
-      <Image
-        src="/images/logo.png"
-        alt="FSplit Logo"
-        width={size}
-        height={size}
-        className="object-cover"
-      />
-      <h1 className="ml-2 text-2xl font-bold">FSplit</h1>
+      <div className="relative h-8 w-8 md:h-10 md:w-10">
+        <Image
+          fill
+          src="/images/logo.png"
+          alt="FSplit Logo"
+          className="object-cover"
+        />
+      </div>
+      <h1
+        className={cn(
+          "ml-2 text-4xl font-bold text-neutral-600 md:text-5xl",
+          logoFont.className,
+        )}
+      >
+        <span className="text-cta">FS</span>plit
+      </h1>
     </div>
   );
 }

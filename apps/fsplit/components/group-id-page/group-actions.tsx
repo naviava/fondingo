@@ -4,7 +4,6 @@ import { memo, useCallback, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAddMemberModal } from "@fondingo/store/fsplit";
-import { usePanel } from "@fondingo/ui/use-panel";
 
 import { ScrollArea, ScrollBar } from "@fondingo/ui/scroll-area";
 import { toast } from "@fondingo/ui/use-toast";
@@ -12,6 +11,7 @@ import { Button } from "@fondingo/ui/button";
 
 import { cn } from "@fondingo/ui/utils";
 import { hexToRgb } from "~/utils";
+import { usePanel } from "@fondingo/ui/use-panel";
 
 interface IProps {
   userId?: string;

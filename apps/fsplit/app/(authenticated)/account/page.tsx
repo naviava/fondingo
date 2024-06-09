@@ -1,12 +1,12 @@
 import { serverClient } from "~/lib/trpc/server-client";
 import { redirect } from "next/navigation";
 
+import { SimpleTitleTopRef } from "~/components/simple-title-top-ref";
 import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
+import { UserDetails } from "~/components/account-page/user-details";
 import { Preferences } from "~/components/account-page/preferences";
 import { Feedback } from "~/components/account-page/feedback";
 import { Logout } from "~/components/account-page/logout";
-import { UserDetails } from "~/components/account-page/user-details";
-import { SimpleTitleTopRef } from "~/components/simple-title-top-ref";
 
 export default async function AccountPage() {
   const user = await serverClient.user.getAuthProfile();

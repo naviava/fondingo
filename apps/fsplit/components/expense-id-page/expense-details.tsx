@@ -21,7 +21,7 @@ export function ExpenseDetails({ user, group, expense, logs }: IProps) {
   return (
     <>
       <Separator ref={topDivRef} className="my-4" />
-      <DynamicScrollArea>
+      <DynamicScrollArea crop={32}>
         <div className="px-6">
           <ul>
             {expense.payments.map((payment) => (

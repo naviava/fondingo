@@ -1,8 +1,8 @@
 "use client";
 
 import { ScrollArea } from "./shadcn/scroll-area";
-import { useMemo } from "react";
 import { usePanel } from "./hooks/use-panel";
+import { useMemo } from "react";
 
 interface IProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface IProps {
   crop?: number;
 }
 
-export function DynamicScrollArea({ children, className, crop = 32 }: IProps) {
+export function DynamicScrollArea({ children, className, crop = 0 }: IProps) {
   const { panelHeight } = usePanel();
   const height = useMemo(() => `${panelHeight - crop}px`, [panelHeight, crop]);
 
