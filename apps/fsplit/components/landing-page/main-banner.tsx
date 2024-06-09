@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 import { MainBannerHeading } from "./main-banner-heading";
@@ -6,8 +8,12 @@ import { archivo, hfont } from "~/utils";
 import { Button } from "@fondingo/ui/button";
 import { ArrowRight } from "@fondingo/ui/lucide";
 import Link from "next/link";
+import bannerImage from "~/public/images/wide-phone-banner.png";
+import { useIsMounted } from "~/hooks/use-is-mounted";
 
 export function MainBanner() {
+  const isMounted = useIsMounted();
+
   return (
     <div
       className={cn(
@@ -19,9 +25,12 @@ export function MainBanner() {
       <div className="relative aspect-square w-full flex-1">
         <Image
           fill
-          src="/images/wide-phone-banner.png"
+          src={bannerImage}
           alt="Welcome to FSplit"
-          className="object-cover"
+          className={cn(
+            "object-cover blur-[20px] transition-all duration-700",
+            isMounted && "blur-none",
+          )}
         />
       </div>
       <div className="flex-1 space-y-10">

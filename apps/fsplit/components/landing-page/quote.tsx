@@ -1,7 +1,15 @@
-import { cn } from "@fondingo/ui/utils";
+"use client";
+
+import { TextGenerateEffect } from "@fondingo/ui/text-generate-effect";
+import { useIsMounted } from "~/hooks/use-is-mounted";
+
 import { archivo, quoteFont } from "~/utils";
+import { cn } from "@fondingo/ui/utils";
 
 export function Quote() {
+  const isMounted = useIsMounted();
+  if (!isMounted) return null;
+
   return (
     <div className="my-28 md:my-40">
       <div className="flex items-center justify-center px-4">
@@ -13,11 +21,10 @@ export function Quote() {
             )}
           >
             <p className="text-center">
-              “Coming together is a beginning; keeping together is progress;
-              working together is success. The strength of the team is each
-              individual member. The strength of each member is the team.
-              Success is not the key to happiness. Happiness is the key to
-              success. If you love what you are doing, you will be successful.”
+              <TextGenerateEffect
+                words={`Coming together is a beginning; keeping together is progress;
+              working together is success.`}
+              />
             </p>
           </blockquote>
           <p
@@ -26,7 +33,7 @@ export function Quote() {
               archivo.className,
             )}
           >
-            - Henry Ford and Albert Schweitzer
+            - Henry Ford
           </p>
         </div>
       </div>
