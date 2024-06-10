@@ -5,13 +5,18 @@ import Image from "next/image";
 import { LandingLayoutWrapper } from "~/components/landing-layout-wrapper";
 import { ContactForm } from "~/components/contact-form";
 import { motion, useAnimate } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function ContactPage() {
+  const isMounted = useRef(true);
   const [scope, animate] = useAnimate();
 
   useEffect(() => {
     const interval = setInterval(async () => {
+      if (!isMounted.current || !scope.current) {
+        clearInterval(interval);
+        return;
+      }
       await animate(
         scope.current,
         { scale: 1.1, rotate: 360 },
@@ -21,7 +26,10 @@ export default function ContactPage() {
       await animate(scope.current, { scale: 0 }, { duration: 1 });
       await animate(scope.current, { scale: 1 }, { duration: 1 });
     }, 2000);
-    return () => clearInterval(interval);
+    return () => {
+      isMounted.current = false;
+      clearInterval(interval);
+    };
   }, [animate, scope]);
 
   return (
