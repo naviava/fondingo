@@ -4,9 +4,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 import { compare, hash } from "bcrypt";
 
+import { sendVerificationEmail, sendPasswordResetEmail } from "../../utils";
 import { privateProcedure, publicProcedure } from "../trpc";
 import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
-import { sendVerificationEmail } from "../../utils";
 
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
@@ -310,6 +310,143 @@ export const changePassword = privateProcedure
       return {
         toastTitle: "Password updated",
         toastDescription: "You changed your password.",
+      };
+    });
+  });
+
+export const sendResetPasswordEmail = publicProcedure
+  .input(z.string().email({ message: "Invalid email" }))
+  .mutation(async ({ input }) => {
+    const email = input.toLowerCase();
+    const existingUser = await splitdb.user.findUnique({
+      where: { email },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "That email is not registered with us.",
+      });
+
+    return splitdb.$transaction(async (db) => {
+      const existingPasswordResetToken = await db.passwordResetToken.findFirst({
+        where: { userEmail: existingUser.email },
+      });
+      if (
+        !!existingPasswordResetToken &&
+        Date.now() < existingPasswordResetToken.expires.getTime()
+      )
+        return {
+          toastTitle: "Reset email sent",
+          toastDescription: `Email has been sent to ${existingUser.email} less than 15 minutes back. Please check your mailbox.`,
+        };
+      if (!!existingPasswordResetToken)
+        await db.passwordResetToken.delete({
+          where: { id: existingPasswordResetToken.id },
+        });
+
+      const newToken = await db.passwordResetToken.create({
+        data: {
+          token: uuid(),
+          email: existingUser.email,
+          userEmail: existingUser.email,
+          expires: new Date(Date.now() + 1000 * 60 * 15),
+        },
+      });
+      const sent = await sendPasswordResetEmail({
+        email: existingUser.email,
+        token: newToken.token,
+        pathname: "/reset-password",
+      });
+      if (!sent)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send email. Password reset request failed.",
+        });
+
+      return {
+        toastTitle: "Password reset intructions sent.",
+        toastDescription: `Email has been sent to ${existingUser.email}. Please check your mailbox.`,
+      };
+    });
+  });
+
+export const getPasswordResetToken = publicProcedure
+  .input(z.string().min(1, { message: "Token cannot be empty." }))
+  .query(async ({ input: token }) => {
+    const existingToken = await splitdb.passwordResetToken.findUnique({
+      where: { token },
+      include: {
+        user: {
+          select: { name: true },
+        },
+      },
+    });
+    if (!existingToken)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Token not found.",
+      });
+    return existingToken;
+  });
+
+export const resetPassword = publicProcedure
+  .input(
+    z.object({
+      token: z.string().min(1, { message: "Token cannot be empty." }),
+      email: z.string().email({ message: "Invalid email" }),
+      password: z.string().min(6, { message: "Password too short" }),
+      confirmPassword: z
+        .string()
+        .min(6, { message: "Confirm password too short" }),
+    }),
+  )
+  .mutation(async ({ input }) => {
+    const email = input.email.toLowerCase();
+    const { token, password, confirmPassword } = input;
+    if (password !== confirmPassword)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Passwords do not match.",
+      });
+
+    const existingToken = await splitdb.passwordResetToken.findUnique({
+      where: { token, email },
+    });
+    if (!existingToken)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Token for that email, not found.",
+      });
+    if (Date.now() > existingToken.expires.getTime())
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Token has expired.",
+      });
+
+    return splitdb.$transaction(async (db) => {
+      const hashedPassword = await hash(password, 10);
+      const updatedUser = await db.user.update({
+        where: { email },
+        data: { hashedPassword },
+      });
+      if (!updatedUser)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update password.",
+        });
+
+      const deletedToken = await db.passwordResetToken.delete({
+        where: { id: existingToken.id },
+      });
+      if (!deletedToken)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete token. Password reset failed.",
+        });
+
+      return {
+        toastTitle: `Password reset for ${updatedUser.name}`,
+        toastDescription: "You can now login with your new password.",
       };
     });
   });

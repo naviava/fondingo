@@ -52,7 +52,7 @@ export function ExpensePaymentsMember({
         {
           userId,
           userName,
-          amount: expenseAmount,
+          amount: Math.floor(Number(expenseAmount) * 100) / 100,
         },
       ]);
     },

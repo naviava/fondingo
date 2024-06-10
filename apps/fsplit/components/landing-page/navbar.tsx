@@ -11,7 +11,7 @@ export function LandingPageNavbar() {
   return (
     <header className="mx-auto flex h-14 max-w-screen-xl items-center px-4 pt-6 lg:px-6">
       <Link
-        href="#"
+        href="/"
         className="flex items-center justify-center"
         prefetch={false}
       >

@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
+
+import { motion, useAnimate, useInView } from "framer-motion";
 import { uuid } from "@fondingo/utils/uuid";
+
 import { cn } from "@fondingo/ui/utils";
 import { archivo } from "~/utils";
-import { motion } from "framer-motion";
-import { useRef } from "react";
 
 const FEATURES = [
   {
@@ -44,22 +46,40 @@ const FEATURES = [
 
 export function KeyFeatures() {
   const ref = useRef<HTMLUListElement>(null);
+  const isInView = useInView(ref);
+
+  const parentVariants = {
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.3,
+        duration: 0.7,
+      },
+    },
+    hidden: { opacity: 0 },
+  };
+
+  const childVariants = {
+    visible: { opacity: 1, scale: 1 },
+    hidden: { opacity: 0, scale: 0 },
+  };
 
   return (
     <div className={cn("mx-auto mt-52 max-w-screen-xl", archivo.className)}>
       <h2 className="lg:leading-tighter mx-auto text-center text-3xl font-bold tracking-tighter sm:text-4xl md:max-w-[70%] md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
-        What you get?
+        Key Features
       </h2>
       <motion.ul
         ref={ref}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        whileInView={{ scale: 1, opacity: 1 }}
+        variants={parentVariants}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
         className="mx-auto mt-6 grid grid-cols-1 place-items-center gap-x-6 gap-y-8 p-6 md:mt-14 md:max-w-[90%] md:grid-cols-2 md:gap-y-14 md:p-0 lg:grid-cols-4"
       >
         {FEATURES.map((feature) => (
-          <li
+          <motion.li
             key={feature.id}
+            variants={childVariants}
             className="flex w-full max-w-[280px] flex-col items-center justify-center rounded-xl bg-neutral-200 pb-3 pt-6"
           >
             <div className="relative mb-4 aspect-square w-14">
@@ -74,7 +94,7 @@ export function KeyFeatures() {
               {feature.adjective.slice(1)}
             </div>
             <span className="text-neutral-500">{feature.title}</span>
-          </li>
+          </motion.li>
         ))}
       </motion.ul>
     </div>

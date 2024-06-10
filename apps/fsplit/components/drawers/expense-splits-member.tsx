@@ -57,7 +57,7 @@ export function ExpenseSplitsMember({
 
       const newSplits = tempSplits.map((split) => ({
         ...split,
-        amount: expenseAmount / tempSplits.length,
+        amount: Math.floor((expenseAmount / tempSplits.length) * 100) / 100,
       }));
 
       const adjustedSplits = adjustMinorAmount(newSplits, expenseAmount);
