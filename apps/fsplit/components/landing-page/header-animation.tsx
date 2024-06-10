@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion, useAnimate } from "framer-motion";
+import { useSafeAnimate } from "~/hooks/use-safe-animate";
 
 export function HeaderAnimation() {
-  const [scope, animate] = useAnimate();
+  const [scope, animate] = useSafeAnimate();
   const [toggleState, setToggleState] = useState(true);
 
   useEffect(() => {
@@ -26,19 +27,23 @@ export function HeaderAnimation() {
           animate("#text", { color: "#fff" }, { duration: 1.5 }),
         ];
         await Promise.all(animations);
+        // @ts-expect-error
+        if (scope.current) await animate("#bg", { originX: 1 });
       }
       if (!toggleState) {
         const animations = [
           animate(
             "#bg",
-            { scaleY: 0, backgroundColor: "#10b981" },
+            { scaleX: 0, backgroundColor: "#10b981" },
             { duration: 1 },
           ),
           animate("#text", { color: "#404040" }, { duration: 1 }),
         ];
         await Promise.all(animations);
-        await animate("#bg", { scaleX: 0, backgroundColor: "#10b981" });
-        await animate("#bg", { scaleY: 1 });
+        if (scope.current)
+          // @ts-expect-error
+          await animate("#bg", { originX: 0, backgroundColor: "#10b981" });
+        await animate("#bg", { height: "100%" });
       }
     }
     handleAnimation();

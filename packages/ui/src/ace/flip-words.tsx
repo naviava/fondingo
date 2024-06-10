@@ -31,7 +31,6 @@ export const FlipWords = ({
 
   return (
     <AnimatePresence
-      mode="sync"
       onExitComplete={() => {
         setIsAnimating(false);
       }}
