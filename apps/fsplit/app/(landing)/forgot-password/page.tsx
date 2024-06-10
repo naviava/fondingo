@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
 
+import { LandingLayoutWrapper } from "~/components/landing-layout-wrapper";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
@@ -20,8 +21,6 @@ import {
 } from "@fondingo/ui/form";
 
 import { trpc } from "~/lib/trpc/client";
-import { cn } from "@fondingo/ui/utils";
-import { archivo } from "~/utils";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -67,12 +66,7 @@ export default function ForgotPasswordPage() {
     [sendEmailMutation],
   );
   return (
-    <div
-      className={cn(
-        "flex min-h-[70vh] flex-col items-center justify-center px-4 py-20 md:min-h-[calc(100vh-440px)] lg:min-h-[calc(100vh-448px)]",
-        archivo.className,
-      )}
-    >
+    <LandingLayoutWrapper>
       <div className="mx-auto max-w-[27rem] space-y-6 rounded-sm border-2 border-neutral-200 px-4 py-10 md:space-y-10 md:p-14">
         <h1 className="text-4xl font-semibold">Can&apos;t log in?</h1>
         <p className="leading-[1.7em] tracking-wide text-neutral-600">
@@ -116,6 +110,6 @@ export default function ForgotPasswordPage() {
           </form>
         </Form>
       </div>
-    </div>
+    </LandingLayoutWrapper>
   );
 }

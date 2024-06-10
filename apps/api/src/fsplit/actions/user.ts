@@ -381,11 +381,6 @@ export const getPasswordResetToken = publicProcedure
         },
       },
     });
-    if (!existingToken)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Token not found.",
-      });
     return existingToken;
   });
 

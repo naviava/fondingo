@@ -1,11 +1,9 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
-import { serverClient } from "~/lib/trpc/server-client";
-import { archivo } from "~/utils";
-
+import { LandingLayoutWrapper } from "~/components/landing-layout-wrapper";
 import { PasswordResetForm } from "~/components/password-reset-form";
-import { cn } from "@fondingo/ui/utils";
+import { serverClient } from "~/lib/trpc/server-client";
 
 interface IProps {
   searchParams?: {
@@ -20,12 +18,7 @@ export default async function PasswordResetPage({ searchParams }: IProps) {
   );
   if (!token) return redirect("/");
   return (
-    <div
-      className={cn(
-        "flex min-h-[70vh] flex-col items-center justify-center px-4 py-24 md:min-h-[calc(100vh-440px)] lg:min-h-[calc(100vh-448px)]",
-        archivo.className,
-      )}
-    >
+    <LandingLayoutWrapper>
       {Date.now() > new Date(token.expires).getTime() ? (
         <div>
           <h1 className="text-center text-4xl font-semibold lg:text-5xl">
@@ -46,6 +39,6 @@ export default async function PasswordResetPage({ searchParams }: IProps) {
       ) : (
         <PasswordResetForm token={token} />
       )}
-    </div>
+    </LandingLayoutWrapper>
   );
 }
