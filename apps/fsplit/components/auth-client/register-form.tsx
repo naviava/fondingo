@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { signIn } from "next-auth/react";
 import { z } from "@fondingo/utils/zod";
 
 import { toast } from "@fondingo/ui/use-toast";
@@ -44,6 +42,7 @@ const formSchema = z
 
 export function RegisterForm() {
   const [emailSent, setEmailSent] = useState(false);
+  const [disableUI, setDisableUI] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,20 +58,27 @@ export function RegisterForm() {
     },
   });
 
-  const { mutate: handleCreateNewUser } = trpc.user.createNewUser.useMutation({
-    onError: ({ message }) =>
-      toast({
-        title: "Something went wrong",
-        description: message,
-      }),
-    onSuccess: async ({ toastTitle, toastDescription }) => {
-      toast({
-        title: toastTitle,
-        description: toastDescription,
-      });
-      setEmailSent(true);
-    },
-  });
+  const { mutate: handleCreateNewUser, isPending } =
+    trpc.user.createNewUser.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: async ({ toastTitle, toastDescription }) => {
+        setDisableUI(true);
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        setEmailSent(true);
+      },
+    });
+
+  const isLoading = useMemo(
+    () => isPending || disableUI,
+    [isPending, disableUI],
+  );
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
@@ -106,21 +112,21 @@ export function RegisterForm() {
               label="Display name"
               placeholder="ImAwesome123"
               description="This will be your public name."
-              disabled={false}
+              disabled={isLoading}
             />
             <AuthFormInput
               form={form}
               fieldName="email"
               label="Email address"
               placeholder="yourname@email.com"
-              disabled={false}
+              disabled={isLoading}
             />
             <div className="flex items-center gap-x-2 md:gap-x-4">
               <AuthFormInput
                 form={form}
                 fieldName="firstName"
                 label="First name"
-                disabled={false}
+                disabled={isLoading}
                 forceFullWidth
                 isOptional
               />
@@ -128,7 +134,7 @@ export function RegisterForm() {
                 form={form}
                 fieldName="lastName"
                 label="Last name"
-                disabled={false}
+                disabled={isLoading}
                 forceFullWidth
                 isOptional
               />
@@ -137,7 +143,7 @@ export function RegisterForm() {
               form={form}
               fieldName="phone"
               label="Phone number"
-              disabled={false}
+              disabled={isLoading}
               isOptional
             />
             <AuthFormInput
@@ -145,7 +151,7 @@ export function RegisterForm() {
               fieldName="password"
               label="Password"
               type="password"
-              disabled={false}
+              disabled={isLoading}
               isPasswordShown={isPasswordShown}
               setIsPasswordShown={setIsPasswordShown}
             />
@@ -154,12 +160,13 @@ export function RegisterForm() {
               type="password"
               fieldName="confirmPassword"
               label="Confirm password"
-              disabled={false}
+              disabled={isLoading}
             />
             <div>
               <Button
                 variant="cta"
                 type="submit"
+                disabled={isLoading}
                 className={cn(
                   "text mt-6 w-full transition focus:scale-[0.98]",
                   hfont.className,

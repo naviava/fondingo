@@ -31,6 +31,7 @@ const formSchema = z.object({
 
 export function SigninForm() {
   const router = useRouter();
+  const [disableUI, setDisableUI] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,19 +44,22 @@ export function SigninForm() {
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof formSchema>) => {
+      setDisableUI(true);
       await signIn("credentials", {
         ...values,
         redirect: false,
       }).then((res) => {
         if (res?.ok) {
           router.refresh();
-        } else
+        } else {
+          setDisableUI(false);
           toast({
             title: "Sign in failed",
             description:
               "Invalid credentials or email not verified. Check your email for verification link.",
             variant: "destructive",
           });
+        }
       });
     },
     [router],
@@ -75,6 +79,7 @@ export function SigninForm() {
               <FormControl>
                 <Input
                   placeholder="yourname@email.com"
+                  disabled={disableUI}
                   {...field}
                   className="auth-form-input placeholder:text-neutral-400"
                 />
@@ -95,6 +100,7 @@ export function SigninForm() {
                   <Input
                     type={isPasswordShown ? "text" : "password"}
                     placeholder="******"
+                    disabled={disableUI}
                     {...field}
                     className="auth-form-input pr-16 placeholder:text-neutral-400"
                   />
@@ -102,6 +108,7 @@ export function SigninForm() {
                     type="button"
                     size="sm"
                     variant="ghost"
+                    disabled={disableUI}
                     onClick={() => setIsPasswordShown((prev) => !prev)}
                     className="absolute right-0 top-1/2 -translate-y-1/2 text-neutral-400 hover:bg-transparent hover:text-neutral-500"
                   >

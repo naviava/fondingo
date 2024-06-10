@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
-import { cn } from "@fondingo/ui/utils";
-import { archivo } from "~/utils";
 import { serverClient } from "~/lib/trpc/server-client";
+import { archivo } from "~/utils";
+
+import { PasswordResetForm } from "~/components/password-reset-form";
+import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   searchParams?: {
@@ -42,7 +44,7 @@ export default async function PasswordResetPage({ searchParams }: IProps) {
           </p>
         </div>
       ) : (
-        <form>A</form>
+        <PasswordResetForm token={token} />
       )}
     </div>
   );

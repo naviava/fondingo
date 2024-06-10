@@ -21,6 +21,7 @@ import {
   getVerificationToken,
   sendResetPasswordEmail,
   getPasswordResetToken,
+  resetPassword,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -44,4 +45,5 @@ export const userRouter = router({
   getVerificationToken,
   sendResetPasswordEmail,
   getPasswordResetToken,
+  resetPassword,
 });

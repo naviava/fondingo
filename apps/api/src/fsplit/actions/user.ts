@@ -316,7 +316,8 @@ export const changePassword = privateProcedure
 
 export const sendResetPasswordEmail = publicProcedure
   .input(z.string().email({ message: "Invalid email" }))
-  .mutation(async ({ input: email }) => {
+  .mutation(async ({ input }) => {
+    const email = input.toLowerCase();
     const existingUser = await splitdb.user.findUnique({
       where: { email },
     });
@@ -374,6 +375,11 @@ export const getPasswordResetToken = publicProcedure
   .query(async ({ input: token }) => {
     const existingToken = await splitdb.passwordResetToken.findUnique({
       where: { token },
+      include: {
+        user: {
+          select: { name: true },
+        },
+      },
     });
     if (!existingToken)
       throw new TRPCError({
@@ -381,6 +387,68 @@ export const getPasswordResetToken = publicProcedure
         message: "Token not found.",
       });
     return existingToken;
+  });
+
+export const resetPassword = publicProcedure
+  .input(
+    z.object({
+      token: z.string().min(1, { message: "Token cannot be empty." }),
+      email: z.string().email({ message: "Invalid email" }),
+      password: z.string().min(6, { message: "Password too short" }),
+      confirmPassword: z
+        .string()
+        .min(6, { message: "Confirm password too short" }),
+    }),
+  )
+  .mutation(async ({ input }) => {
+    const email = input.email.toLowerCase();
+    const { token, password, confirmPassword } = input;
+    if (password !== confirmPassword)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Passwords do not match.",
+      });
+
+    const existingToken = await splitdb.passwordResetToken.findUnique({
+      where: { token, email },
+    });
+    if (!existingToken)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Token for that email, not found.",
+      });
+    if (Date.now() > existingToken.expires.getTime())
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Token has expired.",
+      });
+
+    return splitdb.$transaction(async (db) => {
+      const hashedPassword = await hash(password, 10);
+      const updatedUser = await db.user.update({
+        where: { email },
+        data: { hashedPassword },
+      });
+      if (!updatedUser)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update password.",
+        });
+
+      const deletedToken = await db.passwordResetToken.delete({
+        where: { id: existingToken.id },
+      });
+      if (!deletedToken)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete token. Password reset failed.",
+        });
+
+      return {
+        toastTitle: `Password reset for ${updatedUser.name}`,
+        toastDescription: "You can now login with your new password.",
+      };
+    });
   });
 
 export const editProfile = privateProcedure

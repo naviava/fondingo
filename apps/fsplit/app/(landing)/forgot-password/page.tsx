@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
   return (
     <div
       className={cn(
-        "flex min-h-[70vh] flex-col items-center justify-center px-4 md:h-[calc(100vh-440px)] md:min-h-fit lg:h-[calc(100vh-448px)]",
+        "flex min-h-[70vh] flex-col items-center justify-center px-4 py-20 md:min-h-[calc(100vh-440px)] lg:min-h-[calc(100vh-448px)]",
         archivo.className,
       )}
     >
