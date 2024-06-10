@@ -12,6 +12,7 @@ import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 import { Loader } from "@fondingo/ui/lucide";
+import { Logo } from "./logo";
 
 export function SocialHeader() {
   const pathname = usePathname();
@@ -24,7 +25,9 @@ export function SocialHeader() {
       ref={topDivRef}
       className="mb-4 flex items-center justify-between gap-x-4 px-4 pt-4"
     >
-      <SearchBar />
+      <Link href="/">
+        <Logo className="tracking-wider" />
+      </Link>
       {pathname.startsWith("/friends") && (
         <Button
           variant="ghost"
@@ -41,6 +44,7 @@ export function SocialHeader() {
         <Button
           asChild
           variant="ghost"
+          disabled={isNavigating}
           onClick={() => setIsNavigating(true)}
           className={cn(
             "text-cta hover:text-cta w-[8rem] text-base font-semibold md:text-lg",

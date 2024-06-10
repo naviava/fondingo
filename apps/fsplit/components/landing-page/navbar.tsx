@@ -9,9 +9,16 @@ import { Logo } from "~/components/logo";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useMemo } from "react";
 
 export function LandingPageNavbar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isLoggedIn = useMemo(
+    () => !!session && !!session.user && !!session.user.email,
+    [session],
+  );
 
   return (
     <div className={cn("w-full", pathname === "/contact" && "bg-neutral-200")}>
@@ -26,7 +33,7 @@ export function LandingPageNavbar() {
           className="flex items-center justify-center"
           prefetch={false}
         >
-          <Logo />
+          <Logo className={cn(pathname === "/contact" && "z-[1]")} />
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Button
@@ -40,10 +47,10 @@ export function LandingPageNavbar() {
           >
             <Link
               href="/signin"
-              className="flex items-center bg-transparent text-xs font-medium underline-offset-4 hover:underline md:text-sm"
+              className="flex items-center bg-transparent text-xs font-medium underline-offset-4 hover:underline md:text-sm lg:text-base xl:text-lg"
               prefetch={false}
             >
-              Get started for free
+              {isLoggedIn ? "Open app" : "Get started for free"}
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
