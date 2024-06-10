@@ -19,6 +19,8 @@ import {
   completeVerification,
   isVerified,
   getVerificationToken,
+  sendResetPasswordEmail,
+  getPasswordResetToken,
 } from "../actions/user";
 
 export const userRouter = router({
@@ -40,4 +42,6 @@ export const userRouter = router({
   completeVerification,
   isVerified,
   getVerificationToken,
+  sendResetPasswordEmail,
+  getPasswordResetToken,
 });

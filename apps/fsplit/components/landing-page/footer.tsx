@@ -46,7 +46,7 @@ export function Footer() {
   return (
     <div
       className={cn(
-        "bg-slate-700 pb-16 pt-10 text-neutral-300",
+        "bg-slate-700 pb-10 pt-10 text-neutral-300",
         archivo.className,
       )}
     >

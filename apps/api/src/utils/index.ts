@@ -25,3 +25,26 @@ export async function sendVerificationEmail({
   }
   return true;
 }
+
+export async function sendPasswordResetEmail({
+  email,
+  token,
+  pathname,
+}: {
+  email: string;
+  token: string;
+  pathname: string;
+}) {
+  const confirmLink = `${domain}${pathname}?token=${token}`;
+  const { data, error } = await resend.emails.send({
+    from: "fsplit-security@fondingo.com",
+    to: email,
+    subject: "Reset your password for FSplit",
+    html: `<p><a href="${confirmLink}">Click here</a> to reset your password.<br />This link will be valid for 15 minutes. Any previous links received will not be functional. This is the link to rule them all.</p>`,
+  });
+  if (error) {
+    console.error("Failed to send verification email", error);
+    return false;
+  }
+  return true;
+}

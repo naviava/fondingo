@@ -62,6 +62,18 @@ model ConfirmEmailToken {
   updatedAt DateTime @updatedAt
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String   @unique
+  expires   DateTime
+  userEmail String   @unique
+  user      User     @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id                     String               @id @default(cuid())
   email                  String               @unique
@@ -79,6 +91,7 @@ model User {
   emailVerified          DateTime?            @map("email_verified")
   confirmEmailToken      ConfirmEmailToken?
   accountVerification    AccountVerification?
+  PasswordResetToken     PasswordResetToken?
   accounts               Account[]
   sessions               Session[]
   groups                 GroupMember[]
@@ -95,6 +108,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([email])
 }
 
 model AccountVerification {
@@ -185,6 +200,7 @@ model GroupMember {
   updatedAt DateTime @updatedAt
 
   @@unique([groupId, email])
+  @@index([groupId])
 }
 
 model Expense {
@@ -203,6 +219,8 @@ model Expense {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([groupId])
 }
 
 model ExpensePayment {
@@ -240,6 +258,8 @@ model Settlement {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([groupId])
 }
 
 model SimplifiedDebt {
@@ -251,6 +271,8 @@ model SimplifiedDebt {
   from    GroupMember @relation("DebtFromUser", fields: [fromId], references: [id], onDelete: Restrict)
   toId    String
   to      GroupMember @relation("DebtToUser", fields: [toId], references: [id], onDelete: Restrict)
+
+  @@index([groupId])
 }
 
 model Log {

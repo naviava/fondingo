@@ -1,30 +1,35 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
-import { cn } from "@fondingo/ui/utils";
-import { archivo } from "~/utils";
 
+import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Input } from "@fondingo/ui/input";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@fondingo/ui/form";
 
+import { trpc } from "~/lib/trpc/client";
+import { cn } from "@fondingo/ui/utils";
+import { archivo } from "~/utils";
+
 const formSchema = z.object({
   email: z.string().email(),
 });
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
+  const [disableUI, setDisableUI] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,13 +37,39 @@ export default function ForgotPasswordPage() {
     },
   });
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    console.log(values);
-  }, []);
+  const sendEmailMutation = trpc.user.sendResetPasswordEmail.useMutation({
+    onError: ({ message }) =>
+      toast({
+        title: "Something went wrong",
+        description: message,
+      }),
+    onSuccess: ({ toastTitle, toastDescription }) => {
+      setDisableUI(true);
+      toast({
+        title: toastTitle,
+        description: toastDescription,
+      });
+      form.reset();
+      router.push("/");
+      router.refresh();
+    },
+  });
+
+  const isLoading = useMemo(
+    () => sendEmailMutation.isPending || disableUI,
+    [disableUI, sendEmailMutation.isPending],
+  );
+
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      sendEmailMutation.mutate(values.email);
+    },
+    [sendEmailMutation],
+  );
   return (
     <div
       className={cn(
-        "flex min-h-[70vh] flex-col items-center justify-center px-4",
+        "flex min-h-[70vh] flex-col items-center justify-center px-4 md:h-[calc(100vh-440px)] md:min-h-fit lg:h-[calc(100vh-448px)]",
         archivo.className,
       )}
     >
@@ -65,6 +96,7 @@ export default function ForgotPasswordPage() {
                   <FormControl>
                     <Input
                       type="email"
+                      disabled={isLoading}
                       placeholder="yourname@email.com"
                       {...field}
                       className="form-input placeholder:text-neutral-300"
@@ -73,7 +105,12 @@ export default function ForgotPasswordPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" variant="cta" className="w-full text-base">
+            <Button
+              type="submit"
+              variant="cta"
+              disabled={isLoading}
+              className="w-full text-base"
+            >
               Submit
             </Button>
           </form>
