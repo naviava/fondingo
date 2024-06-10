@@ -26,8 +26,6 @@ export function HeaderAnimation() {
           animate("#text", { color: "#fff" }, { duration: 1.5 }),
         ];
         await Promise.all(animations);
-        // @ts-expect-error
-        await animate("#bg", { originY: 1 });
       }
       if (!toggleState) {
         const animations = [

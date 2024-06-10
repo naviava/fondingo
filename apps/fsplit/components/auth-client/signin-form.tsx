@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -113,12 +114,13 @@ export function SigninForm() {
         />
         <div className="flex justify-end">
           <Button
+            asChild
             type="button"
             size="sm"
             variant="link"
             className="-mt-4 text-neutral-500"
           >
-            Forgot password?
+            <Link href="/forgot-password">Forgot password?</Link>
           </Button>
         </div>
         <Button

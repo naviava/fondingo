@@ -1,10 +1,12 @@
 "use client";
 
-import { useAuthForm } from "@fondingo/store/use-auth-form";
-import { AuthClient } from "~/components/auth-client";
+import Link from "next/link";
 
+import { useAuthForm } from "@fondingo/store/use-auth-form";
 import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/utils";
+
+import { AuthClient } from "~/components/auth-client";
+import { Logo } from "~/components/logo";
 
 export default function SignInPage() {
   const { formType } = useAuthForm();
@@ -12,19 +14,17 @@ export default function SignInPage() {
   return (
     <div
       className={cn(
-        "relative flex h-full flex-col items-center justify-center px-4",
+        "relative z-[2] flex h-full flex-col items-center justify-center px-4",
         formType === "register" && "py-4",
       )}
     >
-      <h1
-        className={cn(
-          "mb-10 text-2xl font-bold",
-          hfont.className,
-          formType === "register" && "hidden md:block",
-        )}
-      >
-        Welcome to FSplit
-      </h1>
+      <Link href="/">
+        <h1
+          className={cn("mb-10", formType === "register" && "hidden md:block")}
+        >
+          <Logo className="tracking-wide" />
+        </h1>
+      </Link>
       <AuthClient />
     </div>
   );

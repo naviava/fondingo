@@ -23,7 +23,7 @@ const COLUMNS = [
     links: [
       { id: uuid(), text: "Help", href: "#" },
       { id: uuid(), text: "Account", href: "#" },
-      { id: uuid(), text: "Reset Password", href: "#" },
+      { id: uuid(), text: "Reset Password", href: "/forgot-password" },
       { id: uuid(), text: "Email Verification", href: "#" },
     ],
   },
