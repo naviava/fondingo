@@ -1,15 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useExpenseDetails } from "@fondingo/store/fsplit";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@fondingo/ui/use-toast";
 import { useUtils } from "~/hooks/use-utils";
 import { useForm } from "react-hook-form";
 import { z } from "@fondingo/utils/zod";
 
+import { currencyIconMap } from "@fondingo/ui/constants";
+import { LayoutList, X } from "@fondingo/ui/lucide";
+import { Separator } from "@fondingo/ui/separator";
+import { Button } from "@fondingo/ui/button";
+import { Loader } from "@fondingo/ui/lucide";
+import { Input } from "@fondingo/ui/input";
 import {
   Form,
   FormControl,
@@ -17,17 +24,11 @@ import {
   FormItem,
   FormMessage,
 } from "@fondingo/ui/form";
-import { currencyIconMap } from "@fondingo/ui/constants";
-import { LayoutList, X } from "@fondingo/ui/lucide";
-import { Separator } from "@fondingo/ui/separator";
-import { useToast } from "@fondingo/ui/use-toast";
-import { Button } from "@fondingo/ui/button";
-import { Input } from "@fondingo/ui/input";
 
 import { serverClient } from "~/lib/trpc/server-client";
+import { hexToRgb, hfont } from "~/utils";
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
-import { hexToRgb, hfont } from "~/utils";
 
 const formSchema = z.object({
   groupId: z.string().min(1, { message: "Group ID is required" }),
@@ -67,6 +68,7 @@ export default function ExpenseForm({
 }: IProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const [disableUI, setDisableUI] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { data: group } = trpc.group.getGroupById.useQuery(groupId);
 
@@ -157,6 +159,7 @@ export default function ExpenseForm({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
+        setDisableUI(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -174,6 +177,7 @@ export default function ExpenseForm({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
+        setDisableUI(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -189,29 +193,30 @@ export default function ExpenseForm({
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
-      if (isEditing)
+      if (isEditing) {
         handleEditExpense({
           ...values,
           expenseId: expenseId ?? "",
-          expenseAmount: Math.floor(Number(values.expenseAmount) * 100) / 100,
+          expenseAmount: Math.floor(Number(values.expenseAmount) * 100),
         });
-      else
+      } else
         handleAddExpense({
           ...values,
-          expenseAmount: Math.floor(Number(values.expenseAmount) * 100) / 100,
+          expenseAmount: Math.floor(Number(values.expenseAmount) * 100),
         });
     },
     [handleAddExpense, handleEditExpense, expenseId, isEditing],
   );
 
+  const isLoading = useMemo(
+    () => isPendingAdd || isPendingEdit || disableUI,
+    [isPendingAdd, isPendingEdit, disableUI],
+  );
+
   return (
     <>
       <div className="flex items-center justify-between px-2 pt-4">
-        <Button
-          asChild
-          variant="ctaGhost"
-          disabled={isPendingAdd || isPendingEdit}
-        >
+        <Button asChild variant="ctaGhost" disabled={isLoading}>
           <Link
             href={
               isEditing
@@ -228,13 +233,13 @@ export default function ExpenseForm({
         <Button
           type="button"
           variant="ctaGhost"
-          disabled={isPendingAdd || isPendingEdit}
+          disabled={isLoading}
           onClick={() => {
             submitButtonRef.current?.click();
           }}
           className="w-20"
         >
-          Save
+          {isLoading ? <Loader className="h-6 w-6 animate-spin" /> : "Save"}
         </Button>
       </div>
       <div className="line-clamp-1 flex items-center px-6 pt-2 text-sm font-medium ">
@@ -271,7 +276,7 @@ export default function ExpenseForm({
                     <Input
                       placeholder="Enter a description"
                       autoComplete="off"
-                      disabled={isPendingAdd || isPendingEdit}
+                      disabled={isLoading}
                       {...field}
                       value={expenseName}
                       onChange={(e) => {
@@ -305,7 +310,7 @@ export default function ExpenseForm({
                       autoComplete="off"
                       type="number"
                       step={0.1}
-                      disabled={isPendingAdd || isPendingEdit}
+                      disabled={isLoading}
                       {...field}
                       value={expenseAmount === 0 ? "" : expenseAmount}
                       onChange={(e) => {
@@ -328,7 +333,7 @@ export default function ExpenseForm({
               type="button"
               variant="ctaGhost"
               size="sm"
-              disabled={isPendingAdd || isPendingEdit}
+              disabled={isLoading}
               onClick={() => {
                 if (Number(form.getValues("expenseAmount")) > 0) {
                   onPaymentsDrawerOpen(groupId);
@@ -351,7 +356,7 @@ export default function ExpenseForm({
               type="button"
               variant="ctaGhost"
               size="sm"
-              disabled={isPendingAdd || isPendingEdit}
+              disabled={isLoading}
               onClick={() => {
                 if (Number(form.getValues("expenseAmount")) > 0) {
                   clearSplits();

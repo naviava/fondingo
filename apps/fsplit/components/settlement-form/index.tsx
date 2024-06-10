@@ -15,6 +15,7 @@ import { SettlementMember } from "./settlement-member";
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
+import { Loader } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 
 import { currencyIconMap } from "@fondingo/ui/constants";
@@ -36,6 +37,7 @@ export const SettlementForm = memo(_SettlementForm);
 function _SettlementForm({ groupId, currency, members }: IProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [disableUI, setDisableUI] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const [flag, setFlag] = useState(false);
@@ -68,6 +70,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: () => {
+        setDisableUI(true);
         utils.group.getGroupTotals.invalidate();
         invalidateAll();
         resetDrawer();
@@ -81,6 +84,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: () => {
+        setDisableUI(true);
         utils.group.getGroupTotals.invalidate();
         invalidateAll();
         resetDrawer();
@@ -90,6 +94,10 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
       },
     });
 
+  const isLoading = useMemo(
+    () => isPendingAdd || isPendingEdit || disableUI,
+    [isPendingAdd, isPendingEdit, disableUI],
+  );
   const amount = useMemo(
     () => Number(searchParams.get("amount")) / 100,
     [searchParams],
@@ -164,7 +172,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
         <Button
           size="sm"
           variant="ghost"
-          disabled={isPendingAdd || isPendingEdit}
+          disabled={isLoading}
           onClick={() => router.back()}
         >
           <ChevronLeft />
@@ -173,12 +181,12 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
         <Button
           size="sm"
           variant="ctaGhost"
-          disabled={isPendingAdd || isPendingEdit}
+          disabled={isLoading}
           onClick={() => {
             submitButtonRef.current?.click();
           }}
         >
-          Save
+          {isLoading ? <Loader className="h-6 w-6 animate-spin" /> : "Save"}
         </Button>
       </div>
       <Form {...form}>
@@ -193,7 +201,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
               members={members}
               setFlag={setFlag}
               drawerType="debtor"
-              disabled={isPendingAdd || isPendingEdit}
+              disabled={isLoading}
               selectedMember={selectedDebtor}
             />
             <div className="-mt-9 flex items-center">
@@ -214,7 +222,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
               members={members}
               setFlag={setFlag}
               drawerType="creditor"
-              disabled={isPendingAdd || isPendingEdit}
+              disabled={isLoading}
               selectedMember={selectedCreditor}
             />
           </div>
@@ -235,7 +243,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
                       step={0.01}
                       placeholder="0.00"
                       autoComplete="off"
-                      disabled={isPendingAdd || isPendingEdit}
+                      disabled={isLoading}
                       {...field}
                       className="form-input h-full max-w-[10rem] text-4xl font-semibold placeholder:text-4xl placeholder:text-neutral-400"
                     />
@@ -247,7 +255,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
           <button
             ref={submitButtonRef}
             type="submit"
-            disabled={isPendingAdd || isPendingEdit}
+            disabled={isLoading}
             className="hidden"
           />
         </form>

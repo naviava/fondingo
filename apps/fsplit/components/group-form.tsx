@@ -155,6 +155,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           description: message,
         }),
       onSuccess: ({ groupId, toastTitle, toastDescription }) => {
+        setDisableUI(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -175,6 +176,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           description: message,
         }),
       onSuccess: ({ groupId, toastTitle, toastDescription }) => {
+        setDisableUI(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -192,6 +194,11 @@ function _GroupForm({ isEditing, initialData }: IProps) {
       },
     });
 
+  const isLoading = useMemo(
+    () => isPendingCreate || isPendingEdit || disableUI,
+    [isPendingCreate, isPendingEdit, disableUI],
+  );
+
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
       if (isEditing)
@@ -206,7 +213,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
       <div className="flex items-center justify-between px-2 pt-4">
         <Button
           variant="ctaGhost"
-          disabled={isPendingCreate || isPendingEdit}
+          disabled={isLoading}
           className={hfont.className}
         >
           <Link
@@ -223,13 +230,13 @@ function _GroupForm({ isEditing, initialData }: IProps) {
         <Button
           type="button"
           variant="ctaGhost"
-          disabled={isPendingCreate || isPendingEdit}
+          disabled={isLoading}
           className={cn("w-20", hfont.className)}
           onClick={() => {
             if (!!submitButtonRef.current) submitButtonRef.current.click();
           }}
         >
-          {isPendingCreate || isPendingEdit ? (
+          {isPendingCreate || isPendingEdit || disableUI ? (
             <Loader className="h-6 w-6 animate-spin" />
           ) : (
             "Done"
@@ -253,7 +260,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
                     <Input
                       autoComplete="off"
                       placeholder="NYC Trip"
-                      disabled={isPendingCreate || isPendingEdit}
+                      disabled={isLoading}
                       {...field}
                       className="form-input"
                     />

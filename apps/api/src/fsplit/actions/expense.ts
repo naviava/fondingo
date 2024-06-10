@@ -28,14 +28,7 @@ export const addExpense = privateProcedure
   )
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
-    const {
-      splits,
-      groupId,
-      payments,
-      expenseName,
-      expenseAmount: unformmatedExpenseAmount,
-    } = input;
-    const expenseAmount = Math.floor(unformmatedExpenseAmount * 100);
+    const { splits, groupId, payments, expenseName, expenseAmount } = input;
 
     try {
       const group = await splitdb.group.findUnique({
@@ -239,15 +232,8 @@ export const updateExpense = privateProcedure
   )
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
-    const {
-      splits,
-      groupId,
-      payments,
-      expenseId,
-      expenseName,
-      expenseAmount: unformatedExpenseAmount,
-    } = input;
-    const expenseAmount = Math.floor(unformatedExpenseAmount * 100);
+    const { splits, groupId, payments, expenseId, expenseName, expenseAmount } =
+      input;
 
     const existingExpense = await splitdb.expense.findUnique({
       where: {
@@ -286,10 +272,9 @@ export const updateExpense = privateProcedure
       (acc, payment) => acc + Math.floor(payment.amount * 100),
       0,
     );
-    const totalSplitsAmount = splits.reduce(
-      (acc, split) => acc + Math.floor(split.amount * 100),
-      0,
-    );
+    const totalSplitsAmount = splits.reduce((acc, split) => {
+      return acc + Math.floor(split.amount * 100);
+    }, 0);
     if (
       totalPaymentsAmount !== expenseAmount ||
       totalSplitsAmount !== expenseAmount
