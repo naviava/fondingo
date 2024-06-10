@@ -9,8 +9,54 @@ export const userLogs = privateProcedure.query(async ({ ctx }) => {
   try {
     const logs = await splitdb.log.findMany({
       where: {
-        type: "USER",
-        userId: user.id,
+        OR: [
+          {
+            type: "USER",
+            userId: user.id,
+          },
+          {
+            type: "GROUP",
+            group: {
+              members: {
+                some: { userId: user.id },
+              },
+            },
+          },
+          {
+            type: "EXPENSE",
+            expense: {
+              OR: [
+                {
+                  payments: {
+                    some: {
+                      groupMember: { userId: user.id },
+                    },
+                  },
+                },
+                {
+                  splits: {
+                    some: {
+                      groupMember: { userId: user.id },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            type: "SETTLEMENT",
+            settlement: {
+              OR: [
+                {
+                  from: { userId: user.id },
+                },
+                {
+                  to: { userId: user.id },
+                },
+              ],
+            },
+          },
+        ],
       },
       orderBy: { createdAt: "desc" },
     });
@@ -47,8 +93,24 @@ export const groupByIdLogs = privateProcedure
 
       const logs = await splitdb.log.findMany({
         where: {
-          type: "GROUP",
-          groupId,
+          OR: [
+            {
+              type: "GROUP",
+              groupId,
+            },
+            {
+              type: "EXPENSE",
+              expense: {
+                group: { id: groupId },
+              },
+            },
+            {
+              type: "SETTLEMENT",
+              settlement: {
+                group: { id: groupId },
+              },
+            },
+          ],
         },
         orderBy: { createdAt: "desc" },
       });

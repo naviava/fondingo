@@ -6,14 +6,14 @@ import { LogEntry } from "~/components/log-entry";
 import { serverClient } from "~/lib/trpc/server-client";
 
 export default async function ActivityPage() {
-  const logs = await serverClient.logs.userLogs();
+  const userLogs = await serverClient.logs.userLogs();
 
   return (
     <div className="h-full pb-24">
       <SimpleTitleTopRef title="Recent activity" />
       <DynamicScrollArea crop={32}>
         <ul>
-          {logs.map((log) => (
+          {userLogs.map((log) => (
             <LogEntry
               key={log.id}
               message={log.message}
