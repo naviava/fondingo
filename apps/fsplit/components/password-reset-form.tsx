@@ -38,7 +38,7 @@ interface IProps {
 
 export function PasswordResetForm({ token }: IProps) {
   const router = useRouter();
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,7 +56,7 @@ export function PasswordResetForm({ token }: IProps) {
         description: message,
       }),
     onSuccess: ({ toastTitle, toastDescription }) => {
-      setDisableUI(true);
+      setIsNavigating(true);
       toast({
         title: toastTitle,
         description: toastDescription,
@@ -67,8 +67,8 @@ export function PasswordResetForm({ token }: IProps) {
   });
 
   const isLoading = useMemo(
-    () => resetPasswordMutation.isPending || disableUI,
-    [resetPasswordMutation.isPending, disableUI],
+    () => resetPasswordMutation.isPending || isNavigating,
+    [resetPasswordMutation.isPending, isNavigating],
   );
 
   const onSubmit = useCallback(

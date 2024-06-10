@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 import { CurrencyCode } from "@fondingo/db-split";
@@ -7,6 +10,7 @@ import { GroupAvatar } from "../group-avatar";
 import { Button } from "@fondingo/ui/button";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
+import { Loader } from "@fondingo/ui/lucide";
 
 interface IProps {
   groupId: string;
@@ -23,6 +27,8 @@ export function GroupNameEdit({
   groupType,
   currency,
 }: IProps) {
+  const [isNavigating, setIsNavigating] = useState(false);
+
   return (
     <section className="mt-6 flex items-center justify-between px-4">
       <div className="flex items-center gap-x-2">
@@ -31,12 +37,18 @@ export function GroupNameEdit({
           {groupName}
         </h2>
       </div>
-      {/* TODO: Activate this link */}
-      <Button asChild size="sm" variant="ctaGhost" className={hfont.className}>
+      <Button
+        asChild
+        size="sm"
+        variant="ctaGhost"
+        disabled={isNavigating}
+        onClick={() => setIsNavigating(true)}
+        className={hfont.className}
+      >
         <Link
           href={`/groups/${groupId}/edit?groupName=${groupName}&color=${groupColor.slice(1)}&type=${groupType}&currency=${currency}`}
         >
-          Edit
+          {isNavigating ? <Loader className="h-5 w-5 animate-spin" /> : "Edit"}
         </Link>
       </Button>
     </section>

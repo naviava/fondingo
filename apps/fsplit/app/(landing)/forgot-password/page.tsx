@@ -29,7 +29,7 @@ const formSchema = z.object({
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
         description: message,
       }),
     onSuccess: ({ toastTitle, toastDescription }) => {
-      setDisableUI(true);
+      setIsNavigating(true);
       toast({
         title: toastTitle,
         description: toastDescription,
@@ -56,8 +56,8 @@ export default function ForgotPasswordPage() {
   });
 
   const isLoading = useMemo(
-    () => sendEmailMutation.isPending || disableUI,
-    [disableUI, sendEmailMutation.isPending],
+    () => sendEmailMutation.isPending || isNavigating,
+    [isNavigating, sendEmailMutation.isPending],
   );
 
   const onSubmit = useCallback(

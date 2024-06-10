@@ -12,6 +12,7 @@ import { z } from "@fondingo/utils/zod";
 import { Eye, EyeOff } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
+import { Loader } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 import {
   Form,
@@ -31,7 +32,7 @@ const formSchema = z.object({
 
 export function SigninForm() {
   const router = useRouter();
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,7 +45,7 @@ export function SigninForm() {
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof formSchema>) => {
-      setDisableUI(true);
+      setIsNavigating(true);
       await signIn("credentials", {
         ...values,
         redirect: false,
@@ -52,7 +53,7 @@ export function SigninForm() {
         if (res?.ok) {
           router.refresh();
         } else {
-          setDisableUI(false);
+          setIsNavigating(false);
           toast({
             title: "Sign in failed",
             description:
@@ -79,7 +80,7 @@ export function SigninForm() {
               <FormControl>
                 <Input
                   placeholder="yourname@email.com"
-                  disabled={disableUI}
+                  disabled={isNavigating}
                   {...field}
                   className="auth-form-input placeholder:text-neutral-400"
                 />
@@ -100,7 +101,7 @@ export function SigninForm() {
                   <Input
                     type={isPasswordShown ? "text" : "password"}
                     placeholder="******"
-                    disabled={disableUI}
+                    disabled={isNavigating}
                     {...field}
                     className="auth-form-input pr-16 placeholder:text-neutral-400"
                   />
@@ -108,7 +109,7 @@ export function SigninForm() {
                     type="button"
                     size="sm"
                     variant="ghost"
-                    disabled={disableUI}
+                    disabled={isNavigating}
                     onClick={() => setIsPasswordShown((prev) => !prev)}
                     className="absolute right-0 top-1/2 -translate-y-1/2 text-neutral-400 hover:bg-transparent hover:text-neutral-500"
                   >
@@ -125,6 +126,7 @@ export function SigninForm() {
             type="button"
             size="sm"
             variant="link"
+            disabled={isNavigating}
             className="-mt-4 text-neutral-500"
           >
             <Link href="/forgot-password">Forgot password?</Link>
@@ -133,12 +135,17 @@ export function SigninForm() {
         <Button
           variant="cta"
           type="submit"
+          disabled={isNavigating}
           className={cn(
             "text w-full transition focus:scale-[0.98]",
             hfont.className,
           )}
         >
-          Sign in
+          {isNavigating ? (
+            <Loader className="h-4 w-4 animate-spin" />
+          ) : (
+            "Sign in"
+          )}
         </Button>
       </form>
     </Form>

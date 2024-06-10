@@ -74,7 +74,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
   const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [color, setColor] = useState(initialData?.color || "#00968a");
   const [currency, setCurrency] = useState<CurrencyCode>(
     initialData?.currency || "USD",
@@ -155,7 +155,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           description: message,
         }),
       onSuccess: ({ groupId, toastTitle, toastDescription }) => {
-        setDisableUI(true);
+        setIsNavigating(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -176,7 +176,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           description: message,
         }),
       onSuccess: ({ groupId, toastTitle, toastDescription }) => {
-        setDisableUI(true);
+        setIsNavigating(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -195,8 +195,8 @@ function _GroupForm({ isEditing, initialData }: IProps) {
     });
 
   const isLoading = useMemo(
-    () => isPendingCreate || isPendingEdit || disableUI,
-    [isPendingCreate, isPendingEdit, disableUI],
+    () => isPendingCreate || isPendingEdit || isNavigating,
+    [isPendingCreate, isPendingEdit, isNavigating],
   );
 
   const onSubmit = useCallback(
@@ -236,7 +236,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
             if (!!submitButtonRef.current) submitButtonRef.current.click();
           }}
         >
-          {isPendingCreate || isPendingEdit || disableUI ? (
+          {isPendingCreate || isPendingEdit || isNavigating ? (
             <Loader className="h-6 w-6 animate-spin" />
           ) : (
             "Done"

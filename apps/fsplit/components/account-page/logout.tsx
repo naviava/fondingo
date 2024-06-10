@@ -1,23 +1,32 @@
 "use client";
 
+import { useState } from "react";
+
 import { Button } from "@fondingo/ui/button";
-import { cn } from "@fondingo/ui/utils";
 import { signOut } from "next-auth/react";
+import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
+import { Loader } from "@fondingo/ui/lucide";
 
 export function Logout() {
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
     <div className="my-6">
       <Button
         size="lg"
         variant="ctaGhost"
-        onClick={() => signOut({ callbackUrl: "/" })}
+        disabled={isLoading}
+        onClick={() => {
+          setIsLoading(true);
+          signOut({ callbackUrl: "/" });
+        }}
         className={cn(
           "w-full rounded-none py-8 hover:bg-neutral-200",
           hfont.className,
         )}
       >
-        Log out
+        {isLoading ? <Loader className="h-6 w-6 animate-spin" /> : "Log out"}
       </Button>
     </div>
   );
