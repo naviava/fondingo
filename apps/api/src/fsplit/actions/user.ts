@@ -542,12 +542,30 @@ export const getFriendRequests = privateProcedure.query(async ({ ctx }) => {
   const { user } = ctx;
   const sentFriendRequests = await splitdb.friendRequest.findMany({
     where: { fromId: user.id },
-    include: { to: true },
+    include: {
+      to: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
   const receivedFriendRequests = await splitdb.friendRequest.findMany({
     where: { toId: user.id },
-    include: { from: true },
+    include: {
+      from: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
   return {
@@ -725,8 +743,22 @@ export const getFriends = privateProcedure.query(async ({ ctx }) => {
       OR: [{ user1Id: user.id }, { user2Id: user.id }],
     },
     include: {
-      user1: true,
-      user2: true,
+      user1: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+      user2: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
     },
   });
   const formattedFriends = friends
@@ -845,8 +877,28 @@ export const findFriends = privateProcedure
         OR: [{ user1Id: user.id }, { user2Id: user.id }],
       },
       include: {
-        user1: true,
-        user2: true,
+        user1: {
+          select: {
+            id: true,
+            name: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            email: true,
+            image: true,
+          },
+        },
+        user2: {
+          select: {
+            id: true,
+            name: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            email: true,
+            image: true,
+          },
+        },
       },
     });
     const formattedFriends = friends
