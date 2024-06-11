@@ -1,9 +1,9 @@
-import { SectionTitle } from "~/components/legal/section-title";
-import { SubHeading } from "~/components/legal/sub-heading";
-import { MainTitle } from "~/components/legal/main-title";
+import { PageWrapper, SectionWrapper } from "~/components/legal/wrappers";
+import { ListItem, ListWrapper } from "~/components/legal/list";
+import { SectionTitle } from "~/components/legal/titles";
 import { Paragraph } from "~/components/legal/paragraph";
-import { ListItem } from "~/components/legal/list-item";
-import { PageWrapper } from "~/components/legal/page-wrapper";
+import { SubHeading } from "~/components/legal/titles";
+import { MainTitle } from "~/components/legal/titles";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -31,7 +31,8 @@ export default function PrivacyPolicyPage() {
       {/* Information we collect */}
       <section>
         <SectionTitle>Information We Collect</SectionTitle>
-        <div className="space-y-6">
+        <SectionWrapper>
+          {/* Personal Data */}
           <div>
             <SubHeading>Personal Data</SubHeading>
             <ListItem>
@@ -39,9 +40,11 @@ export default function PrivacyPolicyPage() {
               phone number.
             </ListItem>
           </div>
+
+          {/* Usage Data */}
           <div>
             <SubHeading>Usage Data</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 <b>Log Information:</b> Such as IP address, browser type, and
                 usage data.
@@ -50,8 +53,10 @@ export default function PrivacyPolicyPage() {
                 <b>Device Information:</b> Such as device type, operating
                 system, and unique device identifiers.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
+
+          {/* Location Data */}
           <div>
             <SubHeading>Location Data</SubHeading>
             <ListItem>
@@ -59,9 +64,11 @@ export default function PrivacyPolicyPage() {
               allow us to do so.
             </ListItem>
           </div>
+
+          {/* How we use your information */}
           <div>
             <SubHeading>How We Use Your Information</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 <b>To Provide Services:</b> To manage your expenses, split
                 bills, and facilitate reimbursements.
@@ -78,11 +85,13 @@ export default function PrivacyPolicyPage() {
                 <b>For Legal and Security Purposes:</b> To comply with legal
                 obligations and protect against fraud.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
+
+          {/* Sharing your information */}
           <div>
             <SubHeading>Sharing Your Information</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 <b>With Service Providers:</b> We may share your information
                 with third-party service providers to perform functions on our
@@ -97,9 +106,9 @@ export default function PrivacyPolicyPage() {
                 acquisition, or sale of assets, your information may be
                 transferred.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
-        </div>
+        </SectionWrapper>
       </section>
 
       {/* Security of Your Information */}
@@ -115,18 +124,24 @@ export default function PrivacyPolicyPage() {
       {/* Your Privacy Rights */}
       <section>
         <SectionTitle>Your Privacy Rights</SectionTitle>
-        <div className="space-y-4">
+        <SectionWrapper>
           <Paragraph>
             Depending on your location, you may have the right to:
           </Paragraph>
-          <div className="space-y-1">
-            <ListItem>Access the personal data we hold about you.</ListItem>
-            <ListItem>
+          <ListWrapper>
+            <ListItem showBullet>
+              Access the personal data we hold about you.
+            </ListItem>
+            <ListItem showBullet>
               Request the correction of incorrect or incomplete data.
             </ListItem>
-            <ListItem>Request deletion of your personal data.</ListItem>
-            <ListItem>Opt-out of certain data processing activities.</ListItem>
-          </div>
+            <ListItem showBullet>
+              Request deletion of your personal data.
+            </ListItem>
+            <ListItem showBullet>
+              Opt-out of certain data processing activities.
+            </ListItem>
+          </ListWrapper>
           <Paragraph>
             To exercise your rights, please contact us at{" "}
             <a
@@ -137,7 +152,7 @@ export default function PrivacyPolicyPage() {
             </a>
             .
           </Paragraph>
-        </div>
+        </SectionWrapper>
       </section>
 
       {/* Changes to This Privacy Policy */}
