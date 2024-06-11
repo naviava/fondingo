@@ -1,11 +1,11 @@
 import { DisplayAmount } from "~/components/display-amount";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   userId: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   data: DebtWithDetails[];
 }
 

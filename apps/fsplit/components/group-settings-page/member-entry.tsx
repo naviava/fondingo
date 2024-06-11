@@ -1,4 +1,4 @@
-import { CurrencyCode, TGroupRole } from "@fondingo/db-split";
+import { TCurrencyCode, TGroupRole } from "@fondingo/db-split";
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
 
@@ -12,7 +12,7 @@ interface IProps {
   memberName: string;
   memberRole: TGroupRole;
   memberEmail: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   imageUrl: string | null | undefined;
 }
 
@@ -31,7 +31,6 @@ export async function MemberEntry({
       memberId,
     });
 
-  // TODO: Handle rendering when member is all settled up.
   return (
     <li className="flex items-center gap-x-4">
       <div className="flex h-14 w-14 items-center justify-center">

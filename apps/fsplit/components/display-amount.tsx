@@ -3,12 +3,12 @@
 import { memo, useMemo } from "react";
 
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   amount: number;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   className?: string;
   showNegative?: boolean;
   variant?: "default" | "xs" | "sm" | "lg" | "xl";

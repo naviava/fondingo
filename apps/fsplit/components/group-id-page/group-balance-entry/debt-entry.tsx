@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { memo } from "react";
 
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { cn } from "@fondingo/ui/utils";
 
 import { DisplayAmount } from "~/components/display-amount";
@@ -23,7 +23,7 @@ interface IProps {
     image: string | null | undefined;
   };
   amount: number;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   isDebt?: boolean;
 }
 

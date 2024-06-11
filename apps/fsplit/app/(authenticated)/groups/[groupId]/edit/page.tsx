@@ -1,4 +1,4 @@
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { GroupForm } from "~/components/group-form";
 import { TGroupType } from "~/types";
 
@@ -21,7 +21,7 @@ export default function EditGroupIdPage({ params, searchParams }: IProps) {
         groupName: searchParams.groupName,
         color: `#${searchParams.color}`,
         type: searchParams.type as TGroupType,
-        currency: searchParams.currency as CurrencyCode,
+        currency: searchParams.currency as TCurrencyCode,
       }}
     />
   );

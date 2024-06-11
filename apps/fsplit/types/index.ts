@@ -1,10 +1,10 @@
-import { GroupMember, SimplifiedDebt } from "@fondingo/db-split";
+import { TGroupMember, TSimplifiedDebt } from "@fondingo/db-split";
 
 export type TGroupType = "TRIP" | "HOME" | "COUPLE" | "OTHER";
 
-export type DebtWithDetails = SimplifiedDebt & {
-  to: GroupMember;
-  from: GroupMember;
+export type DebtWithDetails = TSimplifiedDebt & {
+  to: TGroupMember;
+  from: TGroupMember;
 };
 
 export type GroupMemberClient = {

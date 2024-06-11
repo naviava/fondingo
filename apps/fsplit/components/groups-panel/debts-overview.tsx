@@ -1,6 +1,6 @@
 import { DisplayAmount } from "~/components/display-amount";
 import { serverClient } from "~/lib/trpc/server-client";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 
 function MoreBalances({ totalLength }: { totalLength: number }) {
   return (
@@ -21,7 +21,7 @@ function ListItem({
   name: string;
   amount: number;
   isCredit: boolean;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
 }) {
   return (
     <li
@@ -42,7 +42,7 @@ function ListItem({
 interface IProps {
   userId: string;
   groupId: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
 }
 
 export async function DebtsOverview({ userId, groupId, currency }: IProps) {

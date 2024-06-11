@@ -1,4 +1,4 @@
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { Minus } from "@fondingo/ui/lucide";
 import { cn } from "@fondingo/ui/utils";
 import { DisplayAmount } from "~/components/display-amount";
@@ -6,7 +6,7 @@ import { DisplayAmount } from "~/components/display-amount";
 interface IProps {
   title: string;
   amount: number;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   className?: string;
   showNegative?: boolean;
 }

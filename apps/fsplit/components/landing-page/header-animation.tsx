@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useAnimate } from "framer-motion";
+
 import { useSafeAnimate } from "~/hooks/use-safe-animate";
+import { motion } from "framer-motion";
 
 export function HeaderAnimation() {
   const [scope, animate] = useSafeAnimate();

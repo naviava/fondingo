@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 
 import { useAddMemberModal } from "@fondingo/store/fsplit";
 import { UseFormReturn } from "react-hook-form";
+import { trpc } from "~/lib/trpc/client";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
 
 import { DialogTitle } from "@fondingo/ui/dialog";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
 import { Loader } from "@fondingo/ui/lucide";
-import { trpc } from "~/lib/trpc/client";
-import { cn } from "@fondingo/ui/utils";
-import { hfont } from "~/utils";
 
 interface IProps {
   groupId: string;

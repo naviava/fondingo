@@ -1,12 +1,12 @@
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { create } from "zustand";
 
 type ChangeCurrencyModalStore = {
-  currency: CurrencyCode;
-  setCurrency: (currency: CurrencyCode) => void;
+  currency: TCurrencyCode;
+  setCurrency: (currency: TCurrencyCode) => void;
 
   isOpen: boolean;
-  onOpen: (currency: CurrencyCode) => void;
+  onOpen: (currency: TCurrencyCode) => void;
   onClose: () => void;
 };
 

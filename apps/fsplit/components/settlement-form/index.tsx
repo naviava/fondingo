@@ -19,7 +19,7 @@ import { Loader } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { trpc } from "~/lib/trpc/client";
 
 const formSchema = z.object({
@@ -29,7 +29,7 @@ const formSchema = z.object({
 
 interface IProps {
   groupId: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   members: GroupMemberClient[];
 }
 

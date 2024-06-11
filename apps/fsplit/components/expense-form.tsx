@@ -294,7 +294,6 @@ export default function ExpenseForm({
             />
           </div>
           <div className="flex items-center gap-x-4">
-            {/* TODO: Add currency selector */}
             <div className="rounded-md border-2 border-neutral-300 p-1 shadow-md shadow-neutral-500">
               <CurrencyIcon size={36} />
             </div>

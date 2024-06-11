@@ -169,7 +169,7 @@ export function AdvancedSettings({ userId, group }: IProps) {
   }, [timeRemaining]);
 
   const isMounted = useIsMounted();
-  // TODO: Add loading state
+  // TODO: Add a better loading state
   if (!isMounted)
     return (
       <div className="flex items-center justify-center p-10">

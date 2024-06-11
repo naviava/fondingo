@@ -2,11 +2,11 @@
 
 import { useChangePasswordModal } from "@fondingo/store/use-change-password-modal";
 import { useChangeCurrencyModal } from "@fondingo/store/fsplit";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { Option } from "./option";
 
 interface IProps {
-  preferredCurrency: CurrencyCode;
+  preferredCurrency: TCurrencyCode;
 }
 
 export function Preferences({ preferredCurrency }: IProps) {

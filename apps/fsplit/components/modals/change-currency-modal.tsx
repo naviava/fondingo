@@ -4,7 +4,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { useChangeCurrencyModal } from "@fondingo/store/fsplit";
-import { CurrencyCode, ZCurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode, ZCurrencyCode } from "@fondingo/db-split";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@fondingo/ui/use-toast";
 import { useForm } from "react-hook-form";
@@ -144,7 +144,7 @@ export function ChangeCurrencyModal() {
               render={({ field }) => (
                 <FormItem>
                   <Select
-                    onValueChange={(value: CurrencyCode) => {
+                    onValueChange={(value: TCurrencyCode) => {
                       setCurrency(value);
                       return field.onChange(value);
                     }}

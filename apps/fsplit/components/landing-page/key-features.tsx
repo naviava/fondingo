@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 
-import { motion, useAnimate, useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { uuid } from "@fondingo/utils/uuid";
 
 import { cn } from "@fondingo/ui/utils";

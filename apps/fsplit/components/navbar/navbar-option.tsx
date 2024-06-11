@@ -36,7 +36,6 @@ function _NavbarOption({
 
   if (label === "Account") {
     return (
-      // TODO: Replace with user avatar
       <div className="flex flex-col items-center gap-y-1">
         <Avatar
           variant={isTab ? "sm" : "xs"}

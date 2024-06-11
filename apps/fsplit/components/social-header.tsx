@@ -5,7 +5,6 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { useAddFriendModal } from "@fondingo/store/fsplit";
-import { SearchBar } from "~/components/search-bar";
 import { usePanel } from "@fondingo/ui/use-panel";
 import { Button } from "@fondingo/ui/button";
 

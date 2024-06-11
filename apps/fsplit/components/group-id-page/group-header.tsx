@@ -1,4 +1,4 @@
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
 
 import { RefreshButton } from "@fondingo/ui/refresh-button";
@@ -11,7 +11,7 @@ import { hfont } from "~/utils";
 interface IProps {
   userId: string | undefined;
   groupName: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   hasExpenses: boolean;
   groupDebts: DebtWithDetails[];
 }

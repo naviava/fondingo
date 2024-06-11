@@ -15,7 +15,7 @@ import { IoHomeOutline } from "react-icons/io5";
 import { FaRegListAlt } from "react-icons/fa";
 import { Loader } from "@fondingo/ui/lucide";
 
-import { CurrencyCode, ZGroupType, ZCurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode, ZGroupType, ZCurrencyCode } from "@fondingo/db-split";
 import { trpc } from "~/lib/trpc/client";
 import { TGroupType } from "~/types";
 
@@ -64,7 +64,7 @@ interface IProps {
     groupName: string;
     color: string;
     type: TGroupType;
-    currency: CurrencyCode;
+    currency: TCurrencyCode;
   };
 }
 
@@ -76,7 +76,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
 
   const [isNavigating, setIsNavigating] = useState(false);
   const [color, setColor] = useState(initialData?.color || "#00968a");
-  const [currency, setCurrency] = useState<CurrencyCode>(
+  const [currency, setCurrency] = useState<TCurrencyCode>(
     initialData?.currency || "USD",
   );
   const [selectedGroupType, setSelectedGroupType] = useState<TGroupType>(
@@ -297,7 +297,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
               render={({ field }) => (
                 <FormItem>
                   <Select
-                    onValueChange={(value: CurrencyCode) => {
+                    onValueChange={(value: TCurrencyCode) => {
                       setCurrency(value);
                       return field.onChange(value);
                     }}

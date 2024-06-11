@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { TGroupType } from "~/types";
 
 import { GroupAvatar } from "../group-avatar";
@@ -17,7 +17,7 @@ interface IProps {
   groupName: string;
   groupColor: string;
   groupType: TGroupType;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
 }
 
 export function GroupNameEdit({

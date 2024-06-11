@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 
 type ExpenseDetails = {
   groupId: string;
 
-  currency: CurrencyCode;
-  setCurrency: (currency: CurrencyCode) => void;
+  currency: TCurrencyCode;
+  setCurrency: (currency: TCurrencyCode) => void;
 
   expenseName: string;
   setExpenseName: (expenseName: string) => void;

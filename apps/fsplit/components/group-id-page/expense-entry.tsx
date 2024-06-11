@@ -1,5 +1,5 @@
 import { serverClient } from "~/lib/trpc/server-client";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { cn } from "@fondingo/ui/utils";
 
 import { ExpenseAvatar } from "~/components/expense-avatar";
@@ -11,7 +11,7 @@ interface IProps {
   expenseId: string;
   groupId: string;
   groupColor: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
 }
 
 export async function ExpenseEntry({
