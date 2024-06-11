@@ -18,13 +18,13 @@ export default async function VerifyPage({ searchParams }: IProps) {
   if (!token && !isLoggedIn) return redirect("/signin");
   if (!token) return <TokenState />;
 
-  const existingToken = await serverClient.user.getVerificationToken(token);
+  const existingToken = await serverClient.misc.getVerificationToken(token);
 
   if (!existingToken) return <TokenState title="Invalid token" isInvalid />;
   if (Date.now() > new Date(existingToken.expires).getTime())
     return <TokenState title="Expired token" isExpired />;
 
-  const response = await serverClient.user.completeVerification(
+  const response = await serverClient.misc.completeVerification(
     searchParams?.token || "",
   );
   if (response) return redirect("/signin");

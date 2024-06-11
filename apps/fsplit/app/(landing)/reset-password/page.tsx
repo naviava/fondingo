@@ -13,7 +13,7 @@ interface IProps {
 
 export default async function PasswordResetPage({ searchParams }: IProps) {
   if (!searchParams?.token) return redirect("/");
-  const token = await serverClient.user.getPasswordResetToken(
+  const token = await serverClient.misc.getPasswordResetToken(
     searchParams.token,
   );
   if (!token) return redirect("/");

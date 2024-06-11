@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
     },
   });
 
-  const sendEmailMutation = trpc.user.sendResetPasswordEmail.useMutation({
+  const sendEmailMutation = trpc.misc.sendResetPasswordEmail.useMutation({
     onError: ({ message }) =>
       toast({
         title: "Something went wrong",

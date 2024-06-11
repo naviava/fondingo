@@ -33,7 +33,7 @@ const formSchema = z
   });
 
 interface IProps {
-  token: Awaited<ReturnType<typeof serverClient.user.getPasswordResetToken>>;
+  token: Awaited<ReturnType<typeof serverClient.misc.getPasswordResetToken>>;
 }
 
 export function PasswordResetForm({ token }: IProps) {
@@ -49,7 +49,7 @@ export function PasswordResetForm({ token }: IProps) {
     },
   });
 
-  const resetPasswordMutation = trpc.user.resetPassword.useMutation({
+  const resetPasswordMutation = trpc.misc.resetPassword.useMutation({
     onError: ({ message }) =>
       toast({
         title: "Something went wrong",
@@ -75,8 +75,8 @@ export function PasswordResetForm({ token }: IProps) {
     (values: z.infer<typeof formSchema>) => {
       resetPasswordMutation.mutate({
         ...values,
-        token: token.token,
-        email: token.userEmail,
+        token: token?.token || "",
+        email: token?.userEmail || "",
       });
     },
     [resetPasswordMutation, token],
@@ -86,7 +86,7 @@ export function PasswordResetForm({ token }: IProps) {
     <div className="w-full space-y-16">
       <div className="space-y-6 text-center">
         <h1 className="text-4xl font-semibold leading-[1.5em] lg:text-5xl">
-          Welcome back, {token.user.name?.split(" ")[0]}
+          Welcome back, {token?.user.name?.split(" ")[0]}
         </h1>
         <p className="text-neutral-500 lg:text-lg">
           Please set your new password

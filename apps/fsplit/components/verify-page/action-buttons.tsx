@@ -23,7 +23,7 @@ export function ActionButtons({ isInvalid }: IProps) {
   const token = searchParams.get("token");
 
   const { mutate: handleResendEmail, isPending } =
-    trpc.user.resendVerificationEmailByToken.useMutation({
+    trpc.misc.resendVerificationEmailByToken.useMutation({
       onError: ({ message }) =>
         toast({
           title: "Something went wrong",
