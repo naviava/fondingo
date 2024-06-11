@@ -1,5 +1,5 @@
 import { DisplayAmount } from "~/components/display-amount";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { FcMoneyTransfer } from "react-icons/fc";
 import { EntryDate } from "./entry-date";
 
@@ -8,7 +8,7 @@ interface IProps {
   fromName: string;
   toName: string;
   amount: number;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
 }
 
 export function SettlementEntry({

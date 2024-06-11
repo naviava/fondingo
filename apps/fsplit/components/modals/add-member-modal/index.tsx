@@ -115,7 +115,6 @@ export function AddMemberModal() {
           <div className="space-y-4">
             {!isAddingContact && (
               <div className="relative px-4">
-                {/* TODO: Add search friends functionality */}
                 <Input
                   type="text"
                   defaultValue={debouncedValue}

@@ -42,7 +42,7 @@ const formSchema = z
 
 export function RegisterForm() {
   const [emailSent, setEmailSent] = useState(false);
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -66,7 +66,7 @@ export function RegisterForm() {
           description: message,
         }),
       onSuccess: async ({ toastTitle, toastDescription }) => {
-        setDisableUI(true);
+        setIsNavigating(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -76,8 +76,8 @@ export function RegisterForm() {
     });
 
   const isLoading = useMemo(
-    () => isPending || disableUI,
-    [isPending, disableUI],
+    () => isPending || isNavigating,
+    [isPending, isNavigating],
   );
 
   const onSubmit = useCallback(

@@ -294,6 +294,15 @@ model Log {
   updatedAt DateTime @updatedAt
 }
 
+model ContactForm {
+  id      String @id @default(cuid())
+  name    String
+  email   String
+  message String
+
+  createdAt DateTime @default(now())
+}
+
 enum Role {
   ADMIN
   USER

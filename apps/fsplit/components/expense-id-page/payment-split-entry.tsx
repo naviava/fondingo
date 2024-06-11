@@ -1,6 +1,6 @@
 "use client";
 
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 
 import { DisplayAmount } from "~/components/display-amount";
 import { Avatar } from "@fondingo/ui/avatar";
@@ -12,7 +12,7 @@ interface IProps {
   debtorName?: string;
   doIOwe?: boolean;
   amount: number;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   imageUrl?: string | null | undefined;
   avatarSize?: "default" | "sm" | "lg" | undefined;
 }

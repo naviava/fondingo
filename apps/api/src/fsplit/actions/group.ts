@@ -4,8 +4,6 @@ import { privateProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 
-// TODO: Check all routes that get user data. MUST NOT HAVE hashedPassword returned.
-
 export const createGroup = privateProcedure
   .input(
     z.object({
@@ -324,10 +322,28 @@ export const getGroups = privateProcedure.query(async ({ ctx }) => {
       simplifiedDebts: {
         include: {
           from: {
-            include: { user: true },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  image: true,
+                },
+              },
+            },
           },
           to: {
-            include: { user: true },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  image: true,
+                },
+              },
+            },
           },
         },
       },
@@ -337,15 +353,6 @@ export const getGroups = privateProcedure.query(async ({ ctx }) => {
   return groups || [];
 });
 
-/**
- * Retrieves a group by its ID. The group must include the current user as a member.
- *
- * @function
- * @param {Object} ctx - The context object containing the user information.
- * @param {string} groupId - The ID of the group to retrieve. This ID must be a non-empty string.
- * @returns {Promise<Object>} A promise that resolves to the group object. The group object includes its simplified debts and the associated users (both the 'from' and 'to' users).
- * @throws {TRPCError} Will throw a TRPCError with code "NOT_FOUND" and message "Group not found" if no group with the provided ID exists or if the current user is not a member of the group.
- */
 export const getGroupById = privateProcedure
   .input(z.string().min(1, { message: "Group ID cannot be empty" }))
   .query(async ({ ctx, input: groupId }) => {
@@ -359,17 +366,44 @@ export const getGroupById = privateProcedure
       },
       include: {
         members: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
         },
         expenses: true,
         settlements: true,
         simplifiedDebts: {
           include: {
             from: {
-              include: { user: true },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
+                },
+              },
             },
             to: {
-              include: { user: true },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
+                },
+              },
             },
           },
         },
@@ -388,7 +422,6 @@ export const getGroupById = privateProcedure
     return group;
   });
 
-// TODO: Consolidate these 2 functions into one.
 export const addMember = privateProcedure
   .input(
     z.object({
@@ -821,22 +854,6 @@ export const addMultipleMembers = privateProcedure
     };
   });
 
-/**
- * This function is a private procedure that retrieves the members of a group.
- * It takes a group ID as input and returns the members of the group.
- *
- * @function getMembers
- * @memberof module:group
- * @public
- * @param {string} groupId - The ID of the group. It must be a non-empty string.
- * @throws {TRPCError} Will throw an error if the group ID is not found or the user is not a member of the group.
- * @returns {Promise<Array<GroupMember>>} Returns a promise that resolves to an array of group members. Each group member is an object that includes the user details.
- *
- * @description
- * The function first checks if the user is a member of the group with the provided ID. If the user is not a member or the group does not exist, it throws a TRPCError with a "NOT_FOUND" code.
- * If the user is a member of the group, the function retrieves the members of the group from the database and returns them.
- * The function uses the `splitdb.group.findUnique` method to check if the user is a member of the group and the `splitdb.groupMember.findMany` method to retrieve the group members.
- */
 export const getMembers = privateProcedure
   .input(z.string().min(1, { message: "Group ID cannot be empty" }))
   .query(({ ctx, input: groupId }) => {
@@ -860,7 +877,16 @@ export const getMembers = privateProcedure
         groupId,
         isDeleted: false,
       },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
     });
     return groupMembers;
   });
@@ -990,23 +1016,6 @@ export const removeMemberFromGroup = privateProcedure
     });
   });
 
-/**
- * This function is used to get the debts of a group. It is a private procedure that takes a string input representing the group ID.
- *
- * The function performs the following steps:
- * - It checks if the group ID is at least 1 character long. If not, it throws an error with the message "Group ID cannot be empty".
- * - It retrieves the user from the context object.
- * - It queries the database to find a group with the given ID that includes the user as a member. If no such group is found, it throws an error with the code "NOT_FOUND" and the message "Group not found".
- * - It queries the database to find all simplified debts associated with the group. It includes the 'from' and 'to' fields in the query to get the users involved in each debt.
- * - It returns the debts as an array. If no debts are found, it returns an empty array.
- *
- * @async
- * @function
- * @param {Object} ctx - The context object, which includes the user.
- * @param {string} groupId - The ID of the group.
- * @returns {Promise<Array>} A promise that resolves to an array of simplified debts.
- * @throws {TRPCError} If the group ID is too short or if no group is found.
- */
 export const getDebts = privateProcedure
   .input(z.string().min(1, { message: "Group ID cannot be empty" }))
   .query(async ({ ctx, input: groupId }) => {
@@ -1029,10 +1038,28 @@ export const getDebts = privateProcedure
       where: { groupId },
       include: {
         from: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
         },
         to: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
         },
       },
     });

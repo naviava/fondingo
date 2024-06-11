@@ -68,7 +68,7 @@ export default function ExpenseForm({
 }: IProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { data: group } = trpc.group.getGroupById.useQuery(groupId);
 
@@ -159,7 +159,7 @@ export default function ExpenseForm({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
-        setDisableUI(true);
+        setIsNavigating(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -177,7 +177,7 @@ export default function ExpenseForm({
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: ({ toastTitle, toastDescription }) => {
-        setDisableUI(true);
+        setIsNavigating(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -209,8 +209,8 @@ export default function ExpenseForm({
   );
 
   const isLoading = useMemo(
-    () => isPendingAdd || isPendingEdit || disableUI,
-    [isPendingAdd, isPendingEdit, disableUI],
+    () => isPendingAdd || isPendingEdit || isNavigating,
+    [isPendingAdd, isPendingEdit, isNavigating],
   );
 
   return (
@@ -294,7 +294,6 @@ export default function ExpenseForm({
             />
           </div>
           <div className="flex items-center gap-x-4">
-            {/* TODO: Add currency selector */}
             <div className="rounded-md border-2 border-neutral-300 p-1 shadow-md shadow-neutral-500">
               <CurrencyIcon size={36} />
             </div>

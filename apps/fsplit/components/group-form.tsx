@@ -15,7 +15,7 @@ import { IoHomeOutline } from "react-icons/io5";
 import { FaRegListAlt } from "react-icons/fa";
 import { Loader } from "@fondingo/ui/lucide";
 
-import { CurrencyCode, ZGroupType, ZCurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode, ZGroupType, ZCurrencyCode } from "@fondingo/db-split";
 import { trpc } from "~/lib/trpc/client";
 import { TGroupType } from "~/types";
 
@@ -64,7 +64,7 @@ interface IProps {
     groupName: string;
     color: string;
     type: TGroupType;
-    currency: CurrencyCode;
+    currency: TCurrencyCode;
   };
 }
 
@@ -74,9 +74,9 @@ function _GroupForm({ isEditing, initialData }: IProps) {
   const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [color, setColor] = useState(initialData?.color || "#00968a");
-  const [currency, setCurrency] = useState<CurrencyCode>(
+  const [currency, setCurrency] = useState<TCurrencyCode>(
     initialData?.currency || "USD",
   );
   const [selectedGroupType, setSelectedGroupType] = useState<TGroupType>(
@@ -155,7 +155,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           description: message,
         }),
       onSuccess: ({ groupId, toastTitle, toastDescription }) => {
-        setDisableUI(true);
+        setIsNavigating(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -176,7 +176,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
           description: message,
         }),
       onSuccess: ({ groupId, toastTitle, toastDescription }) => {
-        setDisableUI(true);
+        setIsNavigating(true);
         toast({
           title: toastTitle,
           description: toastDescription,
@@ -195,8 +195,8 @@ function _GroupForm({ isEditing, initialData }: IProps) {
     });
 
   const isLoading = useMemo(
-    () => isPendingCreate || isPendingEdit || disableUI,
-    [isPendingCreate, isPendingEdit, disableUI],
+    () => isPendingCreate || isPendingEdit || isNavigating,
+    [isPendingCreate, isPendingEdit, isNavigating],
   );
 
   const onSubmit = useCallback(
@@ -236,7 +236,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
             if (!!submitButtonRef.current) submitButtonRef.current.click();
           }}
         >
-          {isPendingCreate || isPendingEdit || disableUI ? (
+          {isPendingCreate || isPendingEdit || isNavigating ? (
             <Loader className="h-6 w-6 animate-spin" />
           ) : (
             "Done"
@@ -297,7 +297,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
               render={({ field }) => (
                 <FormItem>
                   <Select
-                    onValueChange={(value: CurrencyCode) => {
+                    onValueChange={(value: TCurrencyCode) => {
                       setCurrency(value);
                       return field.onChange(value);
                     }}

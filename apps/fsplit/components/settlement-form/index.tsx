@@ -19,7 +19,7 @@ import { Loader } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { trpc } from "~/lib/trpc/client";
 
 const formSchema = z.object({
@@ -29,7 +29,7 @@ const formSchema = z.object({
 
 interface IProps {
   groupId: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   members: GroupMemberClient[];
 }
 
@@ -37,7 +37,7 @@ export const SettlementForm = memo(_SettlementForm);
 function _SettlementForm({ groupId, currency, members }: IProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const [flag, setFlag] = useState(false);
@@ -70,7 +70,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: () => {
-        setDisableUI(true);
+        setIsNavigating(true);
         utils.group.getGroupTotals.invalidate();
         invalidateAll();
         resetDrawer();
@@ -84,7 +84,7 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
       onError: ({ message }) =>
         toast({ title: "Something went wrong", description: message }),
       onSuccess: () => {
-        setDisableUI(true);
+        setIsNavigating(true);
         utils.group.getGroupTotals.invalidate();
         invalidateAll();
         resetDrawer();
@@ -95,8 +95,8 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
     });
 
   const isLoading = useMemo(
-    () => isPendingAdd || isPendingEdit || disableUI,
-    [isPendingAdd, isPendingEdit, disableUI],
+    () => isPendingAdd || isPendingEdit || isNavigating,
+    [isPendingAdd, isPendingEdit, isNavigating],
   );
   const amount = useMemo(
     () => Number(searchParams.get("amount")) / 100,

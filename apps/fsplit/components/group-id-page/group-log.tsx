@@ -2,14 +2,14 @@ import Link from "next/link";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { SettlementEntry } from "./settlement-entry";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { ExpenseEntry } from "./expense-entry";
 
 interface IProps {
   userId: string | undefined;
   groupId: string;
   groupColor: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
 }
 
 export async function GroupLog({

@@ -18,7 +18,6 @@ export async function FriendEntry({
   imageUrl,
   hideDebts,
 }: IProps) {
-  // TODO: Handle logic for these variables
   const { isInDebt, amount, displayAmountText } =
     await serverClient.user.getDebtWithFriend(friendId);
 

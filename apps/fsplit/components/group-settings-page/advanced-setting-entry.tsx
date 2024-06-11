@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { currencyIconMap } from "@fondingo/ui/constants";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { cn } from "@fondingo/ui/utils";
 
 import { Loader } from "@fondingo/ui/lucide";
@@ -17,7 +17,7 @@ interface IProps {
   smallIcon?: boolean;
   description?: string;
   timeRemaining?: number;
-  currency?: CurrencyCode;
+  currency?: TCurrencyCode;
   icon?: IconType;
   action: () => void;
 }

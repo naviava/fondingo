@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDate } from "@fondingo/utils/date-fns";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { usePanel } from "@fondingo/ui/use-panel";
 
 import { DisplayAmount } from "~/components/display-amount";
@@ -13,7 +13,7 @@ interface IProps {
   updatedAt: Date;
   debtorName: string;
   creditorName: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   creatorName: string | null;
   lastUpdatedByName: string | null;
 }

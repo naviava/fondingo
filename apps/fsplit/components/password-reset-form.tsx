@@ -12,6 +12,7 @@ import { z } from "@fondingo/utils/zod";
 import { Eye, EyeOff } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
+import { Loader } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 import {
   Form,
@@ -33,12 +34,12 @@ const formSchema = z
   });
 
 interface IProps {
-  token: Awaited<ReturnType<typeof serverClient.user.getPasswordResetToken>>;
+  token: Awaited<ReturnType<typeof serverClient.misc.getPasswordResetToken>>;
 }
 
 export function PasswordResetForm({ token }: IProps) {
   const router = useRouter();
-  const [disableUI, setDisableUI] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,14 +50,14 @@ export function PasswordResetForm({ token }: IProps) {
     },
   });
 
-  const resetPasswordMutation = trpc.user.resetPassword.useMutation({
+  const resetPasswordMutation = trpc.misc.resetPassword.useMutation({
     onError: ({ message }) =>
       toast({
         title: "Something went wrong",
         description: message,
       }),
     onSuccess: ({ toastTitle, toastDescription }) => {
-      setDisableUI(true);
+      setIsNavigating(true);
       toast({
         title: toastTitle,
         description: toastDescription,
@@ -67,16 +68,16 @@ export function PasswordResetForm({ token }: IProps) {
   });
 
   const isLoading = useMemo(
-    () => resetPasswordMutation.isPending || disableUI,
-    [resetPasswordMutation.isPending, disableUI],
+    () => resetPasswordMutation.isPending || isNavigating,
+    [resetPasswordMutation.isPending, isNavigating],
   );
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
       resetPasswordMutation.mutate({
         ...values,
-        token: token.token,
-        email: token.userEmail,
+        token: token?.token || "",
+        email: token?.userEmail || "",
       });
     },
     [resetPasswordMutation, token],
@@ -86,7 +87,7 @@ export function PasswordResetForm({ token }: IProps) {
     <div className="w-full space-y-16">
       <div className="space-y-6 text-center">
         <h1 className="text-4xl font-semibold leading-[1.5em] lg:text-5xl">
-          Welcome back, {token.user.name?.split(" ")[0]}
+          Welcome back, {token?.user.name?.split(" ")[0]}
         </h1>
         <p className="text-neutral-500 lg:text-lg">
           Please set your new password
@@ -156,7 +157,7 @@ export function PasswordResetForm({ token }: IProps) {
             disabled={isLoading}
             className="w-full"
           >
-            Submit
+            {isLoading ? <Loader className="h-5 w-5 animate-spin" /> : "Submit"}
           </Button>
         </form>
       </Form>

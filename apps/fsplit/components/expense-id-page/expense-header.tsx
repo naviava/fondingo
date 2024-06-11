@@ -1,10 +1,10 @@
 import { ExpenseAvatar } from "../expense-avatar";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { DisplayAmount } from "../display-amount";
 
 interface IProps {
   groupColor: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
   expenseName: string;
   expenseAmount: number;
   createdAt: string;

@@ -9,6 +9,7 @@ import { trpc } from "~/lib/trpc/client";
 
 import { Button } from "@fondingo/ui/button";
 import { Loader } from "@fondingo/ui/lucide";
+import Link from "next/link";
 
 interface IProps {
   isInvalid?: boolean;
@@ -22,7 +23,7 @@ export function ActionButtons({ isInvalid }: IProps) {
   const token = searchParams.get("token");
 
   const { mutate: handleResendEmail, isPending } =
-    trpc.user.resendVerificationEmailByToken.useMutation({
+    trpc.misc.resendVerificationEmailByToken.useMutation({
       onError: ({ message }) =>
         toast({
           title: "Something went wrong",
@@ -70,8 +71,13 @@ export function ActionButtons({ isInvalid }: IProps) {
           )}
         </Button>
       )}
-      <Button variant="ctaOutline" disabled={isPending} className="w-[9rem]">
-        Contact us
+      <Button
+        asChild
+        variant="ctaOutline"
+        disabled={isPending}
+        className="w-[9rem]"
+      >
+        <Link href="/contact">Contact us</Link>
       </Button>
     </div>
   );

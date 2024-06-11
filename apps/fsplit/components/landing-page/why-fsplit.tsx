@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+
 import { ArrowRight } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
-import { AnimatePresence, motion } from "framer-motion";
-
 import { uuid } from "@fondingo/utils/uuid";
+
 import { archivo, hfont } from "~/utils";
 import { cn } from "@fondingo/ui/utils";
 
@@ -37,7 +39,12 @@ const ENTRIES = [
 ];
 
 export function WhyFSplit() {
+  const { data: session } = useSession();
   const [activeIndex, setActiveIndex] = useState(0);
+  const isLoggedIn = useMemo(
+    () => !!session && !!session.user && !!session.user.email,
+    [session],
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -112,7 +119,7 @@ export function WhyFSplit() {
               )}
             >
               <Link href="/signin">
-                Sign up
+                {isLoggedIn ? "Open app" : "Sign up"}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

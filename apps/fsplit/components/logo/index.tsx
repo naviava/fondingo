@@ -5,12 +5,11 @@ import { cn } from "@fondingo/ui/utils";
 
 interface IProps {
   variant?: "wide" | "tall";
-  size?: number;
   dark?: boolean;
   className?: string;
 }
 
-export function Logo({ variant = "wide", size, dark, className }: IProps) {
+export function Logo({ variant = "wide", dark, className }: IProps) {
   return (
     <div
       className={cn(

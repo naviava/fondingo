@@ -495,14 +495,32 @@ export const getExpenseById = privateProcedure
         payments: {
           include: {
             groupMember: {
-              include: { user: true },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
+                },
+              },
             },
           },
         },
         splits: {
           include: {
             groupMember: {
-              include: { user: true },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
+                },
+              },
             },
           },
         },
@@ -861,10 +879,28 @@ export const getSettlements = privateProcedure
       where: { groupId },
       include: {
         from: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
         },
         to: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
         },
       },
     });
@@ -897,8 +933,22 @@ export const getSettlementById = privateProcedure
         },
       },
       include: {
-        createdBy: true,
-        lastModifiedBy: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        lastModifiedBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
         from: {
           include: {
             user: {

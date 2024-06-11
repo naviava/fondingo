@@ -18,7 +18,6 @@ export default async function FriendsPage() {
     await serverClient.user.getFriendRequests();
 
   return (
-    // TODO: Add UI when there are no friends
     <>
       <SocialHeader />
       <DynamicScrollArea>

@@ -1,9 +1,9 @@
 import {
   PrismaClient,
   AccountVerification,
-  SimplifiedDebt as SimplifiedDebtPrisma,
-  CurrencyCode as CurrencyCodePrisma,
-  GroupMember as GroupMemberPrisma,
+  SimplifiedDebt,
+  CurrencyCode,
+  GroupMember,
   GroupRole,
   GroupType,
   Role,
@@ -21,8 +21,7 @@ declare const globalThis: {
 
 const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 
-// TODO: Prefix all with Z to mark them as Zod native enum.
-export const ZCurrencyCode = CurrencyCodePrisma;
+export const ZCurrencyCode = CurrencyCode;
 export const ZGroupRole = GroupRole;
 export const ZGroupType = GroupType;
 export const ZRole = Role;
@@ -30,12 +29,12 @@ export const ZRole = Role;
 // TODO: Prefix all with T to mark prisma types.
 export type TAccountVerification = AccountVerification;
 export type TConfirmEmailToken = ConfirmEmailToken;
-export type SimplifiedDebt = SimplifiedDebtPrisma;
-export type CurrencyCode = CurrencyCodePrisma;
-export type GroupMember = GroupMemberPrisma;
+export type TSimplifiedDebt = SimplifiedDebt;
+export type TCurrencyCode = CurrencyCode;
+export type TGroupMember = GroupMember;
 export type TGroupRole = GroupRole;
 export type TUserRole = Role;
-export type User = UserPrisma;
+export type TUser = UserPrisma;
 export default prisma;
 
 if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;

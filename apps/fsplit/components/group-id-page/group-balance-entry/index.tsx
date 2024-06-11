@@ -4,7 +4,7 @@ import { useLocalStorage } from "@fondingo/utils/hooks";
 import { useCallback, useMemo } from "react";
 
 import { DisplayAmount } from "~/components/display-amount";
-import { CurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode } from "@fondingo/db-split";
 import { LoadingState } from "../loading-state";
 import { Avatar } from "@fondingo/ui/avatar";
 import { DebtEntry } from "./debt-entry";
@@ -22,7 +22,7 @@ interface IProps {
   index: number;
   groupId: string;
   memberId: string;
-  currency: CurrencyCode;
+  currency: TCurrencyCode;
 }
 
 export function GroupBalanceEntry({
