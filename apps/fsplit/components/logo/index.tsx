@@ -13,7 +13,7 @@ export function Logo({ variant = "wide", dark, className }: IProps) {
   return (
     <div
       className={cn(
-        "flex items-center justify-center",
+        "flex select-none items-center justify-center",
         variant === "tall" && "flex-col",
         className,
       )}
