@@ -1,6 +1,7 @@
 import { serverClient } from "~/lib/trpc/server-client";
-import { MemberEntry } from "./member-entry";
 import { AddMemberOption } from "./add-member-option";
+import { MemberEntry } from "./member-entry";
+
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 
@@ -16,7 +17,7 @@ export function MembersPanel({ userId = "", group }: IProps) {
         Group members
       </h3>
       <AddMemberOption userId={userId} groupId={group.id} />
-      <ul className="space-y-4 px-4">
+      <ul className="space-y-4">
         {group.members.map((member) => (
           <MemberEntry
             key={member.email}

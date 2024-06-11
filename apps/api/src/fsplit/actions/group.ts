@@ -891,6 +891,35 @@ export const getMembers = privateProcedure
     return groupMembers;
   });
 
+export const isGroupManager = privateProcedure
+  .input(z.string().min(1, { message: "Group ID cannot be empty" }))
+  .query(async ({ ctx, input: groupId }) => {
+    const { user } = ctx;
+    const existingGroup = await splitdb.group.findUnique({
+      where: {
+        id: groupId,
+        members: {
+          some: { userId: user.id },
+        },
+      },
+    });
+    console.log(existingGroup);
+    if (!existingGroup)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+
+    const isManager = await splitdb.groupMember.findFirst({
+      where: {
+        groupId: existingGroup.id,
+        userId: user.id,
+        role: "MANAGER",
+      },
+    });
+    return !!isManager;
+  });
+
 export const removeMemberFromGroup = privateProcedure
   .input(
     z.object({
@@ -1011,7 +1040,7 @@ export const removeMemberFromGroup = privateProcedure
         toastTitle: isSelf ? "You left" : "Member removed",
         toastDescription: isSelf
           ? `You are no longer part of ${group.name}`
-          : `${updatedMember.name} has been removed from the group`,
+          : `${member.name} has been removed from the group`,
       };
     });
   });
