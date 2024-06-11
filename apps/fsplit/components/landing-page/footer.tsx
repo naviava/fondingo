@@ -51,7 +51,9 @@ export function Footer() {
       )}
     >
       <div className="mx-auto grid w-[20rem] max-w-screen-lg grid-cols-1 gap-x-6 gap-y-14 px-10 md:w-auto md:grid-cols-4">
-        <Logo dark variant="tall" />
+        <Link href="/" className="mx-auto h-fit w-fit md:mx-0">
+          <Logo dark variant="tall" />
+        </Link>
         {COLUMNS.map((column) => (
           <FooterColumn key={column.title} {...column} />
         ))}

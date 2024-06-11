@@ -1,9 +1,10 @@
-import { SectionTitle } from "~/components/legal/section-title";
-import { SubHeading } from "~/components/legal/sub-heading";
-import { MainTitle } from "~/components/legal/main-title";
+import { PageWrapper, SectionWrapper } from "~/components/legal/wrappers";
+import { SectionTitle } from "~/components/legal/titles";
 import { Paragraph } from "~/components/legal/paragraph";
-import { ListItem } from "~/components/legal/list-item";
-import { PageWrapper } from "~/components/legal/page-wrapper";
+import { SubHeading } from "~/components/legal/titles";
+import { ListWrapper } from "~/components/legal/list";
+import { MainTitle } from "~/components/legal/titles";
+import { ListItem } from "~/components/legal/list";
 
 export default function TermsPage() {
   return (
@@ -31,11 +32,11 @@ export default function TermsPage() {
       {/* Use of Our Services */}
       <section>
         <SectionTitle>Use of Our Services</SectionTitle>
-        <div className="space-y-6">
+        <SectionWrapper>
           {/* Eligibility */}
           <div>
             <SubHeading>Eligibility</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 You must be at least 18 years old to use our services.
               </ListItem>
@@ -43,13 +44,13 @@ export default function TermsPage() {
                 You must provide accurate and complete information when creating
                 an account.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
 
           {/* Account Security */}
           <div>
             <SubHeading>Account Security</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 You are responsible for maintaining the confidentiality of your
                 account credentials.
@@ -58,13 +59,13 @@ export default function TermsPage() {
                 You must notify us immediately of any unauthorized use of your
                 account.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
 
           {/* Prohibited Activities */}
           <div>
             <SubHeading>Prohibited Activities</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 You may not use our services for any illegal or unauthorized
                 purpose.
@@ -73,19 +74,19 @@ export default function TermsPage() {
                 You may not interfere with or disrupt the App or Site or attempt
                 to access our systems or data unlawfully.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
-        </div>
+        </SectionWrapper>
       </section>
 
       {/* User Content */}
       <section>
         <SectionTitle>User Content</SectionTitle>
-        <div className="space-y-6">
+        <SectionWrapper>
           {/* Responsibility for Content */}
           <div>
             <SubHeading>Responsibility for Content</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 You are responsible for any content you post or share through
                 our services.
@@ -95,13 +96,13 @@ export default function TermsPage() {
                 use, reproduce, and display your content for the purpose of
                 operating and providing our services.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
 
           {/* Content Restrictions */}
           <div>
             <SubHeading>Content Restrictions</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 You may not post content that is illegal, harmful, or infringes
                 on the rights of others.
@@ -110,19 +111,19 @@ export default function TermsPage() {
                 We reserve the right to remove any content that violates these
                 Terms.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
-        </div>
+        </SectionWrapper>
       </section>
 
       {/* Payment and Fees */}
       <section>
         <SectionTitle>Payment and Fees</SectionTitle>
-        <div className="space-y-6">
+        <SectionWrapper>
           {/* Billing */}
           <div>
             <SubHeading>Billing</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 Certain features of our services may require payment. You agree
                 to pay all applicable fees.
@@ -131,7 +132,7 @@ export default function TermsPage() {
                 We may change our fees at any time. Any fee changes will be
                 communicated to you in advance.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
 
           {/* Refunds */}
@@ -142,13 +143,13 @@ export default function TermsPage() {
               stated.
             </ListItem>
           </div>
-        </div>
+        </SectionWrapper>
       </section>
 
       {/* Termination */}
       <section>
         <SectionTitle>Termination</SectionTitle>
-        <div className="space-y-6">
+        <SectionWrapper>
           {/* By You */}
           <div>
             <SubHeading>By You</SubHeading>
@@ -176,7 +177,7 @@ export default function TermsPage() {
           {/* Effect of Termination */}
           <div>
             <SubHeading>Effect of Termination</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 Upon termination, your right to use our services will cease
                 immediately.
@@ -185,13 +186,13 @@ export default function TermsPage() {
                 All provisions of these Terms that should survive termination
                 will remain in effect.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
 
           {/* Limitation of Liability */}
           <div>
             <SubHeading>Limitation of Liability</SubHeading>
-            <div className="space-y-2">
+            <ListWrapper>
               <ListItem>
                 Our services are provided "as is" without warranties of any
                 kind.
@@ -200,9 +201,9 @@ export default function TermsPage() {
                 We are not liable for any indirect, incidental, or consequential
                 damages arising from your use of our services.
               </ListItem>
-            </div>
+            </ListWrapper>
           </div>
-        </div>
+        </SectionWrapper>
       </section>
 
       {/* Governing Law */}

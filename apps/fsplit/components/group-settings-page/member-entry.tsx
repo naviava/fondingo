@@ -2,6 +2,7 @@ import { TCurrencyCode, TGroupRole } from "@fondingo/db-split";
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
 
+import { MemberOptionsTrigger } from "./member-options-trigger";
 import { DisplayAmount } from "~/components/display-amount";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { Avatar } from "@fondingo/ui/avatar";
@@ -32,7 +33,12 @@ export async function MemberEntry({
     });
 
   return (
-    <li className="flex items-center gap-x-4">
+    <MemberOptionsTrigger
+      id={memberId}
+      name={memberName}
+      email={memberEmail}
+      groupId={groupId}
+    >
       <div className="flex h-14 w-14 items-center justify-center">
         <Avatar variant="lg" userName={memberName} userImageUrl={imageUrl} />
       </div>
@@ -66,6 +72,6 @@ export async function MemberEntry({
           />
         </div>
       )}
-    </li>
+    </MemberOptionsTrigger>
   );
 }

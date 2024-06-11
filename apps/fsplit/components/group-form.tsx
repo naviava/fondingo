@@ -46,6 +46,7 @@ import {
 
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
+import { useGroupMutate } from "~/hooks/api/group/use-group-mutate";
 
 const formSchema = z.object({
   groupName: z
@@ -70,11 +71,8 @@ interface IProps {
 
 export const GroupForm = memo(_GroupForm);
 function _GroupForm({ isEditing, initialData }: IProps) {
-  const router = useRouter();
-  const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const [isNavigating, setIsNavigating] = useState(false);
   const [color, setColor] = useState(initialData?.color || "#00968a");
   const [currency, setCurrency] = useState<TCurrencyCode>(
     initialData?.currency || "USD",
@@ -91,6 +89,11 @@ function _GroupForm({ isEditing, initialData }: IProps) {
       type: initialData?.type || ZGroupType.TRIP,
       currency: initialData?.currency || ZCurrencyCode.USD,
     },
+  });
+
+  const { isLoading, editGroupMutation, createGroupMutation } = useGroupMutate({
+    form,
+    initialData,
   });
 
   const groupTypeOptions = useMemo(
@@ -145,67 +148,16 @@ function _GroupForm({ isEditing, initialData }: IProps) {
     [form],
   );
 
-  const utils = trpc.useUtils();
-  const { mutate: handleCreateGroup, isPending: isPendingCreate } =
-    trpc.group.createGroup.useMutation({
-      onError: ({ message }) =>
-        toast({
-          variant: "destructive",
-          title: "Something went wrong.",
-          description: message,
-        }),
-      onSuccess: ({ groupId, toastTitle, toastDescription }) => {
-        setIsNavigating(true);
-        toast({
-          title: toastTitle,
-          description: toastDescription,
-        });
-        form.reset();
-        utils.group.getGroupById.invalidate();
-        utils.group.getGroups.invalidate();
-        router.push(`/groups/${groupId}`);
-        router.refresh();
-      },
-    });
-  const { mutate: handleEditGroup, isPending: isPendingEdit } =
-    trpc.group.editGroup.useMutation({
-      onError: ({ message }) =>
-        toast({
-          variant: "destructive",
-          title: "Something went wrong.",
-          description: message,
-        }),
-      onSuccess: ({ groupId, toastTitle, toastDescription }) => {
-        setIsNavigating(true);
-        toast({
-          title: toastTitle,
-          description: toastDescription,
-        });
-        form.reset({
-          groupName: initialData?.groupName,
-          color: initialData?.color,
-          type: initialData?.type,
-          currency: initialData?.currency,
-        });
-        utils.group.getGroupById.invalidate();
-        utils.group.getGroups.invalidate();
-        router.push(`/groups/${groupId}/settings`);
-        router.refresh();
-      },
-    });
-
-  const isLoading = useMemo(
-    () => isPendingCreate || isPendingEdit || isNavigating,
-    [isPendingCreate, isPendingEdit, isNavigating],
-  );
-
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
       if (isEditing)
-        handleEditGroup({ ...values, groupId: initialData?.groupId || "" });
-      else handleCreateGroup(values);
+        editGroupMutation.mutate({
+          ...values,
+          groupId: initialData?.groupId || "",
+        });
+      else createGroupMutation.mutate(values);
     },
-    [isEditing, handleCreateGroup, handleEditGroup, initialData?.groupId],
+    [editGroupMutation, createGroupMutation, isEditing, initialData?.groupId],
   );
 
   return (
@@ -236,11 +188,7 @@ function _GroupForm({ isEditing, initialData }: IProps) {
             if (!!submitButtonRef.current) submitButtonRef.current.click();
           }}
         >
-          {isPendingCreate || isPendingEdit || isNavigating ? (
-            <Loader className="h-6 w-6 animate-spin" />
-          ) : (
-            "Done"
-          )}
+          {isLoading ? <Loader className="h-6 w-6 animate-spin" /> : "Done"}
         </Button>
       </div>
       <Form {...form}>

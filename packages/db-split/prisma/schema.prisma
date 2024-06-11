@@ -200,7 +200,7 @@ model GroupMember {
   updatedAt DateTime @updatedAt
 
   @@unique([groupId, email])
-  @@index([groupId])
+  @@index([groupId, email])
 }
 
 model Expense {

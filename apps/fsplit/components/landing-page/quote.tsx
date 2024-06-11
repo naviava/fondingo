@@ -16,7 +16,7 @@ export function Quote() {
         <div className="max-w-[40rem]">
           <blockquote
             className={cn(
-              "text-[2rem] font-semibold italic text-neutral-700 md:text-[2.5rem] lg:text-[3rem]",
+              "text-[2rem] font-semibold text-neutral-700 md:text-[2.5rem] lg:text-[3rem]",
               quoteFont.className,
             )}
           >
