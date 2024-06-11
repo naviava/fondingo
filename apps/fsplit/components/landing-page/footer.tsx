@@ -11,20 +11,20 @@ import { archivo } from "~/utils";
 const COLUMNS = [
   {
     id: uuid(),
-    title: "Legal",
-    links: [
-      { id: uuid(), text: "Privacy Policy", href: "/privacy-policy" },
-      { id: uuid(), text: "Terms of Service", href: "/terms" },
-    ],
-  },
-  {
-    id: uuid(),
     title: "Support",
     links: [
       { id: uuid(), text: "Account", href: "/account" },
       { id: uuid(), text: "Contact us", href: "/contact" },
       { id: uuid(), text: "Reset Password", href: "/forgot-password" },
-      { id: uuid(), text: "Email Verification", href: "#" },
+      { id: uuid(), text: "Email Verification", href: "/verification" },
+    ],
+  },
+  {
+    id: uuid(),
+    title: "Legal",
+    links: [
+      { id: uuid(), text: "Privacy Policy", href: "/privacy-policy" },
+      { id: uuid(), text: "Terms of Service", href: "/terms" },
     ],
   },
   {
