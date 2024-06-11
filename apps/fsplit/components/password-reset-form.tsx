@@ -12,6 +12,7 @@ import { z } from "@fondingo/utils/zod";
 import { Eye, EyeOff } from "@fondingo/ui/lucide";
 import { toast } from "@fondingo/ui/use-toast";
 import { Button } from "@fondingo/ui/button";
+import { Loader } from "@fondingo/ui/lucide";
 import { Input } from "@fondingo/ui/input";
 import {
   Form,
@@ -156,7 +157,7 @@ export function PasswordResetForm({ token }: IProps) {
             disabled={isLoading}
             className="w-full"
           >
-            Submit
+            {isLoading ? <Loader className="h-5 w-5 animate-spin" /> : "Submit"}
           </Button>
         </form>
       </Form>

@@ -8,6 +8,7 @@ import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
 import { Loader } from "@fondingo/ui/lucide";
 import { Logo } from "../logo";
+import Link from "next/link";
 
 export function Logout() {
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +33,9 @@ export function Logout() {
         </Button>
       </div>
       <div className="flex flex-col items-center pb-16">
-        <Logo />
+        <Link href="/">
+          <Logo />
+        </Link>
         <small className="mx-auto mt-6 text-neutral-400">
           © 2024 Fondingo. All rights reserved.
         </small>

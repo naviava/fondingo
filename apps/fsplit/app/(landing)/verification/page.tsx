@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -28,9 +28,10 @@ const formSchema = z.object({
   email: z.string().email(),
 });
 
-export default function ForgotPasswordPage() {
+export default function VerificationPage() {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,27 +39,28 @@ export default function ForgotPasswordPage() {
     },
   });
 
-  const sendEmailMutation = trpc.misc.sendResetPasswordEmail.useMutation({
-    onError: ({ message }) =>
-      toast({
-        title: "Something went wrong",
-        description: message,
-      }),
-    onSuccess: ({ toastTitle, toastDescription }) => {
-      setIsNavigating(true);
-      toast({
-        title: toastTitle,
-        description: toastDescription,
-      });
-      form.reset();
-      router.push("/");
-      router.refresh();
-    },
-  });
+  const sendEmailMutation =
+    trpc.misc.resendVerificationEmailByEmail.useMutation({
+      onError: ({ message }) =>
+        toast({
+          title: "Something went wrong",
+          description: message,
+        }),
+      onSuccess: ({ toastTitle, toastDescription }) => {
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+        });
+        setIsNavigating(true);
+        form.reset();
+        router.push("/");
+        router.refresh();
+      },
+    });
 
   const isLoading = useMemo(
     () => sendEmailMutation.isPending || isNavigating,
-    [isNavigating, sendEmailMutation.isPending],
+    [sendEmailMutation.isPending, isNavigating],
   );
 
   const onSubmit = useCallback(
@@ -70,11 +72,11 @@ export default function ForgotPasswordPage() {
   return (
     <LandingLayoutWrapper>
       <div className="mx-auto max-w-[27rem] space-y-6 rounded-sm border-2 border-neutral-200 px-4 py-10 md:space-y-10 md:p-14">
-        <h1 className="text-4xl font-semibold">Can&apos;t log in?</h1>
+        <h1 className="text-4xl font-semibold">Email Verification</h1>
         <p className="leading-[1.7em] tracking-wide text-neutral-600">
-          Not to worry. Enter the email address you use to sign in to{" "}
+          Enter the email address you used to sign up for{" "}
           <span className="text-cta font-medium">FS</span>plit and we&apos;ll
-          send you a link to reset your password.
+          send you a link to activate your account.
         </p>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -116,15 +118,9 @@ export default function ForgotPasswordPage() {
           </form>
         </Form>
       </div>
-      <div className="flex translate-x-[5.6rem] flex-col items-end">
+      <div className="flex translate-x-[7.1rem] flex-col items-end">
         <div className="mt-6 flex items-center text-sm text-neutral-400">
-          Remember your password?
-          <Button asChild size="sm" variant="link" className="text-cta">
-            <Link href="/signin">Sign in</Link>
-          </Button>
-        </div>
-        <div className="mt-4 flex items-center text-sm text-neutral-400">
-          Need to verify your email?
+          Forgot your password?
           <Button
             asChild
             size="sm"
@@ -132,7 +128,7 @@ export default function ForgotPasswordPage() {
             disabled={isLoading}
             className="text-cta"
           >
-            <Link href="/verification">Send email</Link>
+            <Link href="/forgot-password">Reset</Link>
           </Button>
         </div>
       </div>

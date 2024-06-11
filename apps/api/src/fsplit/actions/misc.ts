@@ -98,6 +98,80 @@ export const resendVerificationEmailByToken = publicProcedure
     });
   });
 
+export const resendVerificationEmailByEmail = publicProcedure
+  .input(z.string().email({ message: "Email is invalid" }))
+  .mutation(async ({ input }) => {
+    const email = input.toLowerCase();
+    const existingUser = await splitdb.user.findUnique({
+      where: { email },
+      include: { accountVerification: true },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "No user found with that email.",
+      });
+    if (!!existingUser.accountVerification)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User is already verified.",
+      });
+
+    const existingToken = await splitdb.confirmEmailToken.findFirst({
+      where: { userId: existingUser.id },
+      include: {
+        user: {
+          select: { email: true },
+        },
+      },
+    });
+    if (
+      !!existingToken &&
+      Date.now() - new Date(existingToken.createdAt || "").getTime() < 90 * 1000
+    )
+      return {
+        toastTitle: "Verification email sent",
+        toastDescription: `Email has been sent to ${existingUser.email} less than 90 seconds back.`,
+        createdAt: existingToken.createdAt,
+      };
+
+    return splitdb.$transaction(async (db) => {
+      if (!!existingToken) {
+        const deletedToken = await db.confirmEmailToken.delete({
+          where: { id: existingToken?.id },
+        });
+        if (!deletedToken)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to delete token. Email not sent.",
+          });
+      }
+
+      const newToken = await db.confirmEmailToken.create({
+        data: {
+          token: uuid(),
+          userId: existingUser.id,
+          expires: new Date(Date.now() + 1000 * 60 * 15),
+        },
+      });
+      const sent = await sendVerificationEmail({
+        email: existingUser.email,
+        token: newToken.token,
+        pathname: "/verify",
+      });
+      if (!sent)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send email.",
+        });
+      return {
+        toastTitle: "Verification email sent",
+        toastDescription: `Email has been sent to ${existingUser.email}.`,
+        createdAt: newToken.createdAt,
+      };
+    });
+  });
+
 export const getVerificationToken = publicProcedure
   .input(z.string().min(1, { message: "Token cannot be empty." }))
   .query(async ({ input: token }) => {

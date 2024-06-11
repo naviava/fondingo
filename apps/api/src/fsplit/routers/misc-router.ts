@@ -5,9 +5,10 @@ import {
   getPasswordResetToken,
   getVerificationToken,
   isVerified,
+  sendResetPasswordEmail,
+  resendVerificationEmailByEmail,
   resendVerificationEmailByToken,
   resetPassword,
-  sendResetPasswordEmail,
 } from "../actions/misc";
 
 export const miscRouter = router({
@@ -16,7 +17,8 @@ export const miscRouter = router({
   getPasswordResetToken,
   getVerificationToken,
   isVerified,
+  sendResetPasswordEmail,
+  resendVerificationEmailByEmail,
   resendVerificationEmailByToken,
   resetPassword,
-  sendResetPasswordEmail,
 });
