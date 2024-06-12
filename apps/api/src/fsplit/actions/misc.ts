@@ -252,6 +252,15 @@ export const sendResetPasswordEmail = publicProcedure
         message: "That email is not registered with us.",
       });
 
+    const isOAuth = await splitdb.account.findFirst({
+      where: { userId: existingUser.id },
+    });
+    if (!!isOAuth)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `This is a "${isOAuth.provider.charAt(0).toUpperCase() + isOAuth.provider.slice(1)}" account. Cannot reset password.`,
+      });
+
     return splitdb.$transaction(async (db) => {
       const existingPasswordResetToken = await db.passwordResetToken.findFirst({
         where: { userEmail: existingUser.email },
