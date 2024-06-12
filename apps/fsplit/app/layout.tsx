@@ -15,7 +15,8 @@ import { Toaster } from "@fondingo/ui/toaster";
 import { tfont } from "~/utils";
 
 const APP_NAME = "FSplit";
-const APP_DEFAULT_TITLE = "FSplit";
+const APP_DEFAULT_TITLE =
+  "FSplit: Effortless group expense management made easy, fast, and secure. Split expenses with friends, family, and roommates.";
 const APP_TITLE_TEMPLATE = "%s - FSplit";
 const APP_DESCRIPTION = "Your favorite expenses app";
 

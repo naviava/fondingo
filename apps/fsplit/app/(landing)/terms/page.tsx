@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+
 import { PageWrapper, SectionWrapper } from "~/components/legal/wrappers";
 import { SectionTitle } from "~/components/legal/titles";
 import { Paragraph } from "~/components/legal/paragraph";
@@ -5,6 +7,11 @@ import { SubHeading } from "~/components/legal/titles";
 import { ListWrapper } from "~/components/legal/list";
 import { MainTitle } from "~/components/legal/titles";
 import { ListItem } from "~/components/legal/list";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Terms of service for FSplit",
+};
 
 export default function TermsPage() {
   return (

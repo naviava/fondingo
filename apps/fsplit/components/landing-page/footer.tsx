@@ -7,6 +7,7 @@ import { Logo } from "~/components/logo";
 import { uuid } from "@fondingo/utils/uuid";
 import { cn } from "@fondingo/ui/utils";
 import { archivo } from "~/utils";
+import { FooterLink } from "./footer-link";
 
 const COLUMNS = [
   {
@@ -79,24 +80,7 @@ function FooterColumn({
       </h3>
       <ul className="space-y-2">
         {links.map((link) => (
-          <li key={link.href} className="mx-auto w-fit md:w-full">
-            <Button
-              asChild
-              size="sm"
-              variant="link"
-              className="text-sm text-white md:pl-0 lg:text-base"
-            >
-              <Link
-                href={link.href}
-                target={title === "Social" ? "_blank" : undefined}
-              >
-                {link.text}
-                {title === "Social" && (
-                  <ExternalLink className="ml-2 h-4 w-4 text-neutral-400" />
-                )}
-              </Link>
-            </Button>
-          </li>
+          <FooterLink key={link.id} title={title} {...link} />
         ))}
       </ul>
     </div>

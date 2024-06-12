@@ -12,6 +12,12 @@ import { GroupAvatar } from "~/components/group-avatar";
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "My Groups",
+  description: "View and manage your groups.",
+};
 
 export default async function GroupsPage() {
   const user = await serverClient.user.getAuthProfile();

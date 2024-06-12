@@ -2,9 +2,11 @@ import { router } from "../trpc";
 import {
   completeVerification,
   contactUs,
+  getInviteByEmail,
   getPasswordResetToken,
   getVerificationToken,
   isVerified,
+  sendInvitation,
   sendResetPasswordEmail,
   resendVerificationEmailByEmail,
   resendVerificationEmailByToken,
@@ -14,9 +16,11 @@ import {
 export const miscRouter = router({
   completeVerification,
   contactUs,
+  getInviteByEmail,
   getPasswordResetToken,
   getVerificationToken,
   isVerified,
+  sendInvitation,
   sendResetPasswordEmail,
   resendVerificationEmailByEmail,
   resendVerificationEmailByToken,

@@ -3,7 +3,11 @@ import { TRPCError } from "@trpc/server";
 import splitdb from "@fondingo/db-split";
 import { z } from "@fondingo/utils/zod";
 import { hash } from "bcrypt";
-import { sendPasswordResetEmail, sendVerificationEmail } from "../../utils";
+import {
+  sendInvitationEmail,
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "../../utils";
 import { uuid } from "@fondingo/utils/uuid";
 
 export const contactUs = publicProcedure
@@ -252,6 +256,15 @@ export const sendResetPasswordEmail = publicProcedure
         message: "That email is not registered with us.",
       });
 
+    const isOAuth = await splitdb.account.findFirst({
+      where: { userId: existingUser.id },
+    });
+    if (!!isOAuth)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `This is a "${isOAuth.provider.charAt(0).toUpperCase() + isOAuth.provider.slice(1)}" account. Cannot reset password.`,
+      });
+
     return splitdb.$transaction(async (db) => {
       const existingPasswordResetToken = await db.passwordResetToken.findFirst({
         where: { userEmail: existingUser.email },
@@ -369,4 +382,81 @@ export const resetPassword = publicProcedure
         toastDescription: "You can now login with your new password.",
       };
     });
+  });
+
+export const sendInvitation = privateProcedure
+  .input(z.string().email({ message: "Invalid email" }))
+  .mutation(async ({ ctx, input: email }) => {
+    const { user } = ctx;
+    const existingUser = await splitdb.user.findUnique({
+      where: {
+        id: user.id,
+        disabled: false,
+      },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+
+    const existingInvite = await splitdb.invitation.findUnique({
+      where: { email },
+    });
+    if (existingInvite)
+      return {
+        toastTitle: "This user is already invited",
+        toastDescription: `User with email - ${email} - already has a pending invitation.`,
+      };
+
+    return splitdb.$transaction(async (db) => {
+      const newInvite = await db.invitation.create({
+        data: {
+          email,
+          fromId: existingUser.id,
+        },
+      });
+      if (!newInvite)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send invitation.",
+        });
+
+      const sent = await sendInvitationEmail({
+        email,
+        from: existingUser.name || "A mysterious admirer",
+      });
+      if (!sent)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send email.",
+        });
+
+      return {
+        toastTitle: "Invitation sent",
+        toastDescription: `Invitation has been sent to ${email}.`,
+      };
+    });
+  });
+
+export const getInviteByEmail = privateProcedure
+  .input(z.string().email({ message: "Invalid email" }))
+  .query(async ({ ctx, input: email }) => {
+    const { user } = ctx;
+    const existingUser = await splitdb.user.findUnique({
+      where: {
+        id: user.id,
+        disabled: false,
+      },
+    });
+    if (!existingUser)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+
+    const existingInvite = await splitdb.invitation.findUnique({
+      where: { email },
+    });
+    return existingInvite;
   });

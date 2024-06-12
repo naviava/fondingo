@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Link from "next/link";
 
 import { ExpenseDetails } from "~/components/expense-id-page/expense-details";
@@ -15,6 +16,19 @@ interface IProps {
   params: {
     groupId: string;
     expenseId: string;
+  };
+}
+
+export async function generateMetadata({ params }: IProps): Promise<Metadata> {
+  const expense = await serverClient.expense.getExpenseById({
+    groupId: params.groupId,
+    expenseId: params.expenseId,
+  });
+  if (!expense) return {};
+
+  return {
+    title: `${expense.name} | Expense`,
+    description: `Details of expense: ${expense.name}`,
   };
 }
 

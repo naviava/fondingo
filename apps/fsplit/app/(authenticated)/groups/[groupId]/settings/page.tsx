@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+
 import { AdvancedSettings } from "~/components/group-settings-page/advanced-settings";
 import { GroupNameEdit } from "~/components/group-settings-page/group-name-edit";
 import { MembersPanel } from "~/components/group-settings-page/members-panel";
@@ -10,6 +12,16 @@ import { serverClient } from "~/lib/trpc/server-client";
 interface IProps {
   params: {
     groupId: string;
+  };
+}
+
+export async function generateMetadata({ params }: IProps): Promise<Metadata> {
+  const group = await serverClient.group.getGroupById(params.groupId);
+  if (!group) return {};
+
+  return {
+    title: `Settings | ${group.name}`,
+    description: `Customize group details, members and advanced settings for group: ${group.name}`,
   };
 }
 

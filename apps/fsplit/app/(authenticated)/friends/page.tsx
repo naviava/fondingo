@@ -9,6 +9,12 @@ import { NoFriends } from "~/components/friends-page/no-friends";
 import { SocialHeader } from "~/components/social-header";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Friends",
+  description: "View your friends and friend requests.",
+};
 
 export default async function FriendsPage() {
   const { friends: friendsInApp, tempFriends: friendsInGroups } =
@@ -71,6 +77,7 @@ export default async function FriendsPage() {
                     key={friend.id}
                     friendId={friend.id}
                     friendName={friend.name || "Unknown"}
+                    friendEmail={friend.email}
                     hideDebts
                   />
                 ))}

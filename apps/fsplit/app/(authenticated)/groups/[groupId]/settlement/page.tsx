@@ -1,10 +1,22 @@
+import { redirect } from "next/navigation";
+import { Metadata } from "next";
+
 import { SettlementForm } from "~/components/settlement-form";
 import { serverClient } from "~/lib/trpc/server-client";
-import { redirect } from "next/navigation";
 
 interface IProps {
   params: {
     groupId: string;
+  };
+}
+
+export async function generateMetadata({ params }: IProps): Promise<Metadata> {
+  const group = await serverClient.group.getGroupById(params.groupId);
+  if (!group) return {};
+
+  return {
+    title: `Settle up | ${group.name}`,
+    description: `Settle up balances for group: ${group.name}`,
   };
 }
 

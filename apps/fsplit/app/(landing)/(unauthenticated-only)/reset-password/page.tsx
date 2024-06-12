@@ -1,13 +1,42 @@
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 import Image from "next/image";
 
 import { LandingLayoutWrapper } from "~/components/landing-layout-wrapper";
-import { PasswordResetForm } from "~/components/password-reset-form";
+import { PasswordResetForm } from "~/components/forms/password-reset-form";
 import { serverClient } from "~/lib/trpc/server-client";
 
 interface IProps {
   searchParams?: {
     token?: string;
+  };
+}
+
+export async function generateMetadata({
+  searchParams,
+}: IProps): Promise<Metadata> {
+  if (!searchParams?.token) return {};
+  const token = await serverClient.misc.getPasswordResetToken(
+    searchParams.token,
+  );
+  if (!token)
+    return {
+      title: "Invalid token",
+      description:
+        "The password reset token is invalid. Please request a new one.",
+    };
+
+  if (Date.now() > new Date(token.expires).getTime())
+    return {
+      title: "Token expired. Please request a new one.",
+      description:
+        "The password reset token has expired. Please request a new one.",
+    };
+
+  return {
+    title: "Set a new password",
+    description:
+      "Enter your new password to reset your account password. Make sure it's a strong password.",
   };
 }
 

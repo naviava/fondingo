@@ -1,9 +1,16 @@
+import { Metadata } from "next";
+
 import { PageWrapper, SectionWrapper } from "~/components/legal/wrappers";
 import { ListItem, ListWrapper } from "~/components/legal/list";
 import { SectionTitle } from "~/components/legal/titles";
 import { Paragraph } from "~/components/legal/paragraph";
 import { SubHeading } from "~/components/legal/titles";
 import { MainTitle } from "~/components/legal/titles";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Privacy policy for FSplit",
+};
 
 export default function PrivacyPolicyPage() {
   return (

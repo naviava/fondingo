@@ -1,5 +1,11 @@
+import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+  description: "Sign in to FSplit",
+};
 
 interface IProps {
   children: React.ReactNode;
