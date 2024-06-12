@@ -48,3 +48,23 @@ export async function sendPasswordResetEmail({
   }
   return true;
 }
+
+export async function sendInvitationEmail({
+  email,
+  from,
+}: {
+  email: string;
+  from: string;
+}) {
+  const { data, error } = await resend.emails.send({
+    from: "fsplit-join@fondingo.com",
+    to: email,
+    subject: "You've been invited to join FSplit",
+    html: `<p>${from} has invited you to join FSplit, an app that makes managing group expenses a breeze.<br /><a href="http://split.fondingo.com">Click here</a> to sign up.</p>`,
+  });
+  if (error) {
+    console.error("Failed to send verification email", error);
+    return false;
+  }
+  return true;
+}

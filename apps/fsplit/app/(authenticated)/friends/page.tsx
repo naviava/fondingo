@@ -77,6 +77,7 @@ export default async function FriendsPage() {
                     key={friend.id}
                     friendId={friend.id}
                     friendName={friend.name || "Unknown"}
+                    friendEmail={friend.email}
                     hideDebts
                   />
                 ))}

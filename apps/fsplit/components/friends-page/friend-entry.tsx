@@ -4,10 +4,12 @@ import { Button } from "@fondingo/ui/button";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
+import { InviteButton } from "./invite-button";
 
 interface IProps {
   friendId: string;
   friendName: string;
+  friendEmail?: string;
   imageUrl?: string;
   hideDebts?: boolean;
 }
@@ -15,6 +17,7 @@ interface IProps {
 export async function FriendEntry({
   friendId,
   friendName,
+  friendEmail,
   imageUrl,
   hideDebts,
 }: IProps) {
@@ -29,9 +32,7 @@ export async function FriendEntry({
       </div>
       <div className="flex flex-col items-end justify-center">
         {hideDebts ? (
-          <Button type="button" variant="ctaGhost" size="sm">
-            Invite
-          </Button>
+          <InviteButton friendEmail={friendEmail || ""} />
         ) : amount === 0 ? (
           <p className="text-xs font-medium md:text-sm">all settled up</p>
         ) : (

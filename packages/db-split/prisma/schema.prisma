@@ -100,6 +100,7 @@ model User {
   modifiedExpenses       Expense[]            @relation("LastModifiedBy")
   createdSettlements     Settlement[]         @relation("SettlementCreatedBy")
   modifiedSettlements    Settlement[]         @relation("SettlementLastModifiedBy")
+  invites                Invitation[]
   friends1               Friend[]             @relation("Friend1")
   friends2               Friend[]             @relation("Friend2")
   friendRequestsSent     FriendRequest[]      @relation("FriendRequestFrom")
@@ -146,6 +147,18 @@ model TempFriend {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, email])
+}
+
+model Invitation {
+  id     String @id @default(cuid())
+  email  String @unique
+  fromId String
+  from   User   @relation(fields: [fromId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
 }
 
 model FriendRequest {
