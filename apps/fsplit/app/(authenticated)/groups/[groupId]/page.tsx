@@ -8,6 +8,7 @@ import { GroupLog } from "~/components/group-id-page/group-log";
 
 import { serverClient } from "~/lib/trpc/server-client";
 import { LogEntry } from "~/components/log-entry";
+import { Metadata } from "next";
 
 interface IProps {
   params: {
@@ -17,6 +18,50 @@ interface IProps {
     showTotals?: boolean;
     showBalances?: boolean;
     showActivity?: boolean;
+  };
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: IProps): Promise<Metadata> {
+  const group = await serverClient.group.getGroupById(params.groupId);
+  if (!group) return {};
+
+  if (
+    searchParams?.showBalances &&
+    !searchParams.showTotals &&
+    !searchParams.showActivity
+  ) {
+    return {
+      title: `Balances for ${group.name}`,
+      description: `View balances for group: ${group.name}`,
+    };
+  }
+  if (
+    searchParams?.showTotals &&
+    !searchParams.showBalances &&
+    !searchParams.showActivity
+  ) {
+    return {
+      title: `Totals for ${group.name}`,
+      description: `View totals for group: ${group.name}`,
+    };
+  }
+  if (
+    searchParams?.showActivity &&
+    !searchParams.showBalances &&
+    !searchParams.showTotals
+  ) {
+    return {
+      title: `Activity log for ${group.name}`,
+      description: `View activity log for group: ${group.name}`,
+    };
+  }
+
+  return {
+    title: `${group.name}`,
+    description: `View and manage your group: ${group.name}`,
   };
 }
 

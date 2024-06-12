@@ -9,11 +9,25 @@ import { LogEntry } from "~/components/log-entry";
 import { Button } from "@fondingo/ui/button";
 
 import { serverClient } from "~/lib/trpc/server-client";
+import { Metadata } from "next";
 
 interface IProps {
   params: {
     groupId: string;
     settlementId: string;
+  };
+}
+
+export async function generateMetadata({ params }: IProps): Promise<Metadata> {
+  const settlement = await serverClient.expense.getSettlementById({
+    groupId: params.groupId,
+    settlementId: params.settlementId,
+  });
+  if (!settlement) return {};
+
+  return {
+    title: `Payment from ${settlement.from.name} to ${settlement.to.name} | ${settlement.group.name}`,
+    description: `Details of payment: ${settlement.amount} from ${settlement.from.name} to ${settlement.to.name}`,
   };
 }
 

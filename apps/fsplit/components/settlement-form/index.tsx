@@ -21,6 +21,8 @@ import { Input } from "@fondingo/ui/input";
 import { currencyIconMap } from "@fondingo/ui/constants";
 import { TCurrencyCode } from "@fondingo/db-split";
 import { trpc } from "~/lib/trpc/client";
+import { cn } from "@fondingo/ui/utils";
+import { hfont } from "~/utils";
 
 const formSchema = z.object({
   amount: z.string().min(1, { message: "Amount must be greater than 0" }),
@@ -177,7 +179,9 @@ function _SettlementForm({ groupId, currency, members }: IProps) {
         >
           <ChevronLeft />
         </Button>
-        <h1 className="text-lg font-semibold">Record a payment</h1>
+        <h1 className={cn("font-semibold md:text-lg", hfont.className)}>
+          Record a payment
+        </h1>
         <Button
           size="sm"
           variant="ctaGhost"

@@ -933,6 +933,9 @@ export const getSettlementById = privateProcedure
         },
       },
       include: {
+        group: {
+          select: { name: true },
+        },
         createdBy: {
           select: {
             id: true,
