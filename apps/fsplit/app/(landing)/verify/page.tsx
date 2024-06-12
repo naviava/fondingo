@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { TokenState } from "~/components/verify-page/token-state";
 import { serverClient } from "~/lib/trpc/server-client";
 
-export const generateMetaata: Metadata = {
+export const generateMetadata: Metadata = {
   title: "Email Verification Portal",
   description: "Verify your email address to use FSplit",
 };
