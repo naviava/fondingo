@@ -7,6 +7,7 @@ import { useAnimate } from "framer-motion";
 import { useConfirmModal } from "@fondingo/store/use-confirm-modal";
 import { useRemoveMember } from "~/hooks/api/group/use-remove-member";
 import { trpc } from "~/lib/trpc/client";
+import { useAnimation } from "~/hooks/use-animation";
 
 interface IProps {
   children: React.ReactNode;
@@ -23,27 +24,16 @@ export function MemberOptionsTrigger({
   email,
   groupId,
 }: IProps) {
-  const [scope, animate] = useAnimate();
   const { data: session } = useSession();
-
   const { onOpen, onClose } = useConfirmModal();
+  const { scope, scaleAndShake } = useAnimation();
+
   const { removeMemberMutation } = useRemoveMember();
   const { data: isGroupManager } = trpc.group.isGroupManager.useQuery(groupId);
 
-  const handleAnimate = useCallback(async () => {
-    if (!!scope.current) {
-      await animate(scope.current, { scale: 1.1 }, { duration: 0.2 });
-      for (let i = 0; i < 3; i++) {
-        await animate(scope.current, { rotate: "5deg" }, { duration: 0.05 });
-        await animate(scope.current, { rotate: "-5deg" }, { duration: 0.05 });
-      }
-      await animate(scope.current, { scale: 1, rotate: 0 });
-    }
-  }, [scope, animate]);
-
   useEffect(() => {
-    if (session?.user?.email === email) handleAnimate();
-  }, [handleAnimate, session?.user?.email, email]);
+    if (session?.user?.email === email) scaleAndShake();
+  }, [scaleAndShake, session?.user?.email, email]);
 
   return (
     <li
@@ -55,7 +45,7 @@ export function MemberOptionsTrigger({
           !isGroupManager ||
           removeMemberMutation.isPending
         )
-          return handleAnimate();
+          return scaleAndShake();
         onOpen({
           title: `Remove ${name} from the group?`,
           description: `This action is irreversible. Are you sure you want to remove ${name} from the group?`,

@@ -903,7 +903,6 @@ export const isGroupManager = privateProcedure
         },
       },
     });
-    console.log(existingGroup);
     if (!existingGroup)
       throw new TRPCError({
         code: "NOT_FOUND",
