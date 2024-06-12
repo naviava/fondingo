@@ -130,6 +130,17 @@ CREATE TABLE "TempFriend" (
 );
 
 -- CreateTable
+CREATE TABLE "Invitation" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "fromId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Invitation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "FriendRequest" (
     "id" TEXT NOT NULL,
     "fromId" TEXT NOT NULL,
@@ -296,6 +307,12 @@ CREATE UNIQUE INDEX "Friend_user1Id_user2Id_key" ON "Friend"("user1Id", "user2Id
 CREATE UNIQUE INDEX "TempFriend_userId_email_key" ON "TempFriend"("userId", "email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Invitation_email_key" ON "Invitation"("email");
+
+-- CreateIndex
+CREATE INDEX "Invitation_email_idx" ON "Invitation"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "FriendRequest_fromId_toId_key" ON "FriendRequest"("fromId", "toId");
 
 -- CreateIndex
@@ -336,6 +353,9 @@ ALTER TABLE "Friend" ADD CONSTRAINT "Friend_user2Id_fkey" FOREIGN KEY ("user2Id"
 
 -- AddForeignKey
 ALTER TABLE "TempFriend" ADD CONSTRAINT "TempFriend_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_fromId_fkey" FOREIGN KEY ("fromId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FriendRequest" ADD CONSTRAINT "FriendRequest_fromId_fkey" FOREIGN KEY ("fromId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
