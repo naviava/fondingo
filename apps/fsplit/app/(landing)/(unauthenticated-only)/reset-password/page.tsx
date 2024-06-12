@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 
 import { LandingLayoutWrapper } from "~/components/landing-layout-wrapper";
-import { PasswordResetForm } from "~/components/password-reset-form";
+import { PasswordResetForm } from "~/components/forms/password-reset-form";
 import { serverClient } from "~/lib/trpc/server-client";
 
 interface IProps {

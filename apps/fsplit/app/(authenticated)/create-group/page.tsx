@@ -1,4 +1,4 @@
-import { GroupForm } from "~/components/group-form";
+import { GroupForm } from "~/components/forms/group-form";
 
 export default function CreateGroupPage() {
   return <GroupForm />;

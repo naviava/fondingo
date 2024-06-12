@@ -1,4 +1,4 @@
-import ExpenseForm from "~/components/expense-form";
+import ExpenseForm from "~/components/forms/expense-form";
 import { serverClient } from "~/lib/trpc/server-client";
 
 interface IProps {
