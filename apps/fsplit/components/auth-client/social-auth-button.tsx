@@ -27,10 +27,10 @@ export function SocialAuthButton({
   return (
     <Button
       disabled={disabled}
-      onClick={() => {
+      onClick={async () => {
         setClicked(true);
         setDisabled(true);
-        signIn(authTag);
+        await signIn(authTag);
       }}
       className="text-default h-auto rounded-full bg-white/50 p-3 hover:bg-white"
     >
