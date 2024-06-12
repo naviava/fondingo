@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -30,10 +30,19 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "Password too short" }),
 });
 
-export function SigninForm() {
+interface IProps {
+  disabled: boolean;
+}
+
+export function SigninForm({ disabled }: IProps) {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
+
+  const isLoading = useMemo(
+    () => isNavigating || disabled,
+    [isNavigating, disabled],
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -80,7 +89,7 @@ export function SigninForm() {
               <FormControl>
                 <Input
                   placeholder="yourname@email.com"
-                  disabled={isNavigating}
+                  disabled={isLoading}
                   {...field}
                   className="auth-form-input placeholder:text-neutral-400"
                 />
@@ -101,7 +110,7 @@ export function SigninForm() {
                   <Input
                     type={isPasswordShown ? "text" : "password"}
                     placeholder="******"
-                    disabled={isNavigating}
+                    disabled={isLoading}
                     {...field}
                     className="auth-form-input pr-16 placeholder:text-neutral-400"
                   />
@@ -109,7 +118,7 @@ export function SigninForm() {
                     type="button"
                     size="sm"
                     variant="ghost"
-                    disabled={isNavigating}
+                    disabled={isLoading}
                     onClick={() => setIsPasswordShown((prev) => !prev)}
                     className="absolute right-0 top-1/2 -translate-y-1/2 text-neutral-400 hover:bg-transparent hover:text-neutral-500"
                   >
@@ -126,7 +135,7 @@ export function SigninForm() {
             type="button"
             size="sm"
             variant="link"
-            disabled={isNavigating}
+            disabled={isLoading}
             className="-mt-4 text-neutral-500"
           >
             <Link href="/forgot-password">Forgot password?</Link>
@@ -135,7 +144,7 @@ export function SigninForm() {
         <Button
           variant="cta"
           type="submit"
-          disabled={isNavigating}
+          disabled={isLoading}
           className={cn(
             "text w-full transition focus:scale-[0.98]",
             hfont.className,

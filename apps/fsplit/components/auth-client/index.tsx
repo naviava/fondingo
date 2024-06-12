@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { useAuthForm } from "@fondingo/store/use-auth-form";
 import { uuid } from "@fondingo/utils/uuid";
 import { cn } from "@fondingo/ui/utils";
@@ -50,11 +52,12 @@ const OPTIONS = [
 
 export function AuthClient() {
   const { formType, toggleType } = useAuthForm();
+  const [disabled, setDisabled] = useState(false);
 
   return (
     <div className="z-[2] flex w-full max-w-[30rem] flex-col items-center rounded-[2rem] bg-black/10 p-8 backdrop-blur-md">
-      {formType === "signin" && <SigninForm />}
-      {formType === "register" && <RegisterForm />}
+      {formType === "signin" && <SigninForm disabled={disabled} />}
+      {formType === "register" && <RegisterForm disabled={disabled} />}
       <div className="mt-8 text-center">
         {formType === "signin" && (
           <>
@@ -67,7 +70,12 @@ export function AuthClient() {
             </div>
             <div className="mt-4 flex items-center justify-center gap-x-4">
               {OPTIONS.map((option) => (
-                <SocialAuthButton key={option.id} {...option} />
+                <SocialAuthButton
+                  key={option.id}
+                  {...option}
+                  disabled={disabled}
+                  setDisabled={setDisabled}
+                />
               ))}
             </div>
           </>

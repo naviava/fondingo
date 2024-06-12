@@ -299,7 +299,7 @@ CREATE UNIQUE INDEX "TempFriend_userId_email_key" ON "TempFriend"("userId", "ema
 CREATE UNIQUE INDEX "FriendRequest_fromId_toId_key" ON "FriendRequest"("fromId", "toId");
 
 -- CreateIndex
-CREATE INDEX "GroupMember_groupId_idx" ON "GroupMember"("groupId");
+CREATE INDEX "GroupMember_groupId_email_idx" ON "GroupMember"("groupId", "email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "GroupMember_groupId_email_key" ON "GroupMember"("groupId", "email");

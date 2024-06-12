@@ -40,7 +40,11 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-export function RegisterForm() {
+interface IProps {
+  disabled: boolean;
+}
+
+export function RegisterForm({ disabled }: IProps) {
   const [emailSent, setEmailSent] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -76,8 +80,8 @@ export function RegisterForm() {
     });
 
   const isLoading = useMemo(
-    () => isPending || isNavigating,
-    [isPending, isNavigating],
+    () => disabled || isPending || isNavigating,
+    [disabled, isPending, isNavigating],
   );
 
   const onSubmit = useCallback(
