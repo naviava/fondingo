@@ -19,18 +19,18 @@ import { Button } from "@fondingo/ui/button";
 import { SigninForm } from "./signin-form";
 
 const OPTIONS = [
-  {
-    id: uuid(),
-    icon: FaFacebook,
-    authTag: "facebook",
-    fill: "#1877f2",
-  },
-  {
-    id: uuid(),
-    icon: RiTwitterXFill,
-    authTag: "twitter",
-    fill: "#000",
-  },
+  // {
+  //   id: uuid(),
+  //   icon: FaFacebook,
+  //   authTag: "facebook",
+  //   fill: "#1877f2",
+  // },
+  // {
+  //   id: uuid(),
+  //   icon: RiTwitterXFill,
+  //   authTag: "twitter",
+  //   fill: "#000",
+  // },
   {
     id: uuid(),
     icon: FaDiscord,
