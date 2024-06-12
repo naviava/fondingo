@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 
 import { TCurrencyCode } from "@fondingo/db-split";
 import { Option } from "./option";
+import { trpc } from "~/lib/trpc/client";
 
 interface IProps {
   preferredCurrency: TCurrencyCode;
