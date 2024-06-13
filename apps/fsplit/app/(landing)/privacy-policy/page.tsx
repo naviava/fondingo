@@ -152,10 +152,10 @@ export default function PrivacyPolicyPage() {
           <Paragraph>
             To exercise your rights, please contact us at{" "}
             <a
-              href="mailto:fondingo@gmail.com"
+              href="mailto:team.fondingo@gmail.com"
               className="text-cta hover:underline"
             >
-              fondingo@gmail.com
+              team.fondingo@gmail.com
             </a>
             .
           </Paragraph>
@@ -179,10 +179,10 @@ export default function PrivacyPolicyPage() {
           If you have any questions or concerns about this Privacy Policy,
           please contact us at{" "}
           <a
-            href="mailto:fondingo@gmail.com"
+            href="mailto:team.fondingo@gmail.com"
             className="text-cta hover:underline"
           >
-            fondingo@gmail.com
+            team.fondingo@gmail.com
           </a>
           .
         </Paragraph>
