@@ -72,7 +72,7 @@ export function Navbar() {
     if (!!params.groupId) {
       return router.push(`/groups/${params.groupId}/expense`);
     }
-    return null;
+    return router.push("/create-group");
   }, [params.groupId, router]);
 
   return (
