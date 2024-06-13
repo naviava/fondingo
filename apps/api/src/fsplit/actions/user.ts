@@ -4,9 +4,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "@fondingo/utils/zod";
 import { compare, hash } from "bcrypt";
 
-import { sendVerificationEmail, sendPasswordResetEmail } from "../../utils";
 import { privateProcedure, publicProcedure } from "../trpc";
 import splitdb, { ZCurrencyCode } from "@fondingo/db-split";
+import { sendVerificationEmail } from "../../utils";
 
 export const getAuthProfile = publicProcedure.query(async () => {
   const session = await getServerSession();
@@ -16,12 +16,21 @@ export const getAuthProfile = publicProcedure.query(async () => {
 
   const user = await splitdb.user.findUnique({
     where: { email: session.user.email },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      image: true,
+      preferredCurrency: true,
+      disabled: true,
+    },
   });
   if (!user) return null;
-  // eslint-disable-next-line no-unused-vars
-  const { hashedPassword, ...userWithoutPassword } = user;
 
-  return userWithoutPassword;
+  return user;
 });
 
 export const createNewUser = publicProcedure

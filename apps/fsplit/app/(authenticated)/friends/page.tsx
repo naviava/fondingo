@@ -17,11 +17,13 @@ export const metadata: Metadata = {
 };
 
 export default async function FriendsPage() {
-  const { friends: friendsInApp, tempFriends: friendsInGroups } =
-    await serverClient.user.getFriends();
-
-  const { receivedFriendRequests } =
-    await serverClient.user.getFriendRequests();
+  const [
+    { friends: friendsInApp, tempFriends: friendsInGroups },
+    { receivedFriendRequests },
+  ] = await Promise.all([
+    serverClient.user.getFriends(),
+    serverClient.user.getFriendRequests(),
+  ]);
 
   return (
     <>

@@ -1,13 +1,16 @@
 import { DisplayAmount } from "~/components/display-amount";
-import { TCurrencyCode } from "@fondingo/db-split";
+import { TCurrencyCode, TSimplifiedDebt } from "@fondingo/db-split";
 import { DebtWithDetails } from "~/types";
 import { cn } from "@fondingo/ui/utils";
 
-interface IProps {
+type IProps = {
   userId: string;
   currency: TCurrencyCode;
-  data: DebtWithDetails[];
-}
+  data: (TSimplifiedDebt & {
+    from: { userId: string | null };
+    to: { userId?: string | null };
+  })[];
+};
 
 export function GroupBalance({ userId, currency, data }: IProps) {
   const grossBalanceAmount = data.reduce((acc, debt) => {
