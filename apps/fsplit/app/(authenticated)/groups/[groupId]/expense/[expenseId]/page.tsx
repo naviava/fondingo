@@ -7,7 +7,6 @@ import { ExpenseHeader } from "~/components/expense-id-page/expense-header";
 import { ChevronLeft } from "@fondingo/ui/lucide";
 import { Button } from "@fondingo/ui/button";
 
-import { formatDate } from "@fondingo/utils/date-fns-tz";
 import { serverClient } from "~/lib/trpc/server-client";
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
@@ -46,14 +45,12 @@ export default async function ExpenseIdPage({ params }: IProps) {
     expense.createdById,
   );
 
-  const createdAt = formatDate(expense.createdAt, "d MMMM yyyy");
   const expenseCreator = isExpenseCreatorInGroup
     ? expense.createdById === user?.id
       ? "you"
       : expense.createdBy.name
     : "(deleted)";
 
-  const updatedAt = formatDate(expense.updatedAt, "d MMMM yyyy");
   const expenseUpdatedBy = isExpenseCreatorInGroup
     ? expense.lastModifiedById === user?.id
       ? "you"
@@ -83,8 +80,8 @@ export default async function ExpenseIdPage({ params }: IProps) {
         currency={group.currency}
         expenseName={expense.name}
         expenseAmount={expense.amount}
-        createdAt={createdAt}
-        updatedAt={updatedAt}
+        createdAt={expense.createdAt}
+        updatedAt={expense.updatedAt}
         expenseCreator={expenseCreator || "Unknown"}
         expenseUpdatedBy={expenseUpdatedBy || "Unknown"}
       />

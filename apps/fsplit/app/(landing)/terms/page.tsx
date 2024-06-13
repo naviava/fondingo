@@ -163,10 +163,10 @@ export default function TermsPage() {
             <ListItem>
               You may terminate your account at any time by contacting us at{" "}
               <a
-                href="mailto:fondingo@gmail.com"
+                href="mailto:team.fondingo@gmail.com"
                 className="text-cta hover:underline"
               >
-                fondingo@gmail.com
+                team.fondingo@gmail.com
               </a>
               .
             </ListItem>
@@ -239,10 +239,10 @@ export default function TermsPage() {
           If you have any questions or concerns about these Terms, please
           contact us at{" "}
           <a
-            href="mailto:fondingo@gmail.com"
+            href="mailto:team.fondingo@gmail.com"
             className="text-cta hover:underline"
           >
-            fondingo@gmail.com
+            team.fondingo@gmail.com
           </a>
           .
         </Paragraph>
