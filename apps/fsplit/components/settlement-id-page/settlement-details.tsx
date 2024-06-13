@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDate } from "@fondingo/utils/date-fns";
+import { formatDate } from "@fondingo/utils/date-fns-tz";
 import { TCurrencyCode } from "@fondingo/db-split";
 import { usePanel } from "@fondingo/ui/use-panel";
 
