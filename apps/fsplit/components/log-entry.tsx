@@ -1,3 +1,5 @@
+"use client";
+
 import { formatDate } from "@fondingo/utils/date-fns-tz";
 import { Separator } from "@fondingo/ui/separator";
 
