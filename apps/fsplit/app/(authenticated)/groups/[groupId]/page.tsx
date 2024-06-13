@@ -66,9 +66,11 @@ export async function generateMetadata({
 }
 
 export default async function GroupIdPage({ params, searchParams }: IProps) {
-  const currentUser = await serverClient.user.getAuthProfile();
-  const group = await serverClient.group.getGroupById(params.groupId);
-  const logs = await serverClient.logs.groupByIdLogs(params.groupId);
+  const [currentUser, group, logs] = await Promise.all([
+    serverClient.user.getAuthProfile(),
+    serverClient.group.getGroupById(params.groupId),
+    serverClient.logs.groupByIdLogs(params.groupId),
+  ]);
   const groupMemberIds = group.members.map((member) => member.id);
 
   return (

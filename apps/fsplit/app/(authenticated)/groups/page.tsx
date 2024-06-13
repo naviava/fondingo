@@ -20,12 +20,11 @@ export const metadata: Metadata = {
 };
 
 export default async function GroupsPage() {
-  const user = await serverClient.user.getAuthProfile();
-  const groups = await serverClient.group.getGroups();
+  const [user, groups] = await Promise.all([
+    serverClient.user.getAuthProfile(),
+    serverClient.group.getGroups(),
+  ]);
 
-  if (!user) {
-    return redirect("/api/auth/signin");
-  }
   if (!user) return redirect("/api/auth/signin");
 
   return (

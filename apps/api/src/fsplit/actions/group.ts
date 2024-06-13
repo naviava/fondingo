@@ -318,32 +318,19 @@ export const getGroups = privateProcedure.query(async ({ ctx }) => {
         some: { userId: user.id, isDeleted: false },
       },
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      color: true,
+      type: true,
+      currency: true,
       simplifiedDebts: {
         include: {
           from: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  image: true,
-                },
-              },
-            },
+            select: { userId: true },
           },
           to: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  image: true,
-                },
-              },
-            },
+            select: { userId: true },
           },
         },
       },
