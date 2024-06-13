@@ -8,7 +8,7 @@ import { toast } from "@fondingo/ui/use-toast";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Button } from "@fondingo/ui/button";
 
-import { format } from "@fondingo/utils/date-fns";
+import { formatDate } from "@fondingo/utils/date-fns-tz";
 import { trpc } from "~/lib/trpc/client";
 
 interface IProps {
@@ -73,7 +73,7 @@ function _IncomingFriendRequest({
         <div>
           <p className="font-medium">{fromName}</p>
           <p className="text-xs font-semibold italic text-neutral-400">
-            sent on {format(new Date(createdAt), "LLL d, yyyy")}
+            sent on {formatDate(createdAt, "LLL d, yyyy")}
           </p>
         </div>
       </div>

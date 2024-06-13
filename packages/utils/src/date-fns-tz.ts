@@ -1,6 +1,7 @@
-import { format } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 
 export * from "date-fns-tz";
 export function formatDate(dateStamp: Date | string, code: string) {
-  return format(new Date(dateStamp), code);
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return formatInTimeZone(new Date(dateStamp), timeZone, code);
 }
