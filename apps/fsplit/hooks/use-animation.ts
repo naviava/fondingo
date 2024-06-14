@@ -16,6 +16,19 @@ export function useAnimation() {
     }
   }, [scope, animate]);
 
+  const scaleAndRotate = useCallback(async () => {
+    if (!!scope.current) {
+      await animate("#scaleAndRotate", { scale: 0.8 }, { duration: 0.3 });
+      await animate(
+        "#scaleAndRotate",
+        { rotate: "1080deg" },
+        { duration: 0.7 },
+      );
+      await animate("#scaleAndRotate", { scale: 1 }, { duration: 0.2 });
+      await animate("#scaleAndRotate", { rotate: "0deg" }, { duration: 0 });
+    }
+  }, [scope, animate]);
+
   const textStory = useCallback(
     async (texts: string[]) => {
       if (!texts || texts.length < 2) return;
@@ -43,6 +56,7 @@ export function useAnimation() {
     animate,
     animationText,
     scaleAndShake,
+    scaleAndRotate,
     textStory,
   };
 }
