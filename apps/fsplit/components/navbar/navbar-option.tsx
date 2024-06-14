@@ -45,7 +45,7 @@ export function NavbarOption({
       {isActive && (
         <motion.div
           layoutId="nav-item"
-          className="bg-cta absolute -top-2 h-[2px] w-full"
+          className="bg-cta absolute -top-3.5 h-[2px] w-full md:-top-2"
         />
       )}
       {showNotification && !!incomingFriendRequestCount && (
