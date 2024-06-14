@@ -3,14 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
-import { useAddFriendModal } from "@fondingo/store/fsplit";
 import { useDebounceValue, useMediaQuery } from "@fondingo/utils/hooks";
+import { useAddFriendModal } from "@fondingo/store/fsplit";
 
 import { ScrollArea } from "@fondingo/ui/scroll-area";
 import { Separator } from "@fondingo/ui/separator";
 import { toast } from "@fondingo/ui/use-toast";
 import { Avatar } from "@fondingo/ui/avatar";
 import { Button } from "@fondingo/ui/button";
+import { EmptyState } from "./empty-state";
 import { Input } from "@fondingo/ui/input";
 import {
   ArrowLeft,
@@ -28,7 +29,6 @@ import {
 
 import { trpc } from "~/lib/trpc/client";
 import { cn } from "@fondingo/ui/utils";
-import { EmptyState } from "./empty-state";
 import { hfont } from "~/utils";
 
 export function AddFriendModal() {
@@ -140,7 +140,7 @@ export function AddFriendModal() {
                   key={user?.id}
                   className="flex cursor-pointer items-center justify-between gap-x-2 rounded-md px-2 py-1 transition hover:bg-neutral-100"
                 >
-                  <div className="flex items-center gap-x-2">
+                  <div className="flex max-w-[87%] flex-1 items-center gap-x-2 transition-all md:max-w-[75%]">
                     <Avatar
                       variant={isTab ? "sm" : "default"}
                       userName={user?.name}
