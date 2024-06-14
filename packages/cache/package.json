@@ -1,0 +1,11 @@
+{
+  "name": "@fondingo/cache",
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "author": "Navin Avadhani",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ioredis": "^5.4.1"
+  }
+}

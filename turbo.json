@@ -1,9 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    "**/.env.*local",
-    "**/.env"
-  ],
+  "globalDependencies": ["**/.env.*local", "**/.env"],
   "globalEnv": [
     "NODE_ENV",
     "NEXTAUTH_SECRET",
@@ -18,23 +15,16 @@
     "AUTH_FACEBOOK_ID",
     "AUTH_FACEBOOK_SECRET",
     "NEXT_PUBLIC_SITE_URL",
-    "RESEND_API_KEY"
+    "RESEND_API_KEY",
+    "REDIS_URL"
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build",
-        "^db:generate"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build", "^db:generate"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ]
+      "dependsOn": ["^lint"]
     },
     "dev": {
       "cache": false,

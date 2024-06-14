@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@fondingo/db-split": "workspace:*",
+    "@fondingo/cache": "workspace:*",
     "@fondingo/utils": "workspace:*",
     "@trpc/server": "11.0.0-rc.366",
     "@types/bcrypt": "^5.0.2",
