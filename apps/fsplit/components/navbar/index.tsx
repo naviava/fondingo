@@ -1,7 +1,6 @@
 "use client";
 
-import { useParams, usePathname, useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { Fragment } from "react";
 import Link from "next/link";
 
 import { usePanel } from "@fondingo/ui/use-panel";
@@ -9,7 +8,7 @@ import { uuid } from "@fondingo/utils/uuid";
 
 import { MdOutlineLocalActivity, MdLocalActivity } from "react-icons/md";
 import { NavbarOption } from "./navbar-option";
-import { Button } from "@fondingo/ui/button";
+import { AnimatedPlus } from "./animated-plus";
 import {
   RiUser3Line,
   RiUser3Fill,
@@ -17,97 +16,58 @@ import {
   RiGroupLine,
 } from "react-icons/ri";
 
+const OPTIONS = [
+  {
+    id: uuid(),
+    inactiveIcon: RiUser3Line,
+    activeIcon: RiUser3Fill,
+    label: "Friends",
+    href: "/friends",
+  },
+  {
+    id: uuid(),
+    inactiveIcon: RiGroupLine,
+    activeIcon: RiGroupFill,
+    label: "Groups",
+    href: "/groups",
+  },
+  {
+    id: uuid(),
+    inactiveIcon: MdOutlineLocalActivity,
+    activeIcon: MdLocalActivity,
+    label: "Activity",
+    href: "/activity",
+  },
+  {
+    id: uuid(),
+    inactiveIcon: RiUser3Line,
+    activeIcon: RiUser3Fill,
+    label: "Account",
+    href: "/account",
+  },
+];
+
 export function Navbar() {
-  const router = useRouter();
-  const params = useParams();
-  const pathname = usePathname();
   const { bottomDivRef } = usePanel();
-
-  // TODO: Add global state for navbar links.
-  const optionsLeft = useMemo(
-    () => [
-      {
-        id: uuid(),
-        inactiveIcon: RiUser3Line,
-        activeIcon: RiUser3Fill,
-        label: "Friends",
-        href: "/friends",
-        isActive: pathname.startsWith("/friends"),
-      },
-      {
-        id: uuid(),
-        inactiveIcon: RiGroupLine,
-        activeIcon: RiGroupFill,
-        label: "Groups",
-        href: "/groups",
-        isActive: pathname.startsWith("/groups"),
-      },
-    ],
-    [pathname],
-  );
-
-  const optionsRight = useMemo(
-    () => [
-      {
-        id: uuid(),
-        inactiveIcon: MdOutlineLocalActivity,
-        activeIcon: MdLocalActivity,
-        label: "Activity",
-        href: "/activity",
-        isActive: pathname.startsWith("/activity"),
-      },
-      {
-        id: uuid(),
-        inactiveIcon: RiUser3Line,
-        activeIcon: RiUser3Fill,
-        label: "Account",
-        href: "/account",
-        isActive: pathname.startsWith("/account"),
-      },
-    ],
-    [pathname],
-  );
-
-  const handleClick = useCallback(() => {
-    if (!!params.groupId) {
-      return router.push(`/groups/${params.groupId}/expense`);
-    }
-    return router.push("/create-group");
-  }, [params.groupId, router]);
 
   return (
     <nav
       ref={bottomDivRef}
       className="absolute bottom-0 z-50 flex h-20 w-full items-center justify-between border-t bg-[#F4F4F4] px-4 pb-6 pt-2 md:px-6"
     >
-      {optionsLeft.map((option) => (
-        <Link key={option.id} href={option.href}>
-          <NavbarOption
-            label={option.label}
-            isActive={option.isActive}
-            activeIcon={option.activeIcon}
-            inactiveIcon={option.inactiveIcon}
-            showNotification={option.label === "Friends"}
-          />
-        </Link>
-      ))}
-      <Button
-        type="button"
-        variant="cta"
-        onClick={handleClick}
-        className="aspect-square h-full px-3"
-      >
-        <span className="text-[60px] font-light">+</span>
-      </Button>
-      {optionsRight.map((option) => (
-        <Link key={option.id} href={option.href}>
-          <NavbarOption
-            label={option.label}
-            isActive={option.isActive}
-            activeIcon={option.activeIcon}
-            inactiveIcon={option.inactiveIcon}
-          />
-        </Link>
+      {OPTIONS.map((option, idx) => (
+        <Fragment key={option.id}>
+          {idx === 2 && <AnimatedPlus />}
+          <Link href={option.href}>
+            <NavbarOption
+              href={option.href}
+              label={option.label}
+              activeIcon={option.activeIcon}
+              inactiveIcon={option.inactiveIcon}
+              showNotification={option.label === "Friends"}
+            />
+          </Link>
+        </Fragment>
       ))}
     </nav>
   );

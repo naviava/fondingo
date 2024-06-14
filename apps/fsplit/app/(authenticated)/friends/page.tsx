@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+
 import { serverClient } from "~/lib/trpc/server-client";
 import { FcRating } from "react-icons/fc";
 
@@ -7,9 +9,9 @@ import { DynamicScrollArea } from "@fondingo/ui/dynamic-scroll-area";
 import { FriendEntry } from "~/components/friends-page/friend-entry";
 import { NoFriends } from "~/components/friends-page/no-friends";
 import { SocialHeader } from "~/components/social-header";
+
 import { cn } from "@fondingo/ui/utils";
 import { hfont } from "~/utils";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Friends",
