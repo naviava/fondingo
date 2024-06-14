@@ -75,6 +75,9 @@ importers:
       '@fondingo/api':
         specifier: workspace:*
         version: link:../api
+      '@fondingo/cache':
+        specifier: workspace:*
+        version: link:../../packages/cache
       '@fondingo/db-split':
         specifier: workspace:*
         version: link:../../packages/db-split

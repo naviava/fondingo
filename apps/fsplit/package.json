@@ -12,6 +12,7 @@
     "@auth/prisma-adapter": "^2.0.0",
     "@ducanh2912/next-pwa": "^10.2.7",
     "@fondingo/api": "workspace:*",
+    "@fondingo/cache": "workspace:*",
     "@fondingo/db-split": "workspace:*",
     "@fondingo/store": "workspace:*",
     "@fondingo/ui": "workspace:*",

@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import dotenv from "dotenv";
+import { config } from "dotenv";
 
-dotenv.config();
+config();
 export const redis = new Redis(process.env.REDIS_URL!);
