@@ -20,12 +20,12 @@ export function Quote() {
               quoteFont.className,
             )}
           >
-            <p className="text-center">
+            <div className="text-center">
               <TextGenerateEffect
                 words={`Coming together is a beginning; keeping together is progress;
               working together is success.`}
               />
-            </p>
+            </div>
           </blockquote>
           <p
             className={cn(

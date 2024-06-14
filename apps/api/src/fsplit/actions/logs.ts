@@ -58,6 +58,14 @@ export const userLogs = privateProcedure.query(async ({ ctx }) => {
           },
         ],
       },
+      include: {
+        group: {
+          select: {
+            name: true,
+            color: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
     return logs;

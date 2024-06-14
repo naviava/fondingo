@@ -2,13 +2,18 @@
 
 import { formatDate } from "@fondingo/utils/date-fns-tz";
 import { Separator } from "@fondingo/ui/separator";
+import { hexToRgb } from "~/utils";
 
 interface IProps {
   message: string;
   createdAt: Date;
+  group?: {
+    name?: string | undefined;
+    color?: string | undefined;
+  };
 }
 
-export function LogEntry({ message, createdAt }: IProps) {
+export function LogEntry({ message, createdAt, group }: IProps) {
   return (
     <li>
       <Separator />
@@ -22,9 +27,22 @@ export function LogEntry({ message, createdAt }: IProps) {
         </div>
         <div className="space-y-1">
           <p className="line-clamp-2 text-sm md:text-base">{message}</p>
-          <p className="text-xs text-neutral-500">
-            {formatDate(createdAt, "h:mm a")}
-          </p>
+          <div className="flex items-center gap-x-2 text-xs">
+            <span className="text-neutral-500">
+              {formatDate(createdAt, "h:mm a")}
+            </span>
+            {group?.name && group.color && (
+              <span
+                className="max-w-[15rem] truncate rounded-full px-2 font-medium md:max-w-[25rem]"
+                style={{
+                  border: `1px solid ${group.color}`,
+                  backgroundColor: `${hexToRgb(group.color, 0.1)}`,
+                }}
+              >
+                {group.name}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </li>

@@ -30,6 +30,7 @@ export default async function ActivityPage() {
               key={log.id}
               message={log.message}
               createdAt={log.createdAt}
+              group={{ ...log.group }}
             />
           ))}
         </ul>
