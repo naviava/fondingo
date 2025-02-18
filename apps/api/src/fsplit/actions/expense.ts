@@ -5,6 +5,8 @@ import { calculateDebts } from "../utils/calculate-debts";
 import { hasDuplicates } from "../utils";
 import splitdb from "@fondingo/db-split";
 import { z } from "@fondingo/utils/zod";
+import { createAuditLog } from "../utils/expense-audit";
+import { createSettlementAuditLog } from "../utils/settlement-audit";
 
 export const addExpense = privateProcedure
   .input(
@@ -135,6 +137,10 @@ export const addExpense = privateProcedure
             createdById: user.id,
             lastModifiedById: user.id,
           },
+          include: {
+            payments: true,
+            splits: true,
+          },
         });
         if (!expense)
           throw new TRPCError({
@@ -142,6 +148,47 @@ export const addExpense = privateProcedure
             message: "Failed to create expense",
           });
 
+        // Create payments and splits
+        for (const payment of payments) {
+          await db.expensePayment.create({
+            data: {
+              amount: Math.floor(payment.amount * 100),
+              groupMemberId: payment.userId,
+              expenseId: expense.id,
+            },
+          });
+        }
+
+        for (const split of splits) {
+          await db.expenseSplit.create({
+            data: {
+              amount: Math.floor(split.amount * 100),
+              groupMemberId: split.userId,
+              expenseId: expense.id,
+            },
+          });
+        }
+
+        // Fetch the complete expense with all relations for audit log
+        const expenseWithRelations = await db.expense.findUnique({
+          where: { id: expense.id },
+          include: {
+            payments: true,
+            splits: true,
+          },
+        });
+
+        if (!expenseWithRelations) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to fetch expense for audit log",
+          });
+        }
+
+        // Create audit log for the new expense
+        await createAuditLog(expenseWithRelations, "CREATED");
+
+        // Create activity log
         const log = await db.log.create({
           data: {
             type: "EXPENSE",
@@ -151,42 +198,8 @@ export const addExpense = privateProcedure
             message: `${userInGroup.name} added an expense "${expense.name}", of ${group.currency} ${(expense.amount / 100).toFixed(2)}`,
           },
         });
-        if (!log)
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create log. Expense not added.",
-          });
 
-        for (const payment of payments) {
-          const expensePayment = await db.expensePayment.create({
-            data: {
-              amount: Math.floor(payment.amount * 100),
-              groupMemberId: payment.userId,
-              expenseId: expense.id,
-            },
-          });
-          if (!expensePayment)
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to create payment",
-            });
-        }
-
-        for (const split of splits) {
-          const expenseSplit = await db.expenseSplit.create({
-            data: {
-              amount: Math.floor(split.amount * 100),
-              groupMemberId: split.userId,
-              expenseId: expense.id,
-            },
-          });
-          if (!expenseSplit)
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to create split",
-            });
-        }
-        return expense;
+        return expenseWithRelations;
       });
 
       const res = await calculateDebts(groupId);
@@ -340,6 +353,22 @@ export const updateExpense = privateProcedure
     });
 
     const updatedExpense = await splitdb.$transaction(async (db) => {
+      const existingExpenseWithRelations = await db.expense.findUnique({
+        where: { id: existingExpense.id },
+        include: {
+          payments: true,
+          splits: true,
+        },
+      });
+
+      if (!existingExpenseWithRelations) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch existing expense for audit log",
+        });
+      }
+
+      // Delete existing payments and splits
       await db.expensePayment.deleteMany({
         where: { expenseId: existingExpense.id },
       });
@@ -356,16 +385,57 @@ export const updateExpense = privateProcedure
           groupId,
         },
         include: {
+          payments: true,
+          splits: true,
           group: {
             select: { currency: true },
           },
         },
       });
-      if (!updatedExpense)
+
+      // Create new payments and splits
+      for (const payment of payments) {
+        await db.expensePayment.create({
+          data: {
+            amount: Math.floor(payment.amount * 100),
+            groupMemberId: payment.userId,
+            expenseId: updatedExpense.id,
+          },
+        });
+      }
+
+      for (const split of splits) {
+        await db.expenseSplit.create({
+          data: {
+            amount: Math.floor(split.amount * 100),
+            groupMemberId: split.userId,
+            expenseId: updatedExpense.id,
+          },
+        });
+      }
+
+      // Fetch the complete updated expense with all relations for audit log
+      const updatedExpenseWithRelations = await db.expense.findUnique({
+        where: { id: updatedExpense.id },
+        include: {
+          payments: true,
+          splits: true,
+        },
+      });
+
+      if (!updatedExpenseWithRelations) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update expense",
+          message: "Failed to fetch updated expense for audit log",
         });
+      }
+
+      // Create audit log for the update
+      await createAuditLog(
+        updatedExpenseWithRelations,
+        "UPDATED",
+        existingExpenseWithRelations,
+      );
 
       if (updatedExpense.name !== existingExpense.name) {
         const log = await db.log.create({
@@ -400,35 +470,6 @@ export const updateExpense = privateProcedure
           });
       }
 
-      for (const payment of payments) {
-        const expensePayment = await db.expensePayment.create({
-          data: {
-            amount: Math.floor(payment.amount * 100),
-            groupMemberId: payment.userId,
-            expenseId: updatedExpense.id,
-          },
-        });
-        if (!expensePayment)
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create payment",
-          });
-      }
-
-      for (const split of splits) {
-        const expenseSplit = await db.expenseSplit.create({
-          data: {
-            amount: Math.floor(split.amount * 100),
-            groupMemberId: split.userId,
-            expenseId: updatedExpense.id,
-          },
-        });
-        if (!expenseSplit)
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create split",
-          });
-      }
       return updatedExpense;
     });
 
@@ -580,12 +621,19 @@ export const deleteExpenseById = privateProcedure
     const deletedExpense = await splitdb.$transaction(async (db) => {
       const deletedExpense = await db.expense.delete({
         where: { id: existingExpense.id },
+        include: {
+          payments: true,
+          splits: true,
+        },
       });
       if (!deletedExpense)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete expense",
         });
+
+      // Create audit log for the deletion
+      await createAuditLog(deletedExpense, "DELETED");
 
       const log = await db.log.create({
         data: {
@@ -685,11 +733,11 @@ export const addSettlement = privateProcedure
           },
         },
       });
-      if (!settlement)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create settlement",
-        });
+
+      // Create audit log for the new settlement
+      await createSettlementAuditLog(settlement, "CREATED");
+
+      // Create activity log
       const userInGroup = settlement.group.members.find(
         (m) => m.userId === user.id,
       );
@@ -708,11 +756,7 @@ export const addSettlement = privateProcedure
           message: `${userInGroup.name} added a payment of ${group.currency} ${(settlement.amount / 100).toFixed(2)}, from ${settlement.from.name} to ${settlement.to.name}`,
         },
       });
-      if (!log)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create log. Settlement not added.",
-        });
+
       return settlement;
     });
 
@@ -804,12 +848,15 @@ export const updateSettlement = privateProcedure
           },
         },
       });
-      if (!updatedSettlement)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update settlement",
-        });
-      const userInGroup = updatedSettlement.group.members.find(
+
+      // Create audit log for the update
+      await createSettlementAuditLog(
+        updatedSettlement,
+        "UPDATED",
+        existingSettlement,
+      );
+
+      const userInGroup = existingSettlement.group.members.find(
         (m) => m.userId === user.id,
       );
       if (!userInGroup)
@@ -1044,11 +1091,9 @@ export const deleteSettlementById = privateProcedure
           },
         },
       });
-      if (!deletedSettlement)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to delete Settlement",
-        });
+
+      // Create audit log for the deletion
+      await createSettlementAuditLog(existingSettlement, "DELETED");
 
       const log = await db.log.create({
         data: {

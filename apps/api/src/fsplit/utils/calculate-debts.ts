@@ -7,6 +7,10 @@ import {
   createAuditLog,
 } from "./expense-audit";
 import { ChangeType } from "@prisma/client";
+import {
+  getSettlementChangesSince,
+  processSettlementChange,
+} from "./settlement-audit";
 
 /**
  * Calculates and simplifies debts within a group by processing expenses, splits, and settlements.
@@ -22,7 +26,7 @@ import { ChangeType } from "@prisma/client";
  * - Therefore, we do a full recalculation when any expense is modified or deleted
  *
  * @param groupId - The ID of the group to calculate debts for
- * @param isManualUpdate - Whether this is a manual update (affects lastCalculatedDebtsAt update)
+ * @param isManualUpdate - Whether this is a manual update (only affects logging behavior)
  * @returns Success or error message
  */
 export async function calculateDebts(
@@ -31,45 +35,33 @@ export async function calculateDebts(
 ): Promise<{ success: string } | { error: string }> {
   try {
     return splitdb.$transaction(async (tx) => {
-      // Check when debts were last calculated for this group
+      // Add a lock to prevent concurrent calculations
       const group = await tx.group.findUnique({
         where: { id: groupId },
-        select: { lastCacluatedDebtsAt: true },
-      });
-
-      // For first-time calculation or if no previous calculation exists,
-      // we need to process all transactions from scratch
-      if (!group?.lastCacluatedDebtsAt) {
-        return calculateAllDebts(tx, groupId, isManualUpdate);
-      }
-
-      // Get all changes since last calculation from audit log
-      const changes = await getExpenseChangesSince(
-        groupId,
-        group.lastCacluatedDebtsAt,
-      );
-
-      // If there are any updates, we need to do a full recalculation
-      // This is temporary until we implement proper update handling
-      if (
-        changes.some(
-          (change: { changeType: ChangeType }) =>
-            change.changeType === "UPDATED",
-        )
-      ) {
-        return calculateAllDebts(tx, groupId, isManualUpdate);
-      }
-
-      // Get new settlements between group members
-      const newSettlements = await tx.settlement.findMany({
-        where: {
-          groupId,
-          createdAt: { gt: group.lastCacluatedDebtsAt },
+        select: {
+          lastCacluatedDebtsAt: true,
+          updatedAt: true, // Used for optimistic locking
         },
       });
 
-      // If no changes and no new settlements, return early
-      if (changes.length === 0 && newSettlements.length === 0) {
+      if (!group) {
+        return { error: "Group not found" };
+      }
+
+      // For first-time calculation or if no previous calculation exists,
+      // we need to process all transactions from scratch
+      if (!group.lastCacluatedDebtsAt) {
+        return calculateAllDebts(tx, groupId, isManualUpdate);
+      }
+
+      // Get all changes since last calculation from audit logs
+      const [expenseChanges, settlementChanges] = await Promise.all([
+        getExpenseChangesSince(groupId, group.lastCacluatedDebtsAt),
+        getSettlementChangesSince(groupId, group.lastCacluatedDebtsAt),
+      ]);
+
+      // If no changes, return early
+      if (expenseChanges.length === 0 && settlementChanges.length === 0) {
         return { success: "No new transactions to process" };
       }
 
@@ -81,24 +73,44 @@ export async function calculateDebts(
       // Convert simplified debts into a balance sheet
       const balances: { [key: string]: number } = {};
       for (const debt of existingDebts) {
-        balances[debt.fromId] = (balances[debt.fromId] || 0) - debt.amount;
-        balances[debt.toId] = (balances[debt.toId] || 0) + debt.amount;
+        // Validate and round amount
+        const validAmount = validateAmount(debt.amount);
+        if (validAmount === null) {
+          return {
+            error: "Invalid debt amount: must be a whole number of cents",
+          };
+        }
+        balances[debt.fromId] = (balances[debt.fromId] || 0) - validAmount;
+        balances[debt.toId] = (balances[debt.toId] || 0) + validAmount;
       }
 
       // Process all expense changes from audit log
-      for (const change of changes) {
+      for (const change of expenseChanges) {
         const changeBalances = await processExpenseChange(change);
         for (const [memberId, amount] of changeBalances.entries()) {
-          balances[memberId] = (balances[memberId] || 0) + amount;
+          const validAmount = validateAmount(amount);
+          if (validAmount === null) {
+            return {
+              error: "Invalid expense amount: must be a whole number of cents",
+            };
+          }
+          balances[memberId] = (balances[memberId] || 0) + validAmount;
         }
       }
 
-      // Process new settlements
-      for (const settlement of newSettlements) {
-        balances[settlement.fromId] =
-          (balances[settlement.fromId] || 0) + settlement.amount;
-        balances[settlement.toId] =
-          (balances[settlement.toId] || 0) - settlement.amount;
+      // Process all settlement changes from audit log
+      for (const change of settlementChanges) {
+        const changeBalances = await processSettlementChange(change);
+        for (const [memberId, amount] of changeBalances.entries()) {
+          const validAmount = validateAmount(amount);
+          if (validAmount === null) {
+            return {
+              error:
+                "Invalid settlement amount: must be a whole number of cents",
+            };
+          }
+          balances[memberId] = (balances[memberId] || 0) + validAmount;
+        }
       }
 
       // Clear existing simplified debts before storing new ones
@@ -113,30 +125,22 @@ export async function calculateDebts(
         amount: number;
       }[] = [];
 
-      // Simplify the debts using a greedy algorithm:
-      // 1. Find person who is owed the most (maxOwed)
-      // 2. Find person who owes the most (maxOwing)
-      // 3. Create a debt between them for the minimum of their amounts
-      // 4. Update their balances and repeat until no more debts can be created
+      // Simplify the debts using a greedy algorithm
       while (
         Object.keys(balances).length > 0 &&
         Object.keys(balances).length > 1
       ) {
-        // Find person owed the most money (highest positive balance)
         const maxOwed = Object.keys(balances).reduce((a, b) =>
           (balances[a] ?? 0) > (balances[b] ?? 0) ? a : b,
         );
-        // Find person who owes the most money (lowest negative balance)
         const maxOwing = Object.keys(balances).reduce((a, b) =>
           (balances[a] ?? 0) < (balances[b] ?? 0) ? a : b,
         );
-        // Take the minimum of the two amounts to create a debt
         const amount = Math.min(
           Math.abs(balances[maxOwed] ?? 0),
           Math.abs(balances[maxOwing] ?? 0),
         );
 
-        // Only create debt if amount is positive
         if (amount > 0) {
           debts.push({
             from: maxOwing,
@@ -145,35 +149,41 @@ export async function calculateDebts(
           });
         }
 
-        // Update balances after creating the debt
         balances[maxOwed] = (balances[maxOwed] ?? 0) - amount;
         balances[maxOwing] = (balances[maxOwing] ?? 0) + amount;
 
-        // Remove members whose balance is now zero
         if (balances[maxOwed] === 0) delete balances[maxOwed];
         if (balances[maxOwing] === 0) delete balances[maxOwing];
       }
 
       // Store the simplified debts in the database
       for (const debt of debts) {
-        await tx.simplifiedDebt.create({
-          data: {
-            fromId: debt.from,
-            toId: debt.to,
-            amount: debt.amount,
-            groupId,
-          },
-        });
+        if (debt.amount > 0) {
+          // Explicit positive amount check
+          await tx.simplifiedDebt.create({
+            data: {
+              fromId: debt.from,
+              toId: debt.to,
+              amount: debt.amount,
+              groupId,
+            },
+          });
+        }
       }
 
-      // Update last calculation timestamp if this is a manual update
-      if (isManualUpdate) {
-        await tx.group.update({
-          where: { id: groupId },
-          data: {
-            lastCacluatedDebtsAt: new Date(),
-          },
-        });
+      // Use optimistic locking to prevent race conditions
+      const updated = await tx.group.update({
+        where: {
+          id: groupId,
+          updatedAt: group.updatedAt, // Only update if no other changes happened
+        },
+        data: {
+          lastCacluatedDebtsAt: new Date(),
+        },
+      });
+
+      if (!updated) {
+        return { error: "Calculation conflict detected, please retry" };
       }
 
       return { success: "Simplified debts calculated and stored" };
@@ -238,32 +248,45 @@ async function calculateAllDebts(
 
   // Add positive balance for payments made
   for (const payment of payments) {
+    const validAmount = validateAmount(payment.amount);
+    if (validAmount === null) {
+      return {
+        error: "Invalid payment amount: must be a whole number of cents",
+      };
+    }
     const paidBy = payment.groupMemberId;
-    const amount = payment.amount;
 
     if (!balances[paidBy]) balances[paidBy] = 0;
-    balances[paidBy] += amount;
+    balances[paidBy] += validAmount;
   }
 
   // Add negative balance for expense splits (amounts owed)
   for (const split of splits) {
+    const validAmount = validateAmount(split.amount);
+    if (validAmount === null) {
+      return { error: "Invalid split amount: must be a whole number of cents" };
+    }
     const owes = split.groupMemberId;
-    const amount = split.amount;
 
     if (!balances[owes]) balances[owes] = 0;
-    balances[owes] -= amount;
+    balances[owes] -= validAmount;
   }
 
   // Process settlements (direct transfers between members)
   for (const settlement of settlements) {
+    const validAmount = validateAmount(settlement.amount);
+    if (validAmount === null) {
+      return {
+        error: "Invalid settlement amount: must be a whole number of cents",
+      };
+    }
     const paidBy = settlement.fromId;
     const receivedBy = settlement.toId;
-    const amount = settlement.amount;
 
     if (!balances[paidBy]) balances[paidBy] = 0;
     if (!balances[receivedBy]) balances[receivedBy] = 0;
-    balances[paidBy] += amount;
-    balances[receivedBy] -= amount;
+    balances[paidBy] -= validAmount;
+    balances[receivedBy] += validAmount;
   }
 
   // Array to store simplified debts
@@ -283,11 +306,14 @@ async function calculateAllDebts(
     );
     const amount = Math.min(balances[maxOwed]!, -balances[maxOwing]!);
 
-    debts.push({
-      from: maxOwing,
-      to: maxOwed,
-      amount,
-    });
+    if (amount > 0) {
+      // Explicit positive amount check
+      debts.push({
+        from: maxOwing,
+        to: maxOwed,
+        amount,
+      });
+    }
     balances[maxOwed]! -= amount;
     balances[maxOwing]! += amount;
 
@@ -297,7 +323,8 @@ async function calculateAllDebts(
 
   // Store simplified debts in the database
   for (const debt of debts) {
-    if (!!debt.amount) {
+    if (debt.amount > 0) {
+      // Explicit positive amount check
       await tx.simplifiedDebt.create({
         data: {
           fromId: debt.from,
@@ -309,14 +336,34 @@ async function calculateAllDebts(
     }
   }
 
-  // Update last calculation timestamp for manual updates
-  if (isManualUpdate)
-    await tx.group.update({
-      where: { id: groupId },
-      data: {
-        lastCacluatedDebtsAt: new Date(),
-      },
-    });
+  // Always update last calculation timestamp
+  await tx.group.update({
+    where: { id: groupId },
+    data: {
+      lastCacluatedDebtsAt: new Date(),
+    },
+  });
 
   return { success: "Simplified debts calculated and stored" };
+}
+
+/**
+ * Validates that an amount is a valid integer value in cents.
+ * Since all amounts are stored as integers in cents in the database,
+ * we just need to verify the value is a valid integer.
+ *
+ * @param amount - The amount to validate (in cents)
+ * @returns The amount if valid, or null if invalid
+ */
+function validateAmount(amount: number): number | null {
+  // Check if it's a valid number and an integer
+  if (
+    typeof amount !== "number" ||
+    isNaN(amount) ||
+    !Number.isInteger(amount)
+  ) {
+    return null;
+  }
+
+  return amount;
 }

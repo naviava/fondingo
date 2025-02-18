@@ -176,11 +176,11 @@ model FriendRequest {
 }
 
 model Group {
-  id                   String            @id @default(cuid())
+  id                   String               @id @default(cuid())
   name                 String
   color                String
   type                 GroupType
-  currency             CurrencyCode      @default(USD)
+  currency             CurrencyCode         @default(USD)
   lastCacluatedDebtsAt DateTime?
   members              GroupMember[]
   expenses             Expense[]
@@ -188,6 +188,7 @@ model Group {
   simplifiedDebts      SimplifiedDebt[]
   logs                 Log[]
   auditLogs            ExpenseAuditLog[]
+  SettlementAuditLog   SettlementAuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -308,6 +309,40 @@ model Log {
   updatedAt DateTime @updatedAt
 }
 
+model ExpenseAuditLog {
+  id         String     @id @default(cuid())
+  expenseId  String
+  groupId    String
+  group      Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  changeType ChangeType
+  // Store both old and new states for updates
+  oldState   Json // Includes expense details, payments, and splits
+  newState   Json? // Only used for updates, null for creates/deletes
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([groupId])
+  @@index([expenseId])
+  @@index([createdAt])
+}
+
+model SettlementAuditLog {
+  id           String     @id @default(cuid())
+  settlementId String
+  groupId      String
+  group        Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  changeType   ChangeType
+  // Store both old and new states for updates
+  oldState     Json // Includes settlement details
+  newState     Json? // Only used for updates, null for creates/deletes
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([groupId])
+  @@index([settlementId])
+  @@index([createdAt])
+}
+
 model ContactForm {
   id      String @id @default(cuid())
   name    String
@@ -355,20 +390,4 @@ enum ChangeType {
   CREATED
   UPDATED
   DELETED
-}
-
-model ExpenseAuditLog {
-  id         String     @id @default(cuid())
-  expenseId  String
-  groupId    String
-  group      Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  changeType ChangeType
-  // Store the complete state of the expense and its relations at the time of change
-  oldState   Json // Includes expense details, payments, and splits
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  @@index([groupId])
-  @@index([expenseId])
-  @@index([createdAt])
 }

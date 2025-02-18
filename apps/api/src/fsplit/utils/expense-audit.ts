@@ -7,6 +7,7 @@ import {
   ExpenseSplit,
   ChangeType,
   Prisma,
+  ExpenseAuditLog,
 } from "@prisma/client";
 
 // Type for expense with its related payments and splits
@@ -17,31 +18,59 @@ type ExpenseWithRelations = Expense & {
 
 // Type for audit log with parsed state
 type ExpenseAuditLogWithParsedState = Omit<
-  Awaited<ReturnType<typeof getExpenseChangesSince>>[number],
-  "oldState"
+  ExpenseAuditLog,
+  "oldState" | "newState"
 > & {
   oldState: ExpenseWithRelations;
+  newState?: ExpenseWithRelations;
 };
 
 /**
  * Creates an audit log entry for an expense change.
  * Stores the complete state of the expense including all payments and splits.
- * This is used to track changes for incremental debt calculations.
+ * For updates, stores both old and new states to enable efficient debt calculations.
  *
- * @param expense - The expense being changed (with payments and splits)
+ * @param expense - The current state of the expense (with payments and splits)
  * @param changeType - The type of change (CREATED, UPDATED, DELETED)
+ * @param oldExpense - The previous state for updates, required when changeType is UPDATED
  */
 export async function createAuditLog(
   expense: ExpenseWithRelations,
   changeType: ChangeType,
+  oldExpense?: ExpenseWithRelations,
 ) {
-  const oldState: Prisma.JsonObject = {
-    ...expense,
-    payments: expense.payments,
-    splits: expense.splits,
-    createdAt: expense.createdAt.toISOString(),
-    updatedAt: expense.updatedAt.toISOString(),
-  };
+  // For updates, we need both old and new states
+  if (changeType === "UPDATED" && !oldExpense) {
+    throw new Error("Old expense state required for updates");
+  }
+
+  const oldState: Prisma.JsonObject =
+    changeType === "UPDATED"
+      ? {
+          ...oldExpense!,
+          payments: oldExpense!.payments,
+          splits: oldExpense!.splits,
+          createdAt: oldExpense!.createdAt.toISOString(),
+          updatedAt: oldExpense!.updatedAt.toISOString(),
+        }
+      : {
+          ...expense,
+          payments: expense.payments,
+          splits: expense.splits,
+          createdAt: expense.createdAt.toISOString(),
+          updatedAt: expense.updatedAt.toISOString(),
+        };
+
+  const newState: Prisma.JsonObject | undefined =
+    changeType === "UPDATED"
+      ? {
+          ...expense,
+          payments: expense.payments,
+          splits: expense.splits,
+          createdAt: expense.createdAt.toISOString(),
+          updatedAt: expense.updatedAt.toISOString(),
+        }
+      : undefined;
 
   await splitdb.expenseAuditLog.create({
     data: {
@@ -49,6 +78,7 @@ export async function createAuditLog(
       groupId: expense.groupId,
       changeType,
       oldState,
+      newState,
     },
   });
 }
@@ -78,17 +108,22 @@ export async function getExpenseChangesSince(groupId: string, since: Date) {
  * Returns a map of member IDs to their balance changes.
  * For deletions: Reverses the original payments and splits
  * For creations: Applies the payments and splits
- * For updates: Currently throws error (requires full recalculation)
+ * For updates: Calculates the delta between old and new states
  *
  * @param auditLogRaw - The audit log entry to process
  * @returns Map of member IDs to their balance changes
  */
 export async function processExpenseChange(
-  auditLogRaw: Awaited<ReturnType<typeof getExpenseChangesSince>>[number],
+  auditLogRaw: ExpenseAuditLog,
 ): Promise<Map<string, number>> {
-  // Parse the stored JSON state back into the correct shape
+  // Parse the stored JSON states back into the correct shape
   const auditLog: ExpenseAuditLogWithParsedState = {
-    ...auditLogRaw,
+    id: auditLogRaw.id,
+    expenseId: auditLogRaw.expenseId,
+    groupId: auditLogRaw.groupId,
+    changeType: auditLogRaw.changeType,
+    createdAt: auditLogRaw.createdAt,
+    updatedAt: auditLogRaw.updatedAt,
     oldState: {
       ...(auditLogRaw.oldState as Prisma.JsonObject),
       createdAt: new Date(
@@ -99,6 +134,18 @@ export async function processExpenseChange(
       ),
     } as ExpenseWithRelations,
   };
+
+  if (auditLogRaw.newState) {
+    auditLog.newState = {
+      ...(auditLogRaw.newState as Prisma.JsonObject),
+      createdAt: new Date(
+        (auditLogRaw.newState as Prisma.JsonObject).createdAt as string,
+      ),
+      updatedAt: new Date(
+        (auditLogRaw.newState as Prisma.JsonObject).updatedAt as string,
+      ),
+    } as ExpenseWithRelations;
+  }
 
   const balanceChanges = new Map<string, number>();
   const oldState = auditLog.oldState;
@@ -131,10 +178,35 @@ export async function processExpenseChange(
       break;
 
     case "UPDATED":
-      // For updates, we'd need the new state to calculate the difference
-      // This would require modifying the audit log to store both old and new states
-      // For now, we'll handle updates by doing a full recalculation
-      throw new Error("Updates require full recalculation");
+      if (!auditLog.newState) {
+        throw new Error("New state required for updates");
+      }
+
+      // For updates, calculate the delta between old and new states
+      const newState = auditLog.newState;
+
+      // First reverse the old payments and splits
+      oldState.payments.forEach((payment) => {
+        const current = balanceChanges.get(payment.groupMemberId) ?? 0;
+        balanceChanges.set(payment.groupMemberId, current - payment.amount);
+      });
+
+      oldState.splits.forEach((split) => {
+        const current = balanceChanges.get(split.groupMemberId) ?? 0;
+        balanceChanges.set(split.groupMemberId, current + split.amount);
+      });
+
+      // Then apply the new payments and splits
+      newState.payments.forEach((payment) => {
+        const current = balanceChanges.get(payment.groupMemberId) ?? 0;
+        balanceChanges.set(payment.groupMemberId, current + payment.amount);
+      });
+
+      newState.splits.forEach((split) => {
+        const current = balanceChanges.get(split.groupMemberId) ?? 0;
+        balanceChanges.set(split.groupMemberId, current - split.amount);
+      });
+      break;
   }
 
   return balanceChanges;
