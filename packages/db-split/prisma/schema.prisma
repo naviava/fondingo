@@ -176,17 +176,18 @@ model FriendRequest {
 }
 
 model Group {
-  id                   String           @id @default(cuid())
+  id                   String            @id @default(cuid())
   name                 String
   color                String
   type                 GroupType
-  currency             CurrencyCode     @default(USD)
+  currency             CurrencyCode      @default(USD)
   lastCacluatedDebtsAt DateTime?
   members              GroupMember[]
   expenses             Expense[]
   settlements          Settlement[]
   simplifiedDebts      SimplifiedDebt[]
   logs                 Log[]
+  auditLogs            ExpenseAuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -348,4 +349,26 @@ enum LogType {
   EXPENSE
   SETTLEMENT
   FRIEND_REQUEST
+}
+
+enum ChangeType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+model ExpenseAuditLog {
+  id         String     @id @default(cuid())
+  expenseId  String
+  groupId    String
+  group      Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  changeType ChangeType
+  // Store the complete state of the expense and its relations at the time of change
+  oldState   Json // Includes expense details, payments, and splits
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([groupId])
+  @@index([expenseId])
+  @@index([createdAt])
 }
